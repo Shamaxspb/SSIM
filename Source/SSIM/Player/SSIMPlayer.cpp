@@ -2,7 +2,7 @@
 
 
 #include "SSIMPlayer.h"
-
+#include "EnhancedInputComponent.h"
 #include "Components/ArrowComponent.h"
 #include "SSIM/SSIM.h"
 
@@ -13,8 +13,9 @@ ASSIMPlayer::ASSIMPlayer()
 
 	CurrentPlayerState = EPlayerState::EPS_Movement;
 	
-	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>("PlayerCombatComponent");
-	SSIMPlayerFlowComponent = CreateDefaultSubobject<USSIMPlayerFlowComponent>("PlayerFlowComponent");
+	SSIMPlayerCombatComponent	= CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
+	SSIMPlayerFlowComponent		= CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
+	SSIMPlayerInputComponent	= CreateDefaultSubobject<UEnhancedInputComponent>(TEXT("PlayerInputComponent"));
 }
 
 void ASSIMPlayer::BeginPlay()
@@ -34,6 +35,14 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
+	if (!PlayerInputComponent)
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("PlayerInputComponent is not valid"));
+	}
+	
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	//Input->BindAction()
+	
 }
 
 
@@ -42,17 +51,12 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 // Interfaces
 // This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
-UAnimMontage* ASSIMPlayer::GetDashAnimationInterface()
-{
-	return PlayerDashAnimation;
-}
-
-TArray<UAnimMontage*> ASSIMPlayer::GetAttackAnimationsInterface()
+TArray<UAnimMontage*> ASSIMPlayer::GetAttackAnimationsInterface_Implementation() const
 {
 	return PlayerAttackAnimations;
 }
 
-UAnimMontage* ASSIMPlayer::GetRandomAttackAnimationInterface()
+UAnimMontage* ASSIMPlayer::GetRandomAttackAnimationInterface_Implementation() const
 {
 	if (PlayerAttackAnimations.IsEmpty())
 	{

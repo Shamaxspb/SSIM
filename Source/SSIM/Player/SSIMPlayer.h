@@ -5,6 +5,7 @@
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "Components/SSIMPlayerCombatComponent.h"
 #include "Components/SSIMPlayerFlowComponent.h"
+#include "Components/SSIMPlayerInputComponent.h"
 #include "../Core/Interfaces/PlayerDataInterface.h"
 
 #include "SSIMPlayer.generated.h"
@@ -16,16 +17,17 @@ class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
 
 // Variables
 protected:
-	// Components
+	#pragma region Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerCombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerFlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerInputComponent")
+	TObjectPtr<UEnhancedInputComponent> SSIMPlayerInputComponent;
+	#pragma endregion Components
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
-	TObjectPtr<UAnimMontage> PlayerDashAnimation;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
 	TArray<UAnimMontage*> PlayerAttackAnimations;
@@ -63,10 +65,8 @@ public:
 	
 // Interfaces
 	// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
-	virtual UAnimMontage* GetDashAnimationInterface() override;
+	virtual TArray<UAnimMontage*> GetAttackAnimationsInterface_Implementation() const override final;
 	
-	virtual TArray<UAnimMontage*> GetAttackAnimationsInterface() override;
-	
-	virtual UAnimMontage* GetRandomAttackAnimationInterface() override;
+	virtual UAnimMontage* GetRandomAttackAnimationInterface_Implementation() const override final;
 	// ------------------ end of overengineering
 };

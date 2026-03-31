@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "PlayerDataInterface.generated.h"
 
-UINTERFACE(MinimalAPI, NotBlueprintable)
+UINTERFACE(MinimalAPI, Blueprintable)
 class UPlayerDataInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -19,13 +19,10 @@ class SSIM_API IPlayerDataInterface
 
 public:
 	// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Animations")
-	virtual UAnimMontage* GetDashAnimationInterface() = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Animations")
+	TArray<UAnimMontage*> GetAttackAnimationsInterface() const;
 	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Animations")
-	virtual TArray<UAnimMontage*> GetAttackAnimationsInterface() = 0;
-	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Animations")
-	virtual UAnimMontage* GetRandomAttackAnimationInterface() = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Animations")
+	UAnimMontage* GetRandomAttackAnimationInterface() const;
 	// ------------------ end of overengineering
 };

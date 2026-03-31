@@ -9,7 +9,7 @@
 
 class ASSIMPlayer;
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerFlowComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -19,11 +19,14 @@ public:
 	bool bDashing;
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashVelocityCoef = 15.f;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
+	TObjectPtr<UAnimMontage> PlayerDashAnimation;
+	
 private:
-	ASSIMPlayer* Player;
+	ASSIMPlayer* SSIMPlayer;
 	
 // Overriden Functions
 public:

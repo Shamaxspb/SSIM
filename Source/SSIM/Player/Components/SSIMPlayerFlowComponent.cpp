@@ -3,7 +3,6 @@
 
 #include "SSIMPlayerFlowComponent.h"
 
-#include "Kismet/KismetMathLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Player/SSIMPlayer.h"
 
@@ -28,7 +27,7 @@ void USSIMPlayerFlowComponent::InitializeComponent()
 	
 	if (GetOwner())
 	{
-		Player = Cast<ASSIMPlayer>(GetOwner());
+		SSIMPlayer = Cast<ASSIMPlayer>(GetOwner());
 	}
 	else
 	{
@@ -49,7 +48,7 @@ void USSIMPlayerFlowComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 // My Functions
 void USSIMPlayerFlowComponent::Dash() const
 {
-	/*if (bDashing)
+	if (bDashing)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is still in process"));
 		if (GEngine)
@@ -59,13 +58,13 @@ void USSIMPlayerFlowComponent::Dash() const
 		return;
 	}
 	
-	Player->LaunchCharacter(GetDashLaunchVelocity() ,true, false);*/
+	SSIMPlayer->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash started"));
 }
 
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
-	FVector CurrentVelocity = Player->GetVelocity();
+	FVector CurrentVelocity = SSIMPlayer->GetVelocity();
 	FVector OutLaunchVelocity;
 	
 	if (CurrentVelocity.IsNearlyZero())
@@ -78,9 +77,10 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 	else
 	{
 		// Dash in motion
-		OutLaunchVelocity = FVector(0.f, Player->GetVelocity().Y * DashVelocityCoef,0.f);
+		OutLaunchVelocity = FVector(0.f, SSIMPlayer->GetVelocity().Y * DashVelocityCoef,0.f);
 	}
 		
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Out Dash Velocity: %s"), *OutLaunchVelocity.ToString());
 	return OutLaunchVelocity;
 }
 

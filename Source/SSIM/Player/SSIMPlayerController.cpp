@@ -40,11 +40,11 @@ void ASSIMPlayerController::Tick(float DeltaTime)
 }
 
 // My Functions
-void ASSIMPlayerController::Init()
+void ASSIMPlayerController::MovementProcessing() const
 {
-	InitBasicInputContext();
-	
+	SSIMPlayer->AddMovementInput(FVector::RightVector, 1.f, false);
 }
+
 
 void ASSIMPlayerController::PerformDash() const
 {
@@ -61,6 +61,12 @@ void ASSIMPlayerController::PerformDash() const
 	}
 	
 	SSIMPlayer->GetPlayerFlowComponent()->UseDash();
+	
+}
+
+void ASSIMPlayerController::Init()
+{
+	InitBasicInputContext();
 	
 }
 
@@ -101,4 +107,5 @@ void ASSIMPlayerController::InitBasicInputContext()
 	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("EnhancedInputSubsystem %s added"), *BaseInputContext->GetName());
 	
 }
+
 

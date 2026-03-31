@@ -42,13 +42,17 @@ public:
 	
 // My Functions
 protected:
-	virtual void Init(); 
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Movement")
+	void MovementProcessing() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Abilities")
 	virtual void PerformDash() const;
 	
 private:
+	virtual void Init(); 
 	void GetSSIMPlayerReference(APawn *InPawn);
 	void InitBasicInputContext();
 	
+	
+
 };

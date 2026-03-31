@@ -7,7 +7,7 @@
 #include "SSIMPlayerCombatComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
