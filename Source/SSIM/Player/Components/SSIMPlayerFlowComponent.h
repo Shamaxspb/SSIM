@@ -16,9 +16,12 @@ class SSIM_API USSIMPlayerFlowComponent : public UActorComponent
 
 // Variables
 public:
-	bool bDashing;
+	bool bDashing = false;
 	
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	float DashCooldown = 2.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashVelocityCoef = 15.f;
 	
@@ -27,6 +30,10 @@ protected:
 	
 private:
 	ASSIMPlayer* SSIMPlayer;
+	
+	bool bCanDash = true;
+	FTimerHandle DashCooldownTimerHandle;
+
 	
 // Overriden Functions
 public:
@@ -43,13 +50,15 @@ public:
 
 // My Functions
 public:
-	FORCEINLINE void UseDash() const { Dash(); }
+	FORCEINLINE void UseDash() { StartDash(); }
 	
 protected:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Dash")
-	void Dash() const;
+	void StartDash();
 	
 private:
 	FVector GetDashLaunchVelocity() const;
+	void EndDash();
+	void ResetDash();
 	
 };
