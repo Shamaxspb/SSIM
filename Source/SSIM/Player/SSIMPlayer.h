@@ -19,14 +19,17 @@ class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
 // Variables
 protected:
 #pragma region Components
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerCombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerFlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+	
 #pragma endregion Components
 	
 #pragma region Input
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveRight")
 	UInputAction* MoveRightInputAction;
 	
@@ -49,13 +52,12 @@ protected:
 // Overriden Functions
 public:
 	ASSIMPlayer();
+	
+	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 		
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-protected:
-	virtual void BeginPlay() override;
 	
 	
 // My Functions
@@ -80,6 +82,11 @@ private:
 	void HandleDash(); 
 	
 // Interfaces
+public:
+	virtual USSIMPlayerCombatComponent* GetPlayerCombatComponentInterface_Implementation() const override;
+	
+	virtual USSIMPlayerFlowComponent* GetPlayerFlowComponentInterface_Implementation() const override;
+	
 	// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
 	virtual TArray<UAnimMontage*> GetAttackAnimationsInterface_Implementation() const override final;
 	

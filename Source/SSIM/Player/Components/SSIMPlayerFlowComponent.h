@@ -58,4 +58,7 @@ private:
 	void EndDash();
 	void ResetDash();
 	
+	void InitDashAnimation();
+	void DashEndNotify();
+	
 };

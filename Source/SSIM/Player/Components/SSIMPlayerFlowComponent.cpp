@@ -7,6 +7,7 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "SSIM/Player/SSIMPlayer.h"
+#include "SSIM/Player/Animation/Notifies/SSIMDashEndNotify.h"
 
 
 // Overriden Functions
@@ -21,6 +22,7 @@ void USSIMPlayerFlowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	InitDashAnimation();
 }
 
 
@@ -135,5 +137,25 @@ void USSIMPlayerFlowComponent::EndDash()
 void USSIMPlayerFlowComponent::ResetDash()
 {
 	bCanDash = true;
+}
+
+void USSIMPlayerFlowComponent::InitDashAnimation()
+{
+	if (PlayerDashAnimation)
+	{
+		const TArray<FAnimNotifyEvent> NotifyEvents = PlayerDashAnimation->Notifies;
+		for (const FAnimNotifyEvent& EventNotify : NotifyEvents)
+		{
+			if (const auto DashEndNotify = Cast<USSIMDashEndNotify>(EventNotify.Notify))
+			{
+				DashEndNotify->OnNotified.AddUObject(this, &USSIMPlayerFlowComponent::DashEndNotify);
+			}
+		}
+	}
+}
+
+void USSIMPlayerFlowComponent::DashEndNotify()
+{
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash End notify reached"));	
 }
 

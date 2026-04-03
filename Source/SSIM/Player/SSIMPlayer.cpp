@@ -63,13 +63,25 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // My Functions
 void ASSIMPlayer::MoveRight()
 {
-	this->AddMovementInput(FVector::RightVector, 1.f, false);
+	if (SSIMPlayerFlowComponent->bDashing)
+	{
+		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is in process, cannot move"));
+		return;
+	}
+	
+	AddMovementInput(FVector::RightVector, 1.f, false);
 	SetActorRotation(FRotator(0, 90, 0));
 }
 
 void ASSIMPlayer::MoveLeft()
 {
-	this->AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
+	if (SSIMPlayerFlowComponent->bDashing)
+	{
+		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is in process, cannot move"));
+		return;
+	}
+	
+	AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
 	SetActorRotation(FRotator(0, -90, 0));
 }
 
@@ -79,7 +91,18 @@ void ASSIMPlayer::HandleDash()
 }
 
 
+
 // Interfaces
+USSIMPlayerCombatComponent* ASSIMPlayer::GetPlayerCombatComponentInterface_Implementation() const
+{
+	return SSIMPlayerCombatComponent;
+}
+
+USSIMPlayerFlowComponent* ASSIMPlayer::GetPlayerFlowComponentInterface_Implementation() const
+{
+	return SSIMPlayerFlowComponent;
+}
+
 // This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
 TArray<UAnimMontage*> ASSIMPlayer::GetAttackAnimationsInterface_Implementation() const
 {
