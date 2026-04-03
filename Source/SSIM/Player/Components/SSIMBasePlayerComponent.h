@@ -3,23 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSIMBasePlayerComponent.h"
 #include "Components/ActorComponent.h"
-#include "SSIMPlayerCombatComponent.generated.h"
+#include "SSIMBasePlayerComponent.generated.h"
 
 class ASSIMPlayer;
 
-UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
-class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
+UCLASS(Abstract)
+class SSIM_API USSIMBasePlayerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 // Variables
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
+	ASSIMPlayer* SSIMPlayer;
 
 	
 // Overriden Functions
 public:
-	USSIMPlayerCombatComponent();
+	USSIMBasePlayerComponent();
 
 protected:
 	virtual void BeginPlay() override;

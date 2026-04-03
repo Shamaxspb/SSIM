@@ -5,10 +5,11 @@
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "Components/SSIMPlayerCombatComponent.h"
 #include "Components/SSIMPlayerFlowComponent.h"
-#include "Components/SSIMPlayerInputComponent.h"
 #include "../Core/Interfaces/PlayerDataInterface.h"
 
 #include "SSIMPlayer.generated.h"
+
+class UInputAction;
 
 UCLASS()
 class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
@@ -17,17 +18,25 @@ class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
 
 // Variables
 protected:
-	#pragma region Components
+#pragma region Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerCombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerFlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+#pragma endregion Components
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerInputComponent")
-	TObjectPtr<UEnhancedInputComponent> SSIMPlayerInputComponent;
-	#pragma endregion Components
+#pragma region Input
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveRight")
+	UInputAction* MoveRightInputAction;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveLeft")
+	UInputAction* MoveLeftInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Dash")
+	UInputAction* DashInputAction;
+	
+#pragma endregion Input
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
 	TArray<UAnimMontage*> PlayerAttackAnimations;
@@ -62,6 +71,13 @@ public:
 	{
 		return SSIMPlayerFlowComponent;
 	}
+	
+private:
+	void MoveRight();
+	
+	void MoveLeft();
+	
+	void HandleDash(); 
 	
 // Interfaces
 	// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly

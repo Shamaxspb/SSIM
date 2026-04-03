@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SSIMBasePlayerComponent.h"
 #include "Components/ActorComponent.h"
 #include "SSIMPlayerFlowComponent.generated.h"
 
@@ -10,7 +11,7 @@
 class ASSIMPlayer;
 
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
-class SSIM_API USSIMPlayerFlowComponent : public UActorComponent
+class SSIM_API USSIMPlayerFlowComponent : public USSIMBasePlayerComponent
 {
 	GENERATED_BODY()
 
@@ -28,9 +29,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
 	TObjectPtr<UAnimMontage> PlayerDashAnimation;
 	
-private:
-	ASSIMPlayer* SSIMPlayer;
-	
+private:	
 	bool bCanDash = true;
 	FTimerHandle DashCooldownTimerHandle;
 
@@ -41,16 +40,14 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
-	virtual void InitializeComponent() override;
-	
+
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 // My Functions
 public:
-	FORCEINLINE void UseDash() { StartDash(); }
+	FORCEINLINE void Dash() { StartDash(); }
 	
 protected:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Dash")

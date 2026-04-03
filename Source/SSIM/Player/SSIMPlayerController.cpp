@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "SSIMPlayerController.h" 
@@ -29,9 +29,11 @@ void ASSIMPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
-	GetSSIMPlayerReference(InPawn);
+	SetSSIMPlayerReference(InPawn);
+	SetSSIMActorComponentsReferences();
 	
 }
+
 
 void ASSIMPlayerController::Tick(float DeltaTime)
 {
@@ -40,37 +42,13 @@ void ASSIMPlayerController::Tick(float DeltaTime)
 }
 
 // My Functions
-void ASSIMPlayerController::MovementProcessing() const
-{
-	SSIMPlayer->AddMovementInput(FVector::RightVector, 1.f, false);
-}
-
-
-void ASSIMPlayerController::PerformDash() const
-{
-	if (!SSIMPlayer)
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("PerformDash: SSIMPlayer is not valid"));
-		return;
-	}
-	
-	if (!IsValid(SSIMPlayer->GetPlayerFlowComponent()))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("PerformDash: Couldn't receive %s PlayerFlowComponent"), *SSIMPlayer->GetPlayerFlowComponent()->GetName());
-		return;
-	}
-	
-	SSIMPlayer->GetPlayerFlowComponent()->UseDash();
-	
-}
-
 void ASSIMPlayerController::Init()
 {
 	InitBasicInputContext();
 	
 }
 
-void ASSIMPlayerController::GetSSIMPlayerReference(APawn* InPawn)
+void ASSIMPlayerController::SetSSIMPlayerReference(APawn* InPawn)
 {
 	if (!InPawn)
 	{
@@ -84,7 +62,33 @@ void ASSIMPlayerController::GetSSIMPlayerReference(APawn* InPawn)
 	if (!IsValid(SSIMPlayer))
 	{
 		UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("Failed cast PlayerPawn to SSIMPlayer %s"), *InPawn->GetName());
+		return;
 	}
+	
+}
+
+// Lost its purpose, won't delete for now
+void ASSIMPlayerController::SetSSIMActorComponentsReferences()
+{
+	if (!SSIMPlayer)
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("SSIMPlayer is not valid"));
+		return;
+	}
+	
+	if (!IsValid(SSIMPlayer->GetPlayerFlowComponent()))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("SSIMPlayerFlowComponent is not valid"))
+	}
+	SSIMPlayerFlowComponent = SSIMPlayer->GetPlayerFlowComponent();
+	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s is set"), *SSIMPlayerFlowComponent->GetName());
+	
+	if (!IsValid(SSIMPlayer->GetPlayerCombatComponent()))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("SSIMPlayerCombatComponent is not valid"))
+	}
+	SSIMPlayerCombatComponent = SSIMPlayer->GetPlayerCombatComponent();
+	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s is set"), *SSIMPlayerCombatComponent->GetName());
 	
 }
 
@@ -107,5 +111,3 @@ void ASSIMPlayerController::InitBasicInputContext()
 	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("EnhancedInputSubsystem %s added"), *BaseInputContext->GetName());
 	
 }
-
-

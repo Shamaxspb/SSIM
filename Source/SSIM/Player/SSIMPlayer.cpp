@@ -3,6 +3,7 @@
 
 #include "SSIMPlayer.h"
 #include "EnhancedInputComponent.h"
+#include "SSIMPlayerController.h"
 #include "Components/ArrowComponent.h"
 #include "SSIM/SSIM.h"
 
@@ -15,8 +16,8 @@ ASSIMPlayer::ASSIMPlayer()
 	
 	SSIMPlayerCombatComponent	= CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
 	SSIMPlayerFlowComponent		= CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
-	SSIMPlayerInputComponent	= CreateDefaultSubobject<UEnhancedInputComponent>(TEXT("PlayerInputComponent"));
 }
+
 
 void ASSIMPlayer::BeginPlay()
 {
@@ -25,11 +26,13 @@ void ASSIMPlayer::BeginPlay()
 	
 }
 
+
 void ASSIMPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
 }
+
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -40,13 +43,31 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("PlayerInputComponent is not valid"));
 	}
 	
-	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	//Input->BindAction()
+	UEnhancedInputComponent* SSIMInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	
+	SSIMInputComponent->BindAction(MoveRightInputAction, ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveRight);
+	SSIMInputComponent->BindAction(MoveLeftInputAction,  ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveLeft);
+	SSIMInputComponent->BindAction(DashInputAction,		 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
 	
 }
 
 
+
 // My Functions
+void ASSIMPlayer::MoveRight()
+{
+	this->AddMovementInput(FVector::RightVector, 1.f, false);
+}
+
+void ASSIMPlayer::MoveLeft()
+{
+	this->AddMovementInput(FVector::RightVector, -1.f, false);
+}
+
+void ASSIMPlayer::HandleDash()
+{
+	SSIMPlayerFlowComponent->Dash();
+}
 
 
 // Interfaces

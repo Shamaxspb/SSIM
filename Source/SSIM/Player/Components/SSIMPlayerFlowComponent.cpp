@@ -21,29 +21,6 @@ void USSIMPlayerFlowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (GetOwner())
-	{
-		SSIMPlayer = Cast<ASSIMPlayer>(GetOwner());
-	}
-	else
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s: GetOwner is not valid"), *this->GetName());
-	}
-}
-
-void USSIMPlayerFlowComponent::InitializeComponent()
-{
-	// Super::InitializeComponent();
-	//
-	// if (GetOwner())
-	// {
-	// 	SSIMPlayer = Cast<ASSIMPlayer>(GetOwner());
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogSSIMValidations, Error, TEXT("%s: GetOwner is not valid"), *this->GetName());
-	// }
-	
 }
 
 
@@ -64,10 +41,8 @@ void USSIMPlayerFlowComponent::StartDash()
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is still in process"));
 		}
-		if (!bCanDash)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is on cooldown for %f"), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
-		}
+		
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is on cooldown for %f"), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
 		return;
 	}
 	
@@ -106,6 +81,7 @@ void USSIMPlayerFlowComponent::StartDash()
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash started"));
 }
 
+
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
 	FVector CurrentVelocity = SSIMPlayer->GetVelocity();
@@ -134,25 +110,6 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 			return FVector(-1.f, -1.f, -1.f);
 		}
 		
-		// switch (FVector::DotProduct(SSIMPlayer->GetActorForwardVector(), FVector::RightVector))
-		// {
-		// case 1.f :
-		// 	{
-		// 		DashDirectionVector = FVector::RightVector;
-		// 		break;
-		// 	}
-		// case -1.f :
-		// 	{
-		// 		DashDirectionVector = FVector::RightVector * -1.f;
-		// 		break;
-		// 	}
-		// default:
-		// 	{
-		// 		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Couldn't determine player direction. Return -1.f"));
-		// 		return FVector(-1.f, -1.f, -1.f);
-		// 	}
-		// }
-		
 		OutLaunchVelocity =  DashDirectionVector *
 							 SSIMPlayer->GetCharacterMovement()->GetMaxSpeed() *
 							 DashVelocityCoef;
@@ -168,10 +125,12 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 	return OutLaunchVelocity;
 }
 
+
 void USSIMPlayerFlowComponent::EndDash()
 {
 	bDashing = false;
 }
+
 
 void USSIMPlayerFlowComponent::ResetDash()
 {
