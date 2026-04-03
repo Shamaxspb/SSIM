@@ -41,10 +41,17 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	if (!PlayerInputComponent)
 	{
 		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("PlayerInputComponent is not valid"));
+		return;
 	}
 	
 	UEnhancedInputComponent* SSIMInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	
+	if (!IsValid(SSIMInputComponent))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("EnhancedInputComponent is not valid. Or cast failed"));
+		return;
+	}
+		
 	SSIMInputComponent->BindAction(MoveRightInputAction, ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveRight);
 	SSIMInputComponent->BindAction(MoveLeftInputAction,  ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveLeft);
 	SSIMInputComponent->BindAction(DashInputAction,		 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
@@ -57,11 +64,13 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ASSIMPlayer::MoveRight()
 {
 	this->AddMovementInput(FVector::RightVector, 1.f, false);
+	SetActorRotation(FRotator(0, 90, 0));
 }
 
 void ASSIMPlayer::MoveLeft()
 {
-	this->AddMovementInput(FVector::RightVector, -1.f, false);
+	this->AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
+	SetActorRotation(FRotator(0, -90, 0));
 }
 
 void ASSIMPlayer::HandleDash()
