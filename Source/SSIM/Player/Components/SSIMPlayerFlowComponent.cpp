@@ -50,30 +50,17 @@ void USSIMPlayerFlowComponent::StartDash()
 	
 	bDashing = true;
 	bCanDash = false;
-
-	if (!IsValid(SSIMPlayer))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("SSIMPlayer is not valid"));
-		return;
-	}
 	
 	SSIMPlayer->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
-
-	UAnimInstance* AnimInstance =SSIMPlayer->GetMesh()->GetAnimInstance();
-	if (!IsValid(AnimInstance))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("PlayerFlowComponent->StartDash(): Anim Instance is not valid"));
-		return;
-	}
 
 	if (!IsValid(PlayerDashAnimation))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("PlayerDashAnimation is not valid"));
 		return;
 	}
-	AnimInstance->Montage_Play(PlayerDashAnimation);
+	SSIMAnimInstance->Montage_Play(PlayerDashAnimation);
 	
-	// Should implement OnCompleted/OnBlendOut bDashing reset
+	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DashInProcessTimerHandle, this, &USSIMPlayerFlowComponent::EndDash, PlayerDashAnimation->GetPlayLength(), false);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("PlayerDash animation length: %f"), PlayerDashAnimation->GetPlayLength());

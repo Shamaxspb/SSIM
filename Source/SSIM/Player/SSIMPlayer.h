@@ -9,6 +9,7 @@
 
 #include "SSIMPlayer.generated.h"
 
+class UBoxComponent;
 class UInputAction;
 
 UCLASS()
@@ -26,6 +27,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerFlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FrontalAttackCollision")
+	TObjectPtr<UBoxComponent> FrontalAttackCollision;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "UpperAttackCollision")
+	TObjectPtr<UBoxComponent> UpperAttackCollision;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "BottomAttackCollision")
+	TObjectPtr<UBoxComponent> BottomAttackCollision;
+	
 #pragma endregion Components
 	
 #pragma region Input
@@ -39,13 +49,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Dash")
 	UInputAction* DashInputAction;
 	
-#pragma endregion Input
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Attack")
+	UInputAction* AttackInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
-	TArray<UAnimMontage*> PlayerAttackAnimations;
+#pragma endregion Input	
 	
-	
-	UPROPERTY(VisibleAnywhere, Category = "SSIM|Metadata")
+	UPROPERTY()
 	EPlayerState CurrentPlayerState;
 	
 	
@@ -76,10 +85,12 @@ public:
 	
 private:
 	void MoveRight();
-	
 	void MoveLeft();
 	
 	void HandleDash(); 
+	
+	void HandleAttack();
+	void SetupAttackCollision();
 	
 // Interfaces
 public:
@@ -87,9 +98,4 @@ public:
 	
 	virtual USSIMPlayerFlowComponent* GetPlayerFlowComponentInterface_Implementation() const override;
 	
-	// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
-	virtual TArray<UAnimMontage*> GetAttackAnimationsInterface_Implementation() const override final;
-	
-	virtual UAnimMontage* GetRandomAttackAnimationInterface_Implementation() const override final;
-	// ------------------ end of overengineering
 };

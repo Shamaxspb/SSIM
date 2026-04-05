@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "SSIMPlayerController.h"
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "SSIM/SSIM.h"
 
 // Overriden Functions
@@ -16,6 +17,8 @@ ASSIMPlayer::ASSIMPlayer()
 	
 	SSIMPlayerCombatComponent	= CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
 	SSIMPlayerFlowComponent		= CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
+
+	SetupAttackCollision();
 }
 
 
@@ -55,6 +58,8 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	SSIMInputComponent->BindAction(MoveRightInputAction, ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveRight);
 	SSIMInputComponent->BindAction(MoveLeftInputAction,  ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveLeft);
 	SSIMInputComponent->BindAction(DashInputAction,		 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
+	SSIMInputComponent->BindAction(AttackInputAction,	 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttack);
+	
 	
 }
 
@@ -90,6 +95,22 @@ void ASSIMPlayer::HandleDash()
 	SSIMPlayerFlowComponent->Dash();
 }
 
+void ASSIMPlayer::HandleAttack()
+{
+	SSIMPlayerCombatComponent->StartAttack();
+}
+
+void ASSIMPlayer::SetupAttackCollision()
+{
+	FrontalAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("FrontalAttackCollision"));
+	
+	
+	UpperAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("UpperAttackCollision"));
+	
+	
+	BottomAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("BottomAttackCollision"));
+
+}
 
 
 // Interfaces
@@ -102,21 +123,3 @@ USSIMPlayerFlowComponent* ASSIMPlayer::GetPlayerFlowComponentInterface_Implement
 {
 	return SSIMPlayerFlowComponent;
 }
-
-// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
-TArray<UAnimMontage*> ASSIMPlayer::GetAttackAnimationsInterface_Implementation() const
-{
-	return PlayerAttackAnimations;
-}
-
-UAnimMontage* ASSIMPlayer::GetRandomAttackAnimationInterface_Implementation() const
-{
-	if (PlayerAttackAnimations.IsEmpty())
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("PlayerAttackAnimations array is empty"));
-		return nullptr;
-	}
-	
-	return PlayerAttackAnimations[FMath::RandHelper(PlayerAttackAnimations.Num())];
-}
-// ------------------ end of overengineering

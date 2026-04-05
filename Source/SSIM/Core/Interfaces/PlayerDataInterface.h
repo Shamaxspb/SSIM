@@ -27,13 +27,4 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Components")
 	USSIMPlayerFlowComponent* GetPlayerFlowComponentInterface() const;
 	
-	
-	
-	// This entire thing is just practice, and it is an overengineering, just get all this data in ActorComponent directly
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Animations")
-	TArray<UAnimMontage*> GetAttackAnimationsInterface() const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Animations")
-	UAnimMontage* GetRandomAttackAnimationInterface() const;
-	// ------------------ end of overengineering
 };

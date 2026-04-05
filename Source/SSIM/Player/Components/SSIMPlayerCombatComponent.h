@@ -15,7 +15,12 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
 	GENERATED_BODY()
 
 // Variables
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
+	TArray<UAnimMontage*> PlayerAttackAnimations;
 
+private:
+	bool bIsAttacking = false;
 	
 // Overriden Functions
 public:
@@ -27,4 +32,10 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+// My Functions
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")
+	void StartAttack();
+	void EndAttack();
+
 };
