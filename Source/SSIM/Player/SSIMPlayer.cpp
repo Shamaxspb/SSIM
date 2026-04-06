@@ -62,7 +62,6 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	SSIMInputComponent->BindAction(DashInputAction,		 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
 	SSIMInputComponent->BindAction(AttackInputAction,	 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttack);
 	
-	
 }
 
 
@@ -72,7 +71,6 @@ void ASSIMPlayer::MoveRight()
 {
 	if (SSIMPlayerFlowComponent->bDashing)
 	{
-		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is in process, cannot move"));
 		return;
 	}
 	
@@ -84,7 +82,6 @@ void ASSIMPlayer::MoveLeft()
 {
 	if (SSIMPlayerFlowComponent->bDashing)
 	{
-		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Dash is in process, cannot move"));
 		return;
 	}
 	
@@ -104,7 +101,9 @@ void ASSIMPlayer::HandleAttack()
 
 void ASSIMPlayer::SetupAttackCollision()
 {
-	RootAttackCollisionComponent	= CreateDefaultSubobject<USceneComponent>(TEXT("AttackCollisionRoot"));
+	RootAttackCollisionComponent = CreateDefaultSubobject<USceneComponent>(TEXT("AttackCollisionRoot"));
+	RootAttackCollisionComponent->SetupAttachment(GetRootComponent());
+	
 	FrontalAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("FrontalAttackCollision"));
 	UpperAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("UpperAttackCollision"));
 	BottomAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("BottomAttackCollision"));
@@ -114,15 +113,11 @@ void ASSIMPlayer::SetupAttackCollision()
 	AttackCollisions.Add(UpperAttackCollision);
 	AttackCollisions.Add(BottomAttackCollision);
 
-	for (auto Element : AttackCollisions)
+	for (auto const Element : AttackCollisions)
 	{
-		Element->AttachToComponent(RootAttackCollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		Element->SetupAttachment(RootAttackCollisionComponent);
 		Element->SetActive(false);
-		
-		// For Development purposes, it is implied to change this value frequently 
-		SetActorHiddenInGame(true);
-		
-		Element->SetCollisionObjectType(ECC_AttackTrace);
+		Element->SetCollisionProfileName("AttackTrace", true);
 	}
 	
 }

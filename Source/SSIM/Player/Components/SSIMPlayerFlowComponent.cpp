@@ -7,7 +7,7 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "SSIM/Player/SSIMPlayer.h"
-#include "SSIM/Player/Animation/Notifies/SSIMDashEndNotify.h"
+#include "SSIM/Core/Notifies/SSIMDashEndNotify.h"
 
 
 // Overriden Functions

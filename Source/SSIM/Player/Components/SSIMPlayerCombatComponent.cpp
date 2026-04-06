@@ -2,7 +2,12 @@
 
 
 #include "SSIMPlayerCombatComponent.h"
+
+#include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/NavMovementComponent.h"
 #include "SSIM/SSIM.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIM/Player/SSIMPlayer.h"
 
 // Overriden Functions
@@ -38,23 +43,85 @@ void USSIMPlayerCombatComponent::StartAttack()
 		return;
 	}
 	
-	if (PlayerAttackAnimations.IsEmpty())
+	UAnimMontage* AttackMontage;
+	bIsAttacking = true; // set to false in ANS, so it MUST be in AnimMontage
+
+	if (SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{
-		UE_LOG(LogSSIMGameplayMessages, Error, TEXT("No Attack montages found"));
-		return;
+		if (!IsValid(PlayerAirAttackMontage))
+		{
+			UE_LOG(LogSSIMGameplayMessages, Error, TEXT("No Air Attack montage found"));
+			return;
+		}
+		AttackMontage = PlayerAirAttackMontage;
+	}
+	else
+	{
+		if (PlayerAttackAnimations.IsEmpty())
+		{
+			UE_LOG(LogSSIMGameplayMessages, Error, TEXT("No Attack montages found"));
+			return;
+		}
+		AttackMontage = PlayerAttackAnimations[FMath::RandHelper(PlayerAttackAnimations.Num())];
 	}
 	
-	bIsAttacking = true;
-	
-	UAnimMontage* RandomAttackMontage = PlayerAttackAnimations[FMath::RandHelper(PlayerAttackAnimations.Num())];
-	SSIMAnimInstance->Montage_Play(RandomAttackMontage);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack Montage: %s"), *RandomAttackMontage->GetName());
-	
+	SSIMAnimInstance->Montage_Play(AttackMontage);
+	//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack Montage: %s"), *RandomAttackMontage->GetName());
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack started"));	
 }
 
 void USSIMPlayerCombatComponent::EndAttack()
 {
 	bIsAttacking = false;
+	DeactivateAttackCollision();
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack ended"));
+}
+
+void USSIMPlayerCombatComponent::ActivateAttackCollision(EPlayerAttackDirection InPlayerAttackDirection)
+{
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("AttackDirection: %s"), *UEnum::GetValueAsString(InPlayerAttackDirection));
+	
+	switch (InPlayerAttackDirection)
+	{
+		case EPlayerAttackDirection::EPAD_Frontal:
+		{
+			CachedAttackCollision = SSIMPlayer->GetFrontalAttackCollision();
+			break;
+		}
+		
+		case EPlayerAttackDirection::EPAD_Upwards:
+		{
+			CachedAttackCollision = SSIMPlayer->GetUpperAttackCollision();
+			break;
+		}
+		
+		case EPlayerAttackDirection::EPAD_Downwards:
+		{
+			CachedAttackCollision = SSIMPlayer->GetBottomAttackCollision();
+			break;
+		}
+		
+		default:
+		{
+			UE_LOG(LogSSIMValidations, Error, TEXT("Couldn't receive Attack Direction to activate"));
+			return;
+		}
+	}
+	
+	CachedAttackCollision->SetActive(true);
+	CachedAttackCollision->SetHiddenInGame(false);
+	
+}
+
+void USSIMPlayerCombatComponent::DeactivateAttackCollision() const
+{
+	if (!CachedAttackCollision)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("Couldn't receive Attack Collision to deactivate"))
+		return;
+	}
+	
+	CachedAttackCollision->SetActive(false);
+	CachedAttackCollision->SetHiddenInGame(true);
+
 }

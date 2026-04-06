@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "SSIMPlayerCombatComponent.generated.h"
 
+enum class EPlayerAttackDirection : uint8;
 class ASSIMPlayer;
 class UBoxComponent;
 
@@ -19,18 +20,15 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
 	TArray<UAnimMontage*> PlayerAttackAnimations;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
+	TObjectPtr<UAnimMontage> PlayerAirAttackMontage;
 
 private:
 	bool bIsAttacking = false;
 	
-	// UPROPERTY(EditDefaultsOnly, Category = "SSIM|Collision")
-	// TObjectPtr<UBoxComponent> FrontalAttackCollision;
-	//
-	// UPROPERTY(EditDefaultsOnly, Category = "SSIM|Collision")
-	// TObjectPtr<UBoxComponent> UpperAttackCollision;
-	//
-	// UPROPERTY(EditDefaultsOnly, Category = "SSIM|Collision")
-	// TObjectPtr<UBoxComponent> BottomAttackCollision; 
+	UPROPERTY()
+	UBoxComponent* CachedAttackCollision;
 	
 // Overriden Functions
 public:
@@ -48,7 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")
 	void StartAttack();
 	void EndAttack();
+	
+	void ActivateAttackCollision(EPlayerAttackDirection InPlayerAttackDirection);
+	void DeactivateAttackCollision() const;
 
-private:
-	void ValidateAttackCollisionComponents(); 
 };

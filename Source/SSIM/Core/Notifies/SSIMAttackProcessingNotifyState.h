@@ -1,0 +1,29 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "SSIMAttackProcessingNotifyState.generated.h"
+
+enum class EPlayerAttackDirection : uint8;
+class AActor;
+
+UCLASS()
+class SSIM_API USSIMAttackProcessingNotifyState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+	
+// Variables
+private:
+	UPROPERTY()
+	AActor* Owner;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM")
+	EPlayerAttackDirection PlayerAttackDirection; // implied to be set in ANS field in AnimMontage
+	
+// Overriden Functions
+public:
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+};
