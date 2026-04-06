@@ -2,11 +2,13 @@
 
 
 #include "SSIMPlayer.h"
+#include "SSIM/SSIM.h"
 #include "EnhancedInputComponent.h"
 #include "SSIMPlayerController.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "SSIM/SSIM.h"
+#include "Components/SSIMPlayerCombatComponent.h"
+#include "Components/SSIMPlayerFlowComponent.h"
 
 // Overriden Functions
 ASSIMPlayer::ASSIMPlayer()
@@ -102,14 +104,27 @@ void ASSIMPlayer::HandleAttack()
 
 void ASSIMPlayer::SetupAttackCollision()
 {
+	RootAttackCollisionComponent	= CreateDefaultSubobject<USceneComponent>(TEXT("AttackCollisionRoot"));
 	FrontalAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("FrontalAttackCollision"));
-	
-	
 	UpperAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("UpperAttackCollision"));
-	
-	
 	BottomAttackCollision	= CreateDefaultSubobject<UBoxComponent>(TEXT("BottomAttackCollision"));
+	
+	TArray<TObjectPtr<UBoxComponent>> AttackCollisions;
+	AttackCollisions.Add(FrontalAttackCollision);
+	AttackCollisions.Add(UpperAttackCollision);
+	AttackCollisions.Add(BottomAttackCollision);
 
+	for (auto Element : AttackCollisions)
+	{
+		Element->AttachToComponent(RootAttackCollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		Element->SetActive(false);
+		
+		// For Development purposes, it is implied to change this value frequently 
+		SetActorHiddenInGame(true);
+		
+		Element->SetCollisionObjectType(ECC_AttackTrace);
+	}
+	
 }
 
 

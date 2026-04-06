@@ -3,6 +3,7 @@
 
 #include "SSIMPlayerCombatComponent.h"
 #include "SSIM/SSIM.h"
+#include "SSIM/Player/SSIMPlayer.h"
 
 // Overriden Functions
 USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
@@ -57,4 +58,3 @@ void USSIMPlayerCombatComponent::EndAttack()
 	bIsAttacking = false;
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack ended"));
 }
-

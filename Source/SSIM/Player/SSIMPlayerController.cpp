@@ -6,6 +6,8 @@
 #include "SSIM/SSIM.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Components/SSIMPlayerCombatComponent.h"
+#include "Components/SSIMPlayerFlowComponent.h"
 
 
 // Overriden Functions

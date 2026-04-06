@@ -8,6 +8,7 @@
 #include "SSIMPlayerCombatComponent.generated.h"
 
 class ASSIMPlayer;
+class UBoxComponent;
 
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
@@ -22,6 +23,15 @@ public:
 private:
 	bool bIsAttacking = false;
 	
+	// UPROPERTY(EditDefaultsOnly, Category = "SSIM|Collision")
+	// TObjectPtr<UBoxComponent> FrontalAttackCollision;
+	//
+	// UPROPERTY(EditDefaultsOnly, Category = "SSIM|Collision")
+	// TObjectPtr<UBoxComponent> UpperAttackCollision;
+	//
+	// UPROPERTY(EditDefaultsOnly, Category = "SSIM|Collision")
+	// TObjectPtr<UBoxComponent> BottomAttackCollision; 
+	
 // Overriden Functions
 public:
 	USSIMPlayerCombatComponent();
@@ -34,8 +44,11 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 // My Functions
+public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")
 	void StartAttack();
 	void EndAttack();
 
+private:
+	void ValidateAttackCollisionComponents(); 
 };

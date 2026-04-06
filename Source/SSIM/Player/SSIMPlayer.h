@@ -3,14 +3,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "SSIM/Core/Types/EPlayerState.h"
-#include "Components/SSIMPlayerCombatComponent.h"
-#include "Components/SSIMPlayerFlowComponent.h"
 #include "../Core/Interfaces/PlayerDataInterface.h"
 
 #include "SSIMPlayer.generated.h"
 
 class UBoxComponent;
 class UInputAction;
+class USSIMPlayerCombatComponent;
+class USSIMPlayerFlowComponent;
 
 UCLASS()
 class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
@@ -26,6 +26,10 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerFlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollisionRoot", 
+			  meta = (ToolTip = "This is blank component to group up attack collision components, just for clear hierarchy"))
+	TObjectPtr<USceneComponent> RootAttackCollisionComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FrontalAttackCollision")
 	TObjectPtr<UBoxComponent> FrontalAttackCollision;
@@ -71,6 +75,7 @@ public:
 	
 // My Functions
 public:
+#pragma region Inline Getters
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
@@ -82,6 +87,24 @@ public:
 	{
 		return SSIMPlayerFlowComponent;
 	}
+	
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetFrontalAttackCollision() const
+	{
+		return FrontalAttackCollision;
+	}
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetUpperAttackCollision() const
+	{
+		return UpperAttackCollision;
+	}
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetBottomAttackCollision() const
+	{
+		return BottomAttackCollision;
+	}
+	
+#pragma endregion Inline Getters
 	
 private:
 	void MoveRight();
