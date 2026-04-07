@@ -18,7 +18,7 @@ class SSIM_API ASSIMPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
-	// Variables
+// Variables
 protected:
 	UPROPERTY(BlueprintReadWrite, DisplayName = "Player", Category = "SSIM|References")
 	TObjectPtr<ASSIMPlayer> SSIMPlayer = nullptr;
@@ -36,7 +36,7 @@ private:
 	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem;
 	
-	// Overriden Functions
+// Overriden Functions
 public:
 	ASSIMPlayerController();
 
@@ -48,7 +48,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 	
-	// My Functions	
+// My Functions	
 private:
 	virtual void Init(); 
 	void SetSSIMPlayerReference(APawn *InPawn);

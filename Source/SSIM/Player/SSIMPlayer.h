@@ -53,8 +53,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Dash")
 	UInputAction* DashInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_Attack")
 	UInputAction* AttackInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackUpward")
+	UInputAction* AttackUpwardInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackUpward_Chord")
+	UInputAction* UpwardAttackChord;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackDownward")
+	UInputAction* AttackDownwardInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackDownward_Chord")
+	UInputAction* DownwardAttackChord;
 	
 #pragma endregion Input	
 	
@@ -112,7 +124,11 @@ private:
 	
 	void HandleDash(); 
 	
-	void HandleAttack();
+	void HandleAttackFrontal();
+	void HandleAttackUpward();
+	void HandleAttackDownward();
+	
+	
 	void SetupAttackCollision();
 	
 // Interfaces

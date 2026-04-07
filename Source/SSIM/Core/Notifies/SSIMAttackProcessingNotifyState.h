@@ -19,9 +19,6 @@ private:
 	UPROPERTY()
 	AActor* Owner;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM")
-	EPlayerAttackDirection PlayerAttackDirection; // implied to be set in ANS field in AnimMontage
-	
 // Overriden Functions
 public:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;

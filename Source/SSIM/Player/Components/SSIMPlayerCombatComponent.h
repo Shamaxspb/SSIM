@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "SSIMBasePlayerComponent.h"
 #include "Components/ActorComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIMPlayerCombatComponent.generated.h"
 
-enum class EPlayerAttackDirection : uint8;
 class ASSIMPlayer;
 class UBoxComponent;
 
@@ -18,17 +18,35 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
 
 // Variables
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
-	TArray<UAnimMontage*> PlayerAttackAnimations;
+#pragma region Montages
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
-	TObjectPtr<UAnimMontage> PlayerAirAttackMontage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TArray<UAnimMontage*> PlayerFrontalAttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TArray<UAnimMontage*> PlayerAirFrontalAttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TArray<UAnimMontage*> PlayerUpwardAttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TArray<UAnimMontage*> PlayerAirUpwardAttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TArray<UAnimMontage*> PlayerDownwardAttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TArray<UAnimMontage*> PlayerAirDownwardAttackMontages;
 
+#pragma endregion Montages
+	
+	EPlayerAttackDirection PlayerAttackDirection;
+	
 private:
 	bool bIsAttacking = false;
 	
 	UPROPERTY()
-	UBoxComponent* CachedAttackCollision;
+	UBoxComponent* CurrentAttackCollision;
 	
 // Overriden Functions
 public:
@@ -45,9 +63,15 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")
 	void StartAttack();
+	void StartAttackFrontal();
+	void StartAttackUpward();
+	void StartAttackDownward();
+	
+	void DamageProcessing();
 	void EndAttack();
 	
-	void ActivateAttackCollision(EPlayerAttackDirection InPlayerAttackDirection);
+	UAnimMontage* GetAttackMontage() const;
+	void ActivateAttackCollision();
 	void DeactivateAttackCollision() const;
 
 };

@@ -48,6 +48,8 @@ void ASSIMPlayerController::Init()
 {
 	InitBasicInputContext();
 	
+	
+	
 }
 
 void ASSIMPlayerController::SetSSIMPlayerReference(APawn* InPawn)

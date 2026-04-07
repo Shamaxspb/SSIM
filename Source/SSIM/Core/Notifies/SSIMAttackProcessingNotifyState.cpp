@@ -4,7 +4,6 @@
 #include "SSIMAttackProcessingNotifyState.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
-#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIM/Player/Components/SSIMPlayerCombatComponent.h"
 
 
@@ -15,7 +14,7 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 	
 	if (!IsValid(MeshComp->GetOwner()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("AttackProcessing ANS: Owner is not valid"));
+		UE_LOG(LogSSIMValidations, Error, TEXT("AttackProcessing NotifyBegin: Owner is not valid"));
 		return;
 	}
 	Owner = MeshComp->GetOwner();
@@ -23,7 +22,7 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 									
 	if (Owner->Implements<UPlayerDataInterface>() /*maybe should expand with "... || Owner->Implements<some_not_player_inteface>"*/)  
 	{
-		IPlayerDataInterface::Execute_GetPlayerCombatComponentInterface(Owner)->ActivateAttackCollision(PlayerAttackDirection);
+		IPlayerDataInterface::Execute_GetPlayerCombatComponentInterface(Owner)->ActivateAttackCollision();
 	}
 	
 }
@@ -35,7 +34,7 @@ void USSIMAttackProcessingNotifyState::NotifyEnd(USkeletalMeshComponent* MeshCom
 	
 	if (!IsValid(Owner))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("Owner is not valid"));
+		UE_LOG(LogSSIMValidations, Error, TEXT("AttackProcessing NotifyEnd: Owner is not valid"));
 		return;
 	}
 	

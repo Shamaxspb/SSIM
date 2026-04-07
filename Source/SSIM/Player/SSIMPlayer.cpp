@@ -21,6 +21,8 @@ ASSIMPlayer::ASSIMPlayer()
 	SSIMPlayerFlowComponent		= CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
 
 	SetupAttackCollision();
+	
+	
 }
 
 
@@ -57,11 +59,12 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		return;
 	}
 		
-	SSIMInputComponent->BindAction(MoveRightInputAction, ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveRight);
-	SSIMInputComponent->BindAction(MoveLeftInputAction,  ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveLeft);
-	SSIMInputComponent->BindAction(DashInputAction,		 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
-	SSIMInputComponent->BindAction(AttackInputAction,	 ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttack);
-	
+	SSIMInputComponent->BindAction(MoveRightInputAction,		ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveRight);
+	SSIMInputComponent->BindAction(MoveLeftInputAction,			ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveLeft);
+	SSIMInputComponent->BindAction(DashInputAction,				ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
+	SSIMInputComponent->BindAction(AttackInputAction,			ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackFrontal);
+	SSIMInputComponent->BindAction(AttackUpwardInputAction,		ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackUpward);
+	SSIMInputComponent->BindAction(AttackDownwardInputAction,	ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackDownward);
 }
 
 
@@ -94,9 +97,19 @@ void ASSIMPlayer::HandleDash()
 	SSIMPlayerFlowComponent->Dash();
 }
 
-void ASSIMPlayer::HandleAttack()
+void ASSIMPlayer::HandleAttackFrontal()
 {
-	SSIMPlayerCombatComponent->StartAttack();
+	SSIMPlayerCombatComponent->StartAttackFrontal();
+}
+
+void ASSIMPlayer::HandleAttackUpward()
+{
+	SSIMPlayerCombatComponent->StartAttackUpward();
+}
+
+void ASSIMPlayer::HandleAttackDownward()
+{
+	SSIMPlayerCombatComponent->StartAttackDownward();
 }
 
 void ASSIMPlayer::SetupAttackCollision()
