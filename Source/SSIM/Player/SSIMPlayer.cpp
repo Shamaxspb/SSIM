@@ -17,8 +17,8 @@ ASSIMPlayer::ASSIMPlayer()
 
 	CurrentPlayerState = EPlayerState::EPS_Movement;
 	
-	SSIMPlayerCombatComponent	= CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
-	SSIMPlayerFlowComponent		= CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
+	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
+	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
 
 	SetupAttackCollision();
 	
@@ -81,6 +81,7 @@ void ASSIMPlayer::MoveRight()
 	SetActorRotation(FRotator(0, 90, 0));
 }
 
+
 void ASSIMPlayer::MoveLeft()
 {
 	if (SSIMPlayerFlowComponent->bDashing)
@@ -92,25 +93,12 @@ void ASSIMPlayer::MoveLeft()
 	SetActorRotation(FRotator(0, -90, 0));
 }
 
+
 void ASSIMPlayer::HandleDash()
 {
 	SSIMPlayerFlowComponent->Dash();
 }
 
-void ASSIMPlayer::HandleAttackFrontal()
-{
-	SSIMPlayerCombatComponent->StartAttackFrontal();
-}
-
-void ASSIMPlayer::HandleAttackUpward()
-{
-	SSIMPlayerCombatComponent->StartAttackUpward();
-}
-
-void ASSIMPlayer::HandleAttackDownward()
-{
-	SSIMPlayerCombatComponent->StartAttackDownward();
-}
 
 void ASSIMPlayer::SetupAttackCollision()
 {
@@ -134,6 +122,25 @@ void ASSIMPlayer::SetupAttackCollision()
 	}
 	
 }
+
+
+void ASSIMPlayer::HandleAttackFrontal()
+{
+	SSIMPlayerCombatComponent->StartAttackFrontal();
+}
+
+
+void ASSIMPlayer::HandleAttackUpward()
+{
+	SSIMPlayerCombatComponent->StartAttackUpward();
+}
+
+
+void ASSIMPlayer::HandleAttackDownward()
+{
+	SSIMPlayerCombatComponent->StartAttackDownward();
+}
+
 
 
 // Interfaces

@@ -124,12 +124,12 @@ private:
 	
 	void HandleDash(); 
 	
+	void SetupAttackCollision();
+	
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
 	
-	
-	void SetupAttackCollision();
 	
 // Interfaces
 public:

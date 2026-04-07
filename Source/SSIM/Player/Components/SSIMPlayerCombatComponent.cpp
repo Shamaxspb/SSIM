@@ -52,31 +52,29 @@ void USSIMPlayerCombatComponent::StartAttack()
 	bIsAttacking = true; // set to false in ANS_NotifyEnd, so ANS MUST be in AnimMontage
 	
 	SSIMAnimInstance->Montage_Play(AttackMontage);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack Montage: %s"), *AttackMontage->GetName());
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack started"));	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack started"));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack Direction: %s"), *UEnum::GetValueAsString(PlayerAttackDirection));
+
 }
 
 
 void USSIMPlayerCombatComponent::StartAttackFrontal()
 {
 	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack FRONTAL"));
 	StartAttack();
 }
 
 
 void USSIMPlayerCombatComponent::StartAttackUpward()
 {
-	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Upwards;
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack UPWARD"));
+	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Upward;
 	StartAttack();
 }
 
 
 void USSIMPlayerCombatComponent::StartAttackDownward()
 {
-	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downwards;
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Attack DOWNWARD"));
+	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
 	StartAttack();
 }
 
@@ -121,7 +119,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Upwards:
+		case EPlayerAttackDirection::EPAD_Upward:
 			{
 				if (PlayerAirUpwardAttackMontages.IsEmpty())
 				{
@@ -132,7 +130,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Downwards:
+		case EPlayerAttackDirection::EPAD_Downward:
 			{
 				if (PlayerAirDownwardAttackMontages.IsEmpty())
 				{
@@ -167,7 +165,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Upwards:
+		case EPlayerAttackDirection::EPAD_Upward:
 			{
 				if (PlayerUpwardAttackMontages.IsEmpty())
 				{
@@ -178,7 +176,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Downwards:
+		case EPlayerAttackDirection::EPAD_Downward:
 			{
 				if (PlayerDownwardAttackMontages.IsEmpty())
 				{
@@ -202,9 +200,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 
 
 void USSIMPlayerCombatComponent::ActivateAttackCollision()
-{
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("AttackDirection: %s"), *UEnum::GetValueAsString(PlayerAttackDirection));
-	
+{	
 	switch (PlayerAttackDirection)
 	{
 		case EPlayerAttackDirection::EPAD_Frontal:
@@ -213,13 +209,13 @@ void USSIMPlayerCombatComponent::ActivateAttackCollision()
 			break;
 		}
 		
-		case EPlayerAttackDirection::EPAD_Upwards:
+		case EPlayerAttackDirection::EPAD_Upward:
 		{
 			CurrentAttackCollision = SSIMPlayer->GetUpperAttackCollision();
 			break;
 		}
 		
-		case EPlayerAttackDirection::EPAD_Downwards:
+		case EPlayerAttackDirection::EPAD_Downward:
 		{
 			CurrentAttackCollision = SSIMPlayer->GetBottomAttackCollision();
 			break;
@@ -234,6 +230,7 @@ void USSIMPlayerCombatComponent::ActivateAttackCollision()
 	
 	CurrentAttackCollision->SetActive(true);
 	CurrentAttackCollision->SetHiddenInGame(false);
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Activated Attack Collision: %s"), *CurrentAttackCollision->GetName());
 }
 
 
