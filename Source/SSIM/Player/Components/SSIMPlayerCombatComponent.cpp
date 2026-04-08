@@ -16,7 +16,6 @@ USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
 
 }
 
-
 void USSIMPlayerCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -24,14 +23,12 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	
 }
 
-
 void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                                FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 }
-
 
 
 // My Functions
@@ -57,13 +54,11 @@ void USSIMPlayerCombatComponent::StartAttack()
 
 }
 
-
 void USSIMPlayerCombatComponent::StartAttackFrontal()
 {
 	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
 	StartAttack();
 }
-
 
 void USSIMPlayerCombatComponent::StartAttackUpward()
 {
@@ -71,33 +66,25 @@ void USSIMPlayerCombatComponent::StartAttackUpward()
 	StartAttack();
 }
 
-
 void USSIMPlayerCombatComponent::StartAttackDownward()
 {
+	if (!SSIMPlayer->GetCharacterMovement()->IsFalling())
+	{
+		UE_LOG(LogSSIMValidations, Log, TEXT("%s : Can't attack downwards, while character stays on the ground. Frontal attack used instead"), TEXT(__FUNCTION__))
+		PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
+		StartAttack();
+		return;
+	}
+	
 	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
 	StartAttack();
 }
 
-
-void USSIMPlayerCombatComponent::DamageProcessing()
-{
-	if (!IsValid(CurrentAttackCollision))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : No Valid Attack Collision"), TEXT(__FUNCTION__));
-		return;
-	}
-	
-	// CachedAttackCollision->OnComponentBeginOverlap
-}
-
-
 void USSIMPlayerCombatComponent::EndAttack()
 {
 	bIsAttacking = false;
-	EndAttackTrace();
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack ended"), TEXT(__FUNCTION__));
 }
-
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
 {	
@@ -128,15 +115,18 @@ void USSIMPlayerCombatComponent::StartAttackTrace()
 		}
 	}
 	
-	CurrentAttackCollision->SetActive(true);
-	CurrentAttackCollision->SetHiddenInGame(false);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
-	
 	CurrentAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap);
+
+	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CurrentAttackCollision->UpdateOverlaps();
+	CurrentAttackCollision->SetHiddenInGame(false);
+	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack trace STARTED"), TEXT(__FUNCTION__));
+	
 }
 
-
-void USSIMPlayerCombatComponent::EndAttackTrace() const
+void USSIMPlayerCombatComponent::EndAttackTrace()
 {
 	if (!CurrentAttackCollision)
 	{
@@ -144,12 +134,13 @@ void USSIMPlayerCombatComponent::EndAttackTrace() const
 		return;
 	}
 	
-	CurrentAttackCollision->SetActive(false);
+	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CurrentAttackCollision->SetHiddenInGame(true);
 	
-	//CurrentAttackCollision->OnComponentBeginOverlap.AddUObject();
+	HitActors.Empty();
+	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack trace ENDED"), TEXT(__FUNCTION__));
 }
-
 
 UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 {
@@ -254,5 +245,38 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+	HitActors.Add(OtherActor);
+}
+
+
+//DEBUG
+void USSIMPlayerCombatComponent::SwitchAttackCollision_DEBUG() const
+{
+	if (!IsValid(CurrentAttackCollision))
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("No current attack collision"));
+		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Magenta, 
+										TEXT("No current attack collision"), false, FVector2D(1.2f, 1.2f));
+		return;
+	}
+
 	
+	
+	if (CurrentAttackCollision->GetCollisionEnabled() == ECollisionEnabled::QueryOnly)
+	{
+		CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CurrentAttackCollision->SetHiddenInGame(true);
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Current attack collision: NoCollision"));
+		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Red, 
+										TEXT("Current attack collision: NoCollision"), false, FVector2D(1.2f, 1.2f));
+	}
+	else if (CurrentAttackCollision->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
+	{
+		CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		CurrentAttackCollision->SetHiddenInGame(false);
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Current attack collision: QueryOnly"));
+		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Emerald, 
+										TEXT("Current attack collision: QueryOnly"), false, FVector2D(1.2f, 1.2f));
+	}
 }

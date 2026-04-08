@@ -43,7 +43,7 @@ public:
 	EPlayerAttackDirection PlayerAttackDirection;
 	
 	UPROPERTY()
-	TArray<AActor*> HitActors;
+	TSet<AActor*> HitActors;
 	
 private:
 	bool bIsAttacking = false;
@@ -55,10 +55,8 @@ private:
 public:
 	USSIMPlayerCombatComponent();
 
-protected:
 	virtual void BeginPlay() override;
 
-public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -69,12 +67,10 @@ public:
 	void StartAttackFrontal();
 	void StartAttackUpward();
 	void StartAttackDownward();
-	
-	void DamageProcessing();
 	void EndAttack();
 	
 	void StartAttackTrace();
-	void EndAttackTrace() const;
+	void EndAttackTrace();
 
 private:
 	UAnimMontage* GetAttackMontage() const;
@@ -94,4 +90,8 @@ private:
 									 int32 OtherBodyIndex,
 									 bool bFromSweep,
 									 const FHitResult& SweepResult);*/
+	
+// DEBUG
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
+	void SwitchAttackCollision_DEBUG() const;
 };

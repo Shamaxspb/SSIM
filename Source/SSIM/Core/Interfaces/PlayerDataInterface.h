@@ -21,6 +21,16 @@ class SSIM_API IPlayerDataInterface
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Attack")
+	void StartAttackTraceInterface() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Attack")
+	void EndAttackTraceInterface() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Attack")
+	void EndAttackInterface() const;
+	
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Components")
 	USSIMPlayerCombatComponent* GetPlayerCombatComponentInterface() const;
 

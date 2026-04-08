@@ -9,7 +9,7 @@
 enum class EPlayerAttackDirection : uint8;
 class AActor;
 
-UCLASS()
+UCLASS(meta = (DisplayName = "Attack Processing"))
 class SSIM_API USSIMAttackProcessingNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()

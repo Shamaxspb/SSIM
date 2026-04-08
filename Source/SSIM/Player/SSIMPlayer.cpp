@@ -157,8 +157,23 @@ void ASSIMPlayer::HandleEndAttackTrace()
 }
 
 
-
 // Interfaces
+void ASSIMPlayer::StartAttackTraceInterface_Implementation() const
+{
+	SSIMPlayerCombatComponent->StartAttackTrace();
+}
+
+void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
+{
+	SSIMPlayerCombatComponent->EndAttackTrace();
+}
+
+void ASSIMPlayer::EndAttackInterface_Implementation() const
+{
+	SSIMPlayerCombatComponent->EndAttack();
+}
+
+
 USSIMPlayerCombatComponent* ASSIMPlayer::GetPlayerCombatComponentInterface_Implementation() const
 {
 	return SSIMPlayerCombatComponent;
