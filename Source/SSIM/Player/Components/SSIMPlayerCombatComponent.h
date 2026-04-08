@@ -42,6 +42,9 @@ public:
 	
 	EPlayerAttackDirection PlayerAttackDirection;
 	
+	UPROPERTY()
+	TSet<AActor*> HitActors;
+	
 private:
 	bool bIsAttacking = false;
 	
@@ -52,10 +55,8 @@ private:
 public:
 	USSIMPlayerCombatComponent();
 
-protected:
 	virtual void BeginPlay() override;
 
-public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -66,12 +67,31 @@ public:
 	void StartAttackFrontal();
 	void StartAttackUpward();
 	void StartAttackDownward();
-	
-	void DamageProcessing();
 	void EndAttack();
 	
-	UAnimMontage* GetAttackMontage() const;
-	void ActivateAttackCollision();
-	void DeactivateAttackCollision() const;
+	void StartAttackTrace();
+	void EndAttackTrace();
 
+private:
+	UAnimMontage* GetAttackMontage() const;
+	
+	UFUNCTION()
+	void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+									   AActor* OtherActor,
+									   UPrimitiveComponent* OtherComp,
+									   int32 OtherBodyIndex,
+									   bool bFromSweep,
+									   const FHitResult& SweepResult);
+	
+	/*UFUNCTION()
+	void OnAttackCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent,
+									 AActor* OtherActor,
+									 UPrimitiveComponent* OtherComp,
+									 int32 OtherBodyIndex,
+									 bool bFromSweep,
+									 const FHitResult& SweepResult);*/
+	
+// DEBUG
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
+	void SwitchAttackCollision_DEBUG() const;
 };

@@ -4,7 +4,6 @@
 #include "SSIMAttackProcessingNotifyState.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
-#include "SSIM/Player/Components/SSIMPlayerCombatComponent.h"
 
 
 void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
@@ -14,16 +13,19 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 	
 	if (!IsValid(MeshComp->GetOwner()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("AttackProcessing NotifyBegin: Owner is not valid"));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	Owner = MeshComp->GetOwner();
 	
 									
-	if (Owner->Implements<UPlayerDataInterface>() /*maybe should expand with "... || Owner->Implements<some_not_player_inteface>"*/)  
+	if (!Owner->Implements<UPlayerDataInterface>())  
 	{
-		IPlayerDataInterface::Execute_GetPlayerCombatComponentInterface(Owner)->ActivateAttackCollision();
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement UPlayerDataInterface"), TEXT(__FUNCTION__));
+		return;
 	}
+	
+	IPlayerDataInterface::Execute_StartAttackTraceInterface(Owner);
 	
 }
 
@@ -34,12 +36,15 @@ void USSIMAttackProcessingNotifyState::NotifyEnd(USkeletalMeshComponent* MeshCom
 	
 	if (!IsValid(Owner))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("AttackProcessing NotifyEnd: Owner is not valid"));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	
-	if (Owner->Implements<UPlayerDataInterface>() /*same here*/)  
+	if (!Owner->Implements<UPlayerDataInterface>())  
 	{
-		IPlayerDataInterface::Execute_GetPlayerCombatComponentInterface(Owner)->EndAttack();
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement UPlayerDataInterface"), TEXT(__FUNCTION__));
+		return;
 	}
+	
+	IPlayerDataInterface::Execute_EndAttackTraceInterface(Owner);
 }

@@ -12,7 +12,7 @@ void USSIMAnimInstance::NativeInitializeAnimation()
 
 	if (TryGetPawnOwner() == nullptr)
 	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("SSIMAnimInstance: TryGetPawnOwner is not valid"));
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : TryGetPawnOwner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	SSIMPlayer = CastChecked<ASSIMPlayer>(TryGetPawnOwner());

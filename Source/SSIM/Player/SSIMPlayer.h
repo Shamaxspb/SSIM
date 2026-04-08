@@ -12,7 +12,7 @@ class UInputAction;
 class USSIMPlayerCombatComponent;
 class USSIMPlayerFlowComponent;
 
-UCLASS()
+UCLASS(meta = (PrioritizeCategories = "SSIM"))
 class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
 {
 	GENERATED_BODY()
@@ -88,6 +88,7 @@ public:
 // My Functions
 public:
 #pragma region Inline Getters
+	
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
@@ -130,9 +131,19 @@ private:
 	void HandleAttackUpward();
 	void HandleAttackDownward();
 	
+	void HandleStartAttackTrace();
+	void HandleEndAttackTrace();
+	
 	
 // Interfaces
 public:
+	virtual void StartAttackTraceInterface_Implementation() const override;
+	
+	virtual void EndAttackTraceInterface_Implementation() const override;
+	
+	virtual void EndAttackInterface_Implementation() const override;
+	
+	
 	virtual USSIMPlayerCombatComponent* GetPlayerCombatComponentInterface_Implementation() const override;
 	
 	virtual USSIMPlayerFlowComponent* GetPlayerFlowComponentInterface_Implementation() const override;

@@ -9,7 +9,7 @@
 enum class EPlayerAttackDirection : uint8;
 class AActor;
 
-UCLASS()
+UCLASS(meta = (DisplayName = "Attack Processing"))
 class SSIM_API USSIMAttackProcessingNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()
@@ -22,5 +22,5 @@ private:
 // Overriden Functions
 public:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
-	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+	virtual void NotifyEnd  (USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 };
