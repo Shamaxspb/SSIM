@@ -42,6 +42,9 @@ public:
 	
 	EPlayerAttackDirection PlayerAttackDirection;
 	
+	UPROPERTY()
+	TArray<AActor*> HitActors;
+	
 private:
 	bool bIsAttacking = false;
 	
@@ -70,8 +73,25 @@ public:
 	void DamageProcessing();
 	void EndAttack();
 	
-	UAnimMontage* GetAttackMontage() const;
-	void ActivateAttackCollision();
-	void DeactivateAttackCollision() const;
+	void StartAttackTrace();
+	void EndAttackTrace() const;
 
+private:
+	UAnimMontage* GetAttackMontage() const;
+	
+	UFUNCTION()
+	void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+									   AActor* OtherActor,
+									   UPrimitiveComponent* OtherComp,
+									   int32 OtherBodyIndex,
+									   bool bFromSweep,
+									   const FHitResult& SweepResult);
+	
+	/*UFUNCTION()
+	void OnAttackCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent,
+									 AActor* OtherActor,
+									 UPrimitiveComponent* OtherComp,
+									 int32 OtherBodyIndex,
+									 bool bFromSweep,
+									 const FHitResult& SweepResult);*/
 };

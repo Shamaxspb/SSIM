@@ -18,6 +18,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	ASSIMPlayer* SSIMPlayer;
 	
+	UPROPERTY()
 	TObjectPtr<UAnimInstance> SSIMAnimInstance;
 
 	
@@ -25,10 +26,8 @@ protected:
 public:
 	USSIMBasePlayerComponent();
 
-protected:
 	virtual void BeginPlay() override;
 
-public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 	

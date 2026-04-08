@@ -88,6 +88,7 @@ public:
 // My Functions
 public:
 #pragma region Inline Getters
+	
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
@@ -129,6 +130,9 @@ private:
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
+	
+	void HandleStartAttackTrace();
+	void HandleEndAttackTrace();
 	
 	
 // Interfaces

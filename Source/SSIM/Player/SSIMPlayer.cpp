@@ -47,7 +47,7 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 	if (!PlayerInputComponent)
 	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("PlayerInputComponent is not valid"));
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s PlayerInputComponent is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	
@@ -55,7 +55,7 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 	if (!IsValid(SSIMInputComponent))
 	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("EnhancedInputComponent is not valid. Or cast failed"));
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : EnhancedInputComponent is not valid. Or cast failed"), TEXT(__FUNCTION__));
 		return;
 	}
 		
@@ -118,7 +118,9 @@ void ASSIMPlayer::SetupAttackCollision()
 	{
 		Element->SetupAttachment(RootAttackCollisionComponent);
 		Element->SetActive(false);
+		Element->SetGenerateOverlapEvents(true);
 		Element->SetCollisionProfileName("AttackTrace", true);
+		//Element->OnComponentBeginOverlap.AddDynamic(this, &ASSIMPlayer::);
 	}
 	
 }
@@ -139,6 +141,19 @@ void ASSIMPlayer::HandleAttackUpward()
 void ASSIMPlayer::HandleAttackDownward()
 {
 	SSIMPlayerCombatComponent->StartAttackDownward();
+}
+
+
+void ASSIMPlayer::HandleStartAttackTrace()
+{
+	SSIMPlayerCombatComponent->StartAttackTrace();
+}
+
+
+void ASSIMPlayer::HandleEndAttackTrace()
+{
+	SSIMPlayerCombatComponent->EndAttackTrace();
+
 }
 
 

@@ -39,7 +39,7 @@ void USSIMBasePlayerComponent::SetReferences()
 	// SSIMPlayer
 	if (!IsValid(GetOwner()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s: GetOwner is not valid"), *this->GetName());
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s: GetOwner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	SSIMPlayer = Cast<ASSIMPlayer>(GetOwner());
@@ -47,12 +47,12 @@ void USSIMBasePlayerComponent::SetReferences()
 	// SSIM Anim Instance
 	if (!IsValid(SSIMPlayer->GetMesh()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s: Owner mesh is not valid"), *this->GetName());
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s: Owner mesh is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	if (!IsValid(SSIMPlayer->GetMesh()->GetAnimInstance()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s: Anim Instance is not valid"), *this->GetName());
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s: Anim Instance is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	SSIMAnimInstance = SSIMPlayer->GetMesh()->GetAnimInstance();
