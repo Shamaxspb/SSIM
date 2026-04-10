@@ -119,6 +119,7 @@ void USSIMPlayerCombatComponent::StartAttackTrace()
 
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CurrentAttackCollision->UpdateOverlaps();
+	
 	CurrentAttackCollision->SetHiddenInGame(false);
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
@@ -247,6 +248,14 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 {
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
 	HitActors.Add(OtherActor);
+}
+
+void USSIMPlayerCombatComponent::DealDamageToEnemy()
+{
+	/*for (auto Element : HitActors)
+	{
+		Element
+	}*/
 }
 
 

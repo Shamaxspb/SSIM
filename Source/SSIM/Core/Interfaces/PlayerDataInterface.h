@@ -6,8 +6,6 @@
 #include "UObject/Interface.h"
 #include "PlayerDataInterface.generated.h"
 
-class USSIMPlayerCombatComponent;
-class USSIMPlayerFlowComponent;
 
 UINTERFACE(MinimalAPI, Blueprintable)
 class UPlayerDataInterface : public UInterface
@@ -29,12 +27,5 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Attack")
 	void EndAttackInterface() const;
-	
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Components")
-	USSIMPlayerCombatComponent* GetPlayerCombatComponentInterface() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Components")
-	USSIMPlayerFlowComponent* GetPlayerFlowComponentInterface() const;
 	
 };
