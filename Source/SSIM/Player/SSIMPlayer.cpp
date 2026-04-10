@@ -25,7 +25,6 @@ ASSIMPlayer::ASSIMPlayer()
 	
 }
 
-
 void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -33,13 +32,11 @@ void ASSIMPlayer::BeginPlay()
 	
 }
 
-
 void ASSIMPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
 }
-
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -68,7 +65,6 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 }
 
 
-
 // My Functions
 void ASSIMPlayer::MoveRight()
 {
@@ -81,7 +77,6 @@ void ASSIMPlayer::MoveRight()
 	SetActorRotation(FRotator(0, 90, 0));
 }
 
-
 void ASSIMPlayer::MoveLeft()
 {
 	if (SSIMPlayerFlowComponent->bDashing)
@@ -92,13 +87,6 @@ void ASSIMPlayer::MoveLeft()
 	AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
 	SetActorRotation(FRotator(0, -90, 0));
 }
-
-
-void ASSIMPlayer::HandleDash()
-{
-	SSIMPlayerFlowComponent->Dash();
-}
-
 
 void ASSIMPlayer::SetupAttackCollision()
 {
@@ -117,38 +105,32 @@ void ASSIMPlayer::SetupAttackCollision()
 	for (auto const Element : AttackCollisions)
 	{
 		Element->SetupAttachment(RootAttackCollisionComponent);
-		Element->SetActive(false);
+		Element->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Element->SetGenerateOverlapEvents(true);
 		Element->SetCollisionProfileName("AttackTrace", true);
-		//Element->OnComponentBeginOverlap.AddDynamic(this, &ASSIMPlayer::);
 	}
 	
 }
-
 
 void ASSIMPlayer::HandleAttackFrontal()
 {
 	SSIMPlayerCombatComponent->StartAttackFrontal();
 }
 
-
 void ASSIMPlayer::HandleAttackUpward()
 {
 	SSIMPlayerCombatComponent->StartAttackUpward();
 }
-
 
 void ASSIMPlayer::HandleAttackDownward()
 {
 	SSIMPlayerCombatComponent->StartAttackDownward();
 }
 
-
 void ASSIMPlayer::HandleStartAttackTrace()
 {
 	SSIMPlayerCombatComponent->StartAttackTrace();
 }
-
 
 void ASSIMPlayer::HandleEndAttackTrace()
 {
@@ -156,6 +138,10 @@ void ASSIMPlayer::HandleEndAttackTrace()
 
 }
 
+void ASSIMPlayer::HandleDash()
+{
+	SSIMPlayerFlowComponent->Dash();
+}
 
 // Interfaces
 void ASSIMPlayer::StartAttackTraceInterface_Implementation() const
@@ -171,15 +157,4 @@ void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
 void ASSIMPlayer::EndAttackInterface_Implementation() const
 {
 	SSIMPlayerCombatComponent->EndAttack();
-}
-
-
-USSIMPlayerCombatComponent* ASSIMPlayer::GetPlayerCombatComponentInterface_Implementation() const
-{
-	return SSIMPlayerCombatComponent;
-}
-
-USSIMPlayerFlowComponent* ASSIMPlayer::GetPlayerFlowComponentInterface_Implementation() const
-{
-	return SSIMPlayerFlowComponent;
 }

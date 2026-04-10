@@ -123,16 +123,19 @@ private:
 	void MoveRight();
 	void MoveLeft();
 	
-	void HandleDash(); 
-	
 	void SetupAttackCollision();
+	
+#pragma region Handler Functions
 	
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
-	
 	void HandleStartAttackTrace();
 	void HandleEndAttackTrace();
+	
+	void HandleDash(); 
+	
+#pragma endregion Handler Functions
 	
 	
 // Interfaces
@@ -142,10 +145,5 @@ public:
 	virtual void EndAttackTraceInterface_Implementation() const override;
 	
 	virtual void EndAttackInterface_Implementation() const override;
-	
-	
-	virtual USSIMPlayerCombatComponent* GetPlayerCombatComponentInterface_Implementation() const override;
-	
-	virtual USSIMPlayerFlowComponent* GetPlayerFlowComponentInterface_Implementation() const override;
 	
 };
