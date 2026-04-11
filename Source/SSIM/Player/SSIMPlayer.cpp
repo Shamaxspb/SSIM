@@ -5,7 +5,6 @@
 #include "SSIM/SSIM.h"
 #include "EnhancedInputComponent.h"
 #include "SSIMPlayerController.h"
-#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SSIMPlayerCombatComponent.h"
 #include "Components/SSIMPlayerFlowComponent.h"
@@ -28,7 +27,6 @@ ASSIMPlayer::ASSIMPlayer()
 void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	GetArrowComponent()->SetHiddenInGame(false);
 	
 }
 

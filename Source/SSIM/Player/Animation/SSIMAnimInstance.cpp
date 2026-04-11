@@ -2,18 +2,20 @@
 
 
 #include "SSIMAnimInstance.h"
-#include "SSIM/Player/SSIMPlayer.h"
-#include "../../SSIM.h"
+
+#include "SSIM/SSIM.h"
+
 
 // Overriden Functions
 void USSIMAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	if (TryGetPawnOwner() == nullptr)
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : TryGetPawnOwner is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
-	SSIMPlayer = CastChecked<ASSIMPlayer>(TryGetPawnOwner());
+	SetOwnerReference();
+}
+
+void USSIMAnimInstance::SetOwnerReference()
+{
+	// Function is empty intentional, it must be overriden in child classes
+	// Function is not pure virtual, because UCLASS functions cannot be such
 }

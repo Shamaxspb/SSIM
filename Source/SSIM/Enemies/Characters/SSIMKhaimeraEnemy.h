@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SSIMBaseEnemy.h"
+
 #include "SSIMKhaimeraEnemy.generated.h"
 
 UCLASS()

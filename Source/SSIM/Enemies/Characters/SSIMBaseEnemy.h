@@ -3,15 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "SSIM/Core/SSIMBaseCharacter.h"
 #include "SSIMBaseEnemy.generated.h"
 
 UCLASS(Abstract)
-class SSIM_API ASSIMBaseEnemy : public ACharacter
+class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter
 {
 	GENERATED_BODY()
-
-public:
-
 	
 };

@@ -7,20 +7,18 @@
 
 #include "SSIMAnimInstance.generated.h"
 
-class ASSIMPlayer;
 
-UCLASS()
+UCLASS(Abstract)
 class SSIM_API USSIMAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	
-// Variables
-protected:
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
-	ASSIMPlayer* SSIMPlayer;
-	
 // Overriden Functions
 public:
 	virtual void NativeInitializeAnimation() override;
+	
+// My Functions
+protected:
+	virtual void SetOwnerReference();
 	
 };
