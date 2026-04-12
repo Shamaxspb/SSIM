@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "../Core/Interfaces/PlayerDataInterface.h"
+#include "SSIM/Core/SSIMBaseCharacter.h"
 
 #include "SSIMPlayer.generated.h"
 
@@ -13,7 +13,7 @@ class USSIMPlayerCombatComponent;
 class USSIMPlayerFlowComponent;
 
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
-class SSIM_API ASSIMPlayer : public ACharacter, public IPlayerDataInterface
+class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface
 {
 	GENERATED_BODY()
 
