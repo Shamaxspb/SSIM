@@ -12,6 +12,7 @@ class SSIM_API ASSIMKhaimeraEnemy : public ASSIMBaseEnemy
 {
 	GENERATED_BODY()
 
+// Overriden Functions
 public:
 	ASSIMKhaimeraEnemy();
 
@@ -21,5 +22,4 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

@@ -3,8 +3,6 @@
 
 #include "SSIMAnimInstance.h"
 
-#include "SSIM/SSIM.h"
-
 
 // Overriden Functions
 void USSIMAnimInstance::NativeInitializeAnimation()

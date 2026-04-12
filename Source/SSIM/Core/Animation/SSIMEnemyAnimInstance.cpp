@@ -40,5 +40,5 @@ void USSIMEnemyAnimInstance::UpdateCharacterVelocity()
 		return;
 	}
 	
-	VelocityY = SSIMBaseEnemy->GetVelocity().Y;
+	VelocityY = SSIMBaseEnemy->GetVelocity().Length();
 }

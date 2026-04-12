@@ -6,6 +6,8 @@
 #include "SSIM/Core/SSIMBaseCharacter.h"
 #include "SSIMBaseEnemy.generated.h"
 
+class UBehaviorTreeComponent;
+
 UCLASS(Abstract)
 class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter
 {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSIM/Player/Animation/SSIMAnimInstance.h"
+#include "SSIM/Core/Animation/SSIMAnimInstance.h"
 
 #include "SSIMEnemyAnimInstance.generated.h"
 

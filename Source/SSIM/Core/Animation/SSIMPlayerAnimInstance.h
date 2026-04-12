@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSIM/Player/Animation/SSIMAnimInstance.h"
+#include "SSIM/Core/Animation/SSIMAnimInstance.h"
 
 #include "SSIMPlayerAnimInstance.generated.h"
 
@@ -19,10 +19,6 @@ class SSIM_API USSIMPlayerAnimInstance : public USSIMAnimInstance
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
-	
-// Overriden Functions
-public:
-
 	
 // My Functions
 protected:
