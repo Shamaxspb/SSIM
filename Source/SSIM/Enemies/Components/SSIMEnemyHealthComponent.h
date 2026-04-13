@@ -22,7 +22,7 @@ protected:
 	
 	
 // My Functions
-protected:
+public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
-	void ReduceHealth(float InHealth);
+	void ReduceHealth(float InDamage);
 };

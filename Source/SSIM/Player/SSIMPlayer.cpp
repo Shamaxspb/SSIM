@@ -16,8 +16,8 @@ ASSIMPlayer::ASSIMPlayer()
 
 	CurrentPlayerState = EPlayerState::EPS_Movement;
 	
-	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("CombatComponent"));
-	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("FlowComponent"));
+	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
+	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
 
 	SetupAttackCollision();
 	

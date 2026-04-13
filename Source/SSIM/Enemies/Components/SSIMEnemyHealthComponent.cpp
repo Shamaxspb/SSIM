@@ -7,9 +7,9 @@
 
 
 // My Functions
-void USSIMEnemyHealthComponent::ReduceHealth(float InHealth)
+void USSIMEnemyHealthComponent::ReduceHealth(float InDamage)
 {
-	Health -= InHealth;
+	Health -= InDamage;
 	Health = FMath::Clamp(Health, 0.f, MaxHealth);
 	
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s Health: %f/%f"),TEXT(__FUNCTION__), 

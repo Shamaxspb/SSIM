@@ -44,7 +44,10 @@ public:
 	EPlayerAttackDirection PlayerAttackDirection;
 	
 	UPROPERTY()
-	TSet<AActor*> HitActors;
+	TSet<AActor*> HitCharacters;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Stats")
+	float MeleeDamage;
 	
 private:
 	bool bIsAttacking = false;

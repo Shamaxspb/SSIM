@@ -12,4 +12,12 @@ ASSIMBaseEnemy::ASSIMBaseEnemy()
 	// Combat Component
 }
 
+
 // My Functions
+
+
+// Interfaces
+void ASSIMBaseEnemy::ReceiveDamage_Implementation(float InDamage) const
+{
+	EnemyHealthComponent->ReduceHealth(InDamage);
+}

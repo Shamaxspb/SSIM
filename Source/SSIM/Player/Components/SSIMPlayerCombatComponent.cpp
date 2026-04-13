@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/SSIM.h"
+#include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIM/Player/SSIMPlayer.h"
 
@@ -118,7 +119,7 @@ void USSIMPlayerCombatComponent::EndAttackTrace()
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CurrentAttackCollision->SetHiddenInGame(true);
 	
-	HitActors.Empty();
+	HitCharacters.Empty();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
 }
@@ -226,18 +227,25 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	HitActors.Add(OtherActor);
+	HitCharacters.Add(OtherActor);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
 	
+	DealDamageToEnemy();
 	
 }
 
 void USSIMPlayerCombatComponent::DealDamageToEnemy()
 {
-	/*for (auto Element : HitActors)
+	for (auto Element : HitCharacters)
 	{
-		if (Element->Implements<>())
-	}*/
+		if (!Element->Implements<USSIMEnemyCombatInterface>())
+		{
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMEnemyCombatInterface"), TEXT(__FUNCTION__));
+			return;
+		}
+		
+		ISSIMEnemyCombatInterface::Execute_ReceiveDamage(Element, MeleeDamage);
+	}
 }
 
 

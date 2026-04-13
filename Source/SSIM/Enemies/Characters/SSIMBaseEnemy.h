@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Core/SSIMBaseCharacter.h"
+#include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
 #include "SSIMBaseEnemy.generated.h"
 
 class USSIMEnemyHealthComponent;
 class UBehaviorTreeComponent;
 
 UCLASS(Abstract)
-class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter
+class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMEnemyCombatInterface
 {
 	GENERATED_BODY()
 	
@@ -22,5 +23,10 @@ protected:
 // Overriden Functions
 public:
 	ASSIMBaseEnemy();
+	
+	
+// Interfaces
+public:
+	virtual void ReceiveDamage_Implementation(float InDamage) const override;
 	
 };
