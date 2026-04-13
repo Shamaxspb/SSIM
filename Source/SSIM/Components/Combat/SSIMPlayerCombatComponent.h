@@ -8,6 +8,7 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
+class ASSIMPlayer;
 class UBoxComponent;
 
 
@@ -63,9 +64,14 @@ private:
 	
 #pragma endregion Metadata
 	
+protected:
+	UPROPERTY()
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	
 	
 // My Functions
 public:
+	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")
 	void StartAttack();
 	void StartAttackFrontal();
@@ -76,6 +82,9 @@ public:
 	void StartAttackTrace();
 	void EndAttackTrace();
 
+protected:
+	virtual void SetReferences() override;
+	
 private:
 	UAnimMontage* GetAttackMontage() const;
 	
@@ -88,6 +97,8 @@ private:
 									   const FHitResult& SweepResult);
 	
 	void DealDamageToEnemy();
+	
+	
 	
 // DEBUG
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")

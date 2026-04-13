@@ -124,6 +124,13 @@ void USSIMPlayerCombatComponent::EndAttackTrace()
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
 }
 
+void USSIMPlayerCombatComponent::SetReferences()
+{
+	Super::SetReferences();
+	
+	SSIMPlayer = CastChecked<ASSIMPlayer>(GetOwner());
+}
+
 UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 {
 	UAnimMontage* AttackMontage;

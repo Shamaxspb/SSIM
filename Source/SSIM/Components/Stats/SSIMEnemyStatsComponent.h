@@ -8,7 +8,7 @@
 #include "SSIMEnemyStatsComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMEnemyStatsComponent : public USSIMBaseStatsComponent
 {
 	GENERATED_BODY()

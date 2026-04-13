@@ -6,8 +6,6 @@
 
 #include "SSIMBaseComponent.generated.h"
 
-class ASSIMBaseEnemy;
-class ASSIMPlayer;
 class ACharacter;
 
 
@@ -22,12 +20,6 @@ class SSIM_API USSIMBaseComponent : public UActorComponent
 protected:
 	UPROPERTY()
 	TObjectPtr<ACharacter> SSIMCharacter;
-	
-	UPROPERTY()
-	TObjectPtr<ASSIMPlayer> SSIMPlayer;
-	
-	UPROPERTY()
-	TObjectPtr<ASSIMBaseEnemy> SSIMBaseEnemy;
 	
 	UPROPERTY()
 	TObjectPtr<UAnimInstance> AnimInstance;

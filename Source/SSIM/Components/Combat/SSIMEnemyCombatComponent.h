@@ -7,7 +7,7 @@
 #include "SSIMEnemyCombatComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMEnemyCombatComponent : public USSIMBaseCombatComponent
 {
 	GENERATED_BODY()

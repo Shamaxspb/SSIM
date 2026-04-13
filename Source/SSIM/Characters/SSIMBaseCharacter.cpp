@@ -12,6 +12,7 @@ ASSIMBaseCharacter::ASSIMBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RestrictXAxisMovement();
+	SetActorLocation(FVector(0.0f, GetActorLocation().Y, GetActorLocation().Z));
 
 }
 

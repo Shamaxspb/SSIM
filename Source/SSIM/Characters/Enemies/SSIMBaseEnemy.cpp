@@ -10,7 +10,7 @@
 ASSIMBaseEnemy::ASSIMBaseEnemy()
 {
 	EnemyCombatComponent = CreateDefaultSubobject<USSIMEnemyCombatComponent>(TEXT("CombatComponent"));
-	EnemyStatsComponent = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
+	EnemyStatsComponent  = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
 }
 
 

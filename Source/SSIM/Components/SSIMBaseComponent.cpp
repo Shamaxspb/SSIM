@@ -33,8 +33,6 @@ void USSIMBaseComponent::SetReferences()
 		return;
 	}
 	SSIMCharacter = CastChecked<ACharacter>(GetOwner());
-	SSIMPlayer	  = CastChecked<ASSIMPlayer>(GetOwner());
-	SSIMBaseEnemy = CastChecked<ASSIMBaseEnemy>(GetOwner());
 	
 	// Anim Instance
 	if (!IsValid(SSIMCharacter->GetMesh()))
