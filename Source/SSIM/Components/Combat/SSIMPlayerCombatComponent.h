@@ -3,24 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSIMBasePlayerComponent.h"
-#include "Components/ActorComponent.h"
+#include "SSIMBaseCombatComponent.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+
 #include "SSIMPlayerCombatComponent.generated.h"
 
-class ASSIMPlayer;
 class UBoxComponent;
 
 
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
-class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
+class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 {
 	GENERATED_BODY()
 
 // Variables
+	
+#pragma region Stats
+	
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Stats")
+	float MeleeDamage;
+	
+#pragma endregion Stats
+	
 #pragma region Montages
 	
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TArray<UAnimMontage*> PlayerFrontalAttackMontages;
 	
@@ -41,21 +49,21 @@ public:
 
 #pragma endregion Montages
 	
+#pragma region Metadata
+	
+private:
+	bool bIsAttacking = false;
 	EPlayerAttackDirection PlayerAttackDirection;
 	
 	UPROPERTY()
 	TSet<AActor*> HitCharacters;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Stats")
-	float MeleeDamage;
-	
-private:
-	bool bIsAttacking = false;
-	
 	UPROPERTY()
 	UBoxComponent* CurrentAttackCollision;
 	
-
+#pragma endregion Metadata
+	
+	
 // My Functions
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")

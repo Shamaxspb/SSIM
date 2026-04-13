@@ -16,10 +16,4 @@ class SSIM_API ASSIMKhaimeraEnemy : public ASSIMBaseEnemy
 public:
 	ASSIMKhaimeraEnemy();
 
-protected:
-	virtual void BeginPlay() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
-
 };

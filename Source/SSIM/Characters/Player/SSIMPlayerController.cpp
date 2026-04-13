@@ -2,12 +2,13 @@
 
 
 #include "SSIMPlayerController.h" 
+
 #include "SSIMPlayer.h" 
 #include "SSIM/SSIM.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
-#include "Components/SSIMPlayerCombatComponent.h"
-#include "Components/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
 
 // Overriden Functions
@@ -37,18 +38,10 @@ void ASSIMPlayerController::OnPossess(APawn* InPawn)
 }
 
 
-void ASSIMPlayerController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-}
-
 // My Functions
 void ASSIMPlayerController::Init()
 {
 	InitBasicInputContext();
-	
-	
 	
 }
 

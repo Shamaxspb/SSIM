@@ -2,12 +2,14 @@
 
 
 #include "SSIMPlayer.h"
+
 #include "SSIM/SSIM.h"
 #include "EnhancedInputComponent.h"
 #include "SSIMPlayerController.h"
 #include "Components/BoxComponent.h"
-#include "Components/SSIMPlayerCombatComponent.h"
-#include "Components/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
+#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
 // Overriden Functions
 ASSIMPlayer::ASSIMPlayer()
@@ -16,8 +18,9 @@ ASSIMPlayer::ASSIMPlayer()
 
 	CurrentPlayerState = EPlayerState::EPS_Movement;
 	
-	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
 	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
+	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
+	SSIMPlayerStatsComponent  = CreateDefaultSubobject<USSIMPlayerStatsComponent>(TEXT("PlayerStatsComponent"));
 
 	SetupAttackCollision();
 	
@@ -125,7 +128,7 @@ void ASSIMPlayer::HandleEndAttackTrace()
 
 void ASSIMPlayer::HandleDash()
 {
-	SSIMPlayerFlowComponent->Dash();
+	SSIMPlayerFlowComponent->StartDash();
 }
 
 // Interfaces
@@ -142,4 +145,17 @@ void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
 void ASSIMPlayer::EndAttackInterface_Implementation() const
 {
 	SSIMPlayerCombatComponent->EndAttack();
+}
+
+
+void ASSIMPlayer::EndDashInterface_Implementation() const
+{
+	SSIMPlayerFlowComponent->EndDash();
+}
+
+
+void ASSIMPlayer::ReceiveDamage_Implementation(int32 InDamage) const
+{
+	SSIMPlayerStatsComponent->SetReceivedDamage(InDamage);
+	SSIMPlayerStatsComponent->ReduceHealth();
 }

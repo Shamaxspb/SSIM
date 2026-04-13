@@ -3,22 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSIMBasePlayerComponent.h"
-#include "Components/ActorComponent.h"
+#include "SSIM/Components/SSIMBaseComponent.h"
+
 #include "SSIMPlayerFlowComponent.generated.h"
 
 
-class ASSIMPlayer;
-
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
-class SSIM_API USSIMPlayerFlowComponent : public USSIMBasePlayerComponent
+class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
 
 // Variables
-public:
-	bool bDashing = false;
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashCooldown = 2.f;
@@ -28,31 +23,27 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
 	TObjectPtr<UAnimMontage> PlayerDashAnimation;
+
+#pragma region Metadata
+
+public:
+	bool bDashing = false;
 	
 private:	
 	bool bCanDash = true;
 	FTimerHandle DashCooldownTimerHandle;
 
+#pragma endregion Metadata
 	
-// Overriden Functions
-protected:
-	virtual void BeginPlay() override;
-
 	
 // My Functions
 public:
-	FORCEINLINE void Dash() { StartDash(); }
-	
-protected:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Dash")
 	void StartDash();
-	
+	void EndDash();
+
 private:
 	FVector GetDashLaunchVelocity() const;
-	void EndDash();
 	void ResetDash();
-	
-	void InitDashAnimation();
-	void DashEndNotify();
 	
 };

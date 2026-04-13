@@ -1,19 +1,23 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Types/EPlayerState.h"
-#include "../Core/Interfaces/PlayerDataInterface.h"
-#include "SSIM/Core/SSIMBaseCharacter.h"
+#include "SSIM/Core/Interfaces/PlayerDataInterface.h"
+#include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
 
 #include "SSIMPlayer.generated.h"
 
+class USSIMPlayerStatsComponent;
 class UBoxComponent;
 class UInputAction;
 class USSIMPlayerCombatComponent;
 class USSIMPlayerFlowComponent;
 
+
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
-class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface
+class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface,
+														public ISSIMPlayerCombatInterface
 {
 	GENERATED_BODY()
 
@@ -24,8 +28,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
+	TObjectPtr<USSIMPlayerStatsComponent> SSIMPlayerStatsComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+	
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollisionRoot", 
 			  meta = (ToolTip = "This is blank component to group up attack collision components, just for clear hierarchy"))
@@ -137,9 +145,11 @@ private:
 // Interfaces
 public:
 	virtual void StartAttackTraceInterface_Implementation() const override;
-	
 	virtual void EndAttackTraceInterface_Implementation() const override;
-	
 	virtual void EndAttackInterface_Implementation() const override;
+	
+	virtual void EndDashInterface_Implementation() const override;
+	
+	virtual void ReceiveDamage_Implementation(int32 InDamage) const override;
 	
 };

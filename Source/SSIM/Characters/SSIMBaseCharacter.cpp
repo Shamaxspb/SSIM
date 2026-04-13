@@ -2,6 +2,7 @@
 
 
 #include "SSIMBaseCharacter.h"
+
 #include "GameFramework/PawnMovementComponent.h"
 #include "SSIM/SSIM.h"
 

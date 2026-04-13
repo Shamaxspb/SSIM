@@ -28,4 +28,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Attack")
 	void EndAttackInterface() const;
 	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Dash")
+	void EndDashInterface() const;
+	
 };

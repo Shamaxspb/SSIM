@@ -6,17 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
-#include "SSIM/Player/SSIMPlayer.h"
-#include "SSIM/Core/Notifies/SSIMDashEndNotify.h"
-
-
-// Overriden Functions
-void USSIMPlayerFlowComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	InitDashAnimation();
-}
+#include "GameFramework/Character.h"
 
 
 // My Functions
@@ -36,14 +26,14 @@ void USSIMPlayerFlowComponent::StartDash()
 	bDashing = true;
 	bCanDash = false;
 	
-	SSIMPlayer->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
+	SSIMCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
 	if (!IsValid(PlayerDashAnimation))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerDashAnimation is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	SSIMAnimInstance->Montage_Play(PlayerDashAnimation);
+	AnimInstance->Montage_Play(PlayerDashAnimation);
 	
 	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;
@@ -58,7 +48,7 @@ void USSIMPlayerFlowComponent::StartDash()
 
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
-	FVector CurrentVelocity = SSIMPlayer->GetVelocity();
+	FVector CurrentVelocity = SSIMCharacter->GetVelocity();
 	FVector OutLaunchVelocity;
 	
 	if (CurrentVelocity.IsNearlyZero())
@@ -67,7 +57,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		
 		// Calculate Player direction
 		FVector DashDirectionVector;
-		float DirectionDotProduct = FVector::DotProduct(SSIMPlayer->GetActorForwardVector(), FVector::RightVector);
+		float DirectionDotProduct = FVector::DotProduct(SSIMCharacter->GetActorForwardVector(), FVector::RightVector);
 		
 		
 		if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
@@ -85,14 +75,14 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		}
 		
 		OutLaunchVelocity =  DashDirectionVector *
-							 SSIMPlayer->GetCharacterMovement()->GetMaxSpeed() *
+							 SSIMCharacter->GetCharacterMovement()->GetMaxSpeed() *
 							 DashVelocityCoef;
 		
 	}
 	else
 	{
 		// Dash in motion
-		OutLaunchVelocity = FVector(0.f, SSIMPlayer->GetVelocity().Y * DashVelocityCoef,0.f);
+		OutLaunchVelocity = FVector(0.f, SSIMCharacter->GetVelocity().Y * DashVelocityCoef,0.f);
 	}
 		
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
@@ -109,24 +99,4 @@ void USSIMPlayerFlowComponent::EndDash()
 void USSIMPlayerFlowComponent::ResetDash()
 {
 	bCanDash = true;
-}
-
-void USSIMPlayerFlowComponent::InitDashAnimation()
-{
-	if (PlayerDashAnimation)
-	{
-		const TArray<FAnimNotifyEvent> NotifyEvents = PlayerDashAnimation->Notifies;
-		for (const FAnimNotifyEvent& EventNotify : NotifyEvents)
-		{
-			if (const auto DashEndNotify = Cast<USSIMDashEndNotify>(EventNotify.Notify))
-			{
-				DashEndNotify->OnNotified.AddUObject(this, &USSIMPlayerFlowComponent::DashEndNotify);
-			}
-		}
-	}
-}
-
-void USSIMPlayerFlowComponent::DashEndNotify()
-{
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash End notify reached"), TEXT(__FUNCTION__));	
 }

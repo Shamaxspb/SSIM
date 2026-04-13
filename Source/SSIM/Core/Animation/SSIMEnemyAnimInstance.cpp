@@ -4,7 +4,7 @@
 #include "SSIMEnemyAnimInstance.h"
 
 #include "SSIM/SSIM.h"
-#include "SSIM/Enemies/Characters/SSIMBaseEnemy.h"
+#include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 
 void USSIMEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {

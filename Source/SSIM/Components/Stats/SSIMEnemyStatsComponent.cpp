@@ -1,15 +1,20 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SSIMEnemyHealthComponent.h"
+#include "SSIMEnemyStatsComponent.h"
 
 #include "SSIM/SSIM.h"
 
 
 // My Functions
-void USSIMEnemyHealthComponent::ReduceHealth(float InDamage)
+void USSIMEnemyStatsComponent::SetReceivedDamage(float InReceivedDamage)
 {
-	Health -= InDamage;
+	ReceivedDamage = InReceivedDamage;
+}
+
+void USSIMEnemyStatsComponent::ReduceHealth()
+{
+	Health -= ReceivedDamage;
 	Health = FMath::Clamp(Health, 0.f, MaxHealth);
 	
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s Health: %f/%f"),TEXT(__FUNCTION__), 

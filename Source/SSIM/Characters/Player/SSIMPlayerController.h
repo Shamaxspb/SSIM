@@ -40,11 +40,9 @@ private:
 public:
 	ASSIMPlayerController();
 
-	virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
 	
 protected:
-	virtual void BeginPlay() override;
-
 	virtual void OnPossess(APawn* InPawn) override;
 	
 	

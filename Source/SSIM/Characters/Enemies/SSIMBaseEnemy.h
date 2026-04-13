@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSIM/Core/SSIMBaseCharacter.h"
+#include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
 #include "SSIMBaseEnemy.generated.h"
 
-class USSIMEnemyHealthComponent;
+class USSIMEnemyCombatComponent;
+class USSIMEnemyStatsComponent;
 class UBehaviorTreeComponent;
 
 UCLASS(Abstract)
@@ -17,8 +18,11 @@ class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMEnemyComb
 	
 // Variables
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "HealthComponent")
-	TObjectPtr<USSIMEnemyHealthComponent> EnemyHealthComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
+	TObjectPtr<USSIMEnemyCombatComponent> EnemyCombatComponent;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
+	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
 	
 // Overriden Functions
 public:

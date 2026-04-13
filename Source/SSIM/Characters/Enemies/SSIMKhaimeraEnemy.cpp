@@ -19,15 +19,3 @@ ASSIMKhaimeraEnemy::ASSIMKhaimeraEnemy()
 	}
 	
 }
-
-void ASSIMKhaimeraEnemy::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	
-}
-
-void ASSIMKhaimeraEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}

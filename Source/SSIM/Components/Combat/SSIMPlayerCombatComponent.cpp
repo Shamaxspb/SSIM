@@ -6,9 +6,9 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/SSIM.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
-#include "SSIM/Player/SSIMPlayer.h"
 
 
 // My Functions
@@ -28,7 +28,7 @@ void USSIMPlayerCombatComponent::StartAttack()
 	
 	bIsAttacking = true; // set to false in ANS_NotifyEnd, so ANS MUST be in AnimMontage
 	
-	SSIMAnimInstance->Montage_Play(AttackMontage);
+	AnimInstance->Montage_Play(AttackMontage);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
 

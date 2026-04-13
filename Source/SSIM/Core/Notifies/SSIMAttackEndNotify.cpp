@@ -13,13 +13,13 @@ void USSIMAttackEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 	
 	if (!IsValid(MeshComp->GetOwner()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : AttackProcessing NotifyBegin: Owner is not valid"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	
 	if (!MeshComp->GetOwner()->Implements<UPlayerDataInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement UPlayerDataInterface"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner does not implement UPlayerDataInterface"), TEXT(__FUNCTION__));
 		return;
 	}
 	
