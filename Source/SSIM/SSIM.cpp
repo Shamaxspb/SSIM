@@ -6,5 +6,6 @@
 DEFINE_LOG_CATEGORY(LogSSIMPlayerInitialization);
 DEFINE_LOG_CATEGORY(LogSSIMGameplayMessages);
 DEFINE_LOG_CATEGORY(LogSSIMValidations);
+DEFINE_LOG_CATEGORY(LogSSIMStatsCalculation);
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, SSIM, "SSIM" );

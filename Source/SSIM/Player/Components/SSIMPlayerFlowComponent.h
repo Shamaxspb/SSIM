@@ -35,16 +35,10 @@ private:
 
 	
 // Overriden Functions
-public:
-	USSIMPlayerFlowComponent();
-
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 // My Functions
 public:
 	FORCEINLINE void Dash() { StartDash(); }

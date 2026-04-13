@@ -11,26 +11,11 @@
 
 
 // Overriden Functions
-USSIMPlayerFlowComponent::USSIMPlayerFlowComponent()
-{
-	PrimaryComponentTick.bCanEverTick = true;
-
-}
-
-
 void USSIMPlayerFlowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	InitDashAnimation();
-}
-
-
-void USSIMPlayerFlowComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                             FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 }
 
 
@@ -41,10 +26,10 @@ void USSIMPlayerFlowComponent::StartDash()
 	{
 		if (bDashing)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Dash is still in process"), TEXT(__FUNCTION__));
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
 		}
 		
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
 		return;
 	}
 	
@@ -55,7 +40,7 @@ void USSIMPlayerFlowComponent::StartDash()
 
 	if (!IsValid(PlayerDashAnimation))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : PlayerDashAnimation is not valid"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerDashAnimation is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	SSIMAnimInstance->Montage_Play(PlayerDashAnimation);
@@ -63,11 +48,11 @@ void USSIMPlayerFlowComponent::StartDash()
 	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DashInProcessTimerHandle, this, &USSIMPlayerFlowComponent::EndDash, PlayerDashAnimation->GetPlayLength(), false);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashAnimation->GetPlayLength());
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashAnimation->GetPlayLength());
 	
 	GetWorld()->GetTimerManager().SetTimer(DashCooldownTimerHandle, this, &USSIMPlayerFlowComponent::ResetDash, DashCooldown, false);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Dash started"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
 }
 
 
@@ -95,7 +80,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		}
 		else
 		{
-			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s : Couldn't determine player direction. Return -1.f"), TEXT(__FUNCTION__));
+			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Couldn't determine player direction. Return -1.f"), TEXT(__FUNCTION__));
 			return FVector(-1.f, -1.f, -1.f);
 		}
 		
@@ -110,7 +95,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		OutLaunchVelocity = FVector(0.f, SSIMPlayer->GetVelocity().Y * DashVelocityCoef,0.f);
 	}
 		
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
 	return OutLaunchVelocity;
 }
 
@@ -143,6 +128,5 @@ void USSIMPlayerFlowComponent::InitDashAnimation()
 
 void USSIMPlayerFlowComponent::DashEndNotify()
 {
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Dash End notify reached"), TEXT(__FUNCTION__));	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash End notify reached"), TEXT(__FUNCTION__));	
 }
-

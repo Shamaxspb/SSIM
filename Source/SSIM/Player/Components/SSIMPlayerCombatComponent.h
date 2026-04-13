@@ -11,6 +11,7 @@
 class ASSIMPlayer;
 class UBoxComponent;
 
+
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerCombatComponent : public USSIMBasePlayerComponent
 {
@@ -51,14 +52,6 @@ private:
 	UPROPERTY()
 	UBoxComponent* CurrentAttackCollision;
 	
-// Overriden Functions
-public:
-	USSIMPlayerCombatComponent();
-
-	virtual void BeginPlay() override;
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 // My Functions
 public:

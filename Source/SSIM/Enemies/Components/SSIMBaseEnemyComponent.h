@@ -4,20 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "SSIMBasePlayerComponent.generated.h"
+#include "SSIMBaseEnemyComponent.generated.h"
 
-class ASSIMPlayer;
+class ASSIMBaseEnemy;
 
 
-UCLASS(Abstract)
-class SSIM_API USSIMBasePlayerComponent : public UActorComponent
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class SSIM_API USSIMBaseEnemyComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 // Variables
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
-	ASSIMPlayer* SSIMPlayer;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References", DisplayName = "Enemy")
+	ASSIMBaseEnemy* SSIMBaseEnemy;
 	
 	UPROPERTY()
 	TObjectPtr<UAnimInstance> SSIMAnimInstance;
@@ -25,8 +25,9 @@ protected:
 	
 // Overriden Functions
 public:
-	USSIMBasePlayerComponent();
+	USSIMBaseEnemyComponent();
 
+protected:
 	virtual void BeginPlay() override;
 	
 	

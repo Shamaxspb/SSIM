@@ -9,34 +9,13 @@
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIM/Player/SSIMPlayer.h"
 
-// Overriden Functions
-USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
-{
-	PrimaryComponentTick.bCanEverTick = true;
-
-}
-
-void USSIMPlayerCombatComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	
-}
-
-void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                               FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-}
-
 
 // My Functions
 void USSIMPlayerCombatComponent::StartAttack()
 {
 	if (bIsAttacking)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack is still in process"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is still in process"), TEXT(__FUNCTION__));
 		return;
 	}
 	
@@ -49,8 +28,8 @@ void USSIMPlayerCombatComponent::StartAttack()
 	bIsAttacking = true; // set to false in ANS_NotifyEnd, so ANS MUST be in AnimMontage
 	
 	SSIMAnimInstance->Montage_Play(AttackMontage);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack started"), TEXT(__FUNCTION__));
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
 
 }
 
@@ -70,7 +49,7 @@ void USSIMPlayerCombatComponent::StartAttackDownward()
 {
 	if (!SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{
-		UE_LOG(LogSSIMValidations, Log, TEXT("%s : Can't attack downwards, while character stays on the ground. Frontal attack used instead"), TEXT(__FUNCTION__))
+		UE_LOG(LogSSIMValidations, Log, TEXT("%s | Can't attack downwards, while character stays on the ground. Frontal attack used instead"), TEXT(__FUNCTION__))
 		PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
 		StartAttack();
 		return;
@@ -83,7 +62,7 @@ void USSIMPlayerCombatComponent::StartAttackDownward()
 void USSIMPlayerCombatComponent::EndAttack()
 {
 	bIsAttacking = false;
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack ended"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
 }
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
@@ -110,7 +89,7 @@ void USSIMPlayerCombatComponent::StartAttackTrace()
 		
 		default:
 		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Couldn't receive Attack Direction to activate"), TEXT(__FUNCTION__));
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s | Couldn't receive Attack Direction to activate"), TEXT(__FUNCTION__));
 			return;
 		}
 	}
@@ -122,8 +101,8 @@ void USSIMPlayerCombatComponent::StartAttackTrace()
 	
 	CurrentAttackCollision->SetHiddenInGame(false);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack trace STARTED"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
 	
 }
 
@@ -131,16 +110,17 @@ void USSIMPlayerCombatComponent::EndAttackTrace()
 {
 	if (!CurrentAttackCollision)
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Couldn't receive Attack Collision to deactivate"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Couldn't receive Attack Collision to deactivate"), TEXT(__FUNCTION__));
 		return;
 	}
 	
+	CurrentAttackCollision->OnComponentBeginOverlap.RemoveDynamic(this, &USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap);
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CurrentAttackCollision->SetHiddenInGame(true);
 	
 	HitActors.Empty();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Attack trace ENDED"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
 }
 
 UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
@@ -156,7 +136,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			{
 				if (PlayerAirFrontalAttackMontages.IsEmpty())
 				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s : No AIR FRONTAL Attack Montages found"), TEXT(__FUNCTION__));
+					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No AIR FRONTAL Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
 				AttackMontage = PlayerAirFrontalAttackMontages[FMath::RandHelper(PlayerAirFrontalAttackMontages.Num())];			
@@ -167,7 +147,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			{
 				if (PlayerAirUpwardAttackMontages.IsEmpty())
 				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s : No AIR UPWARD Attack Montages found"), TEXT(__FUNCTION__));
+					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No AIR UPWARD Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
 				AttackMontage = PlayerAirUpwardAttackMontages[FMath::RandHelper(PlayerAirUpwardAttackMontages.Num())];
@@ -178,7 +158,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			{
 				if (PlayerAirDownwardAttackMontages.IsEmpty())
 				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s : No Air DOWNWARD Attack Montages found"), TEXT(__FUNCTION__));
+					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No Air DOWNWARD Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
 				AttackMontage = PlayerAirDownwardAttackMontages[FMath::RandHelper(PlayerAirDownwardAttackMontages.Num())];
@@ -187,7 +167,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			
 		default:
 			{
-				UE_LOG(LogSSIMValidations, Error, TEXT("%s : Something went EXTREMELY wrong during attack animation search"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s | Something went EXTREMELY wrong during attack animation search"), TEXT(__FUNCTION__));
 				AttackMontage = nullptr;
 				return nullptr;
 			}
@@ -202,7 +182,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			{
 				if (PlayerFrontalAttackMontages.IsEmpty())
 				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s : No FRONTAL Attack Montages found"), TEXT(__FUNCTION__));
+					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No FRONTAL Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
 				AttackMontage = PlayerFrontalAttackMontages[FMath::RandHelper(PlayerFrontalAttackMontages.Num())];			
@@ -213,7 +193,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			{
 				if (PlayerUpwardAttackMontages.IsEmpty())
 				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s : No UPWARD Attack Montages found"), TEXT(__FUNCTION__));
+					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No UPWARD Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
 				AttackMontage = PlayerUpwardAttackMontages[FMath::RandHelper(PlayerUpwardAttackMontages.Num())];
@@ -224,7 +204,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			{
 				if (PlayerDownwardAttackMontages.IsEmpty())
 				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s : No DOWNWARD Attack Montages found"), TEXT(__FUNCTION__));
+					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No DOWNWARD Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
 				AttackMontage = PlayerDownwardAttackMontages[FMath::RandHelper(PlayerDownwardAttackMontages.Num())];
@@ -233,7 +213,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
 			
 		default:
 			{
-				UE_LOG(LogSSIMValidations, Error, TEXT("%s : Something went EXTREMELY wrong during attack animation search"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s | Something went EXTREMELY wrong during attack animation search"), TEXT(__FUNCTION__));
 				AttackMontage = nullptr;
 				return nullptr;
 			}
@@ -246,15 +226,17 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
 	HitActors.Add(OtherActor);
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+	
+	
 }
 
 void USSIMPlayerCombatComponent::DealDamageToEnemy()
 {
 	/*for (auto Element : HitActors)
 	{
-		Element
+		if (Element->Implements<>())
 	}*/
 }
 

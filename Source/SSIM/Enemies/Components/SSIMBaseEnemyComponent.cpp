@@ -1,52 +1,49 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SSIMBasePlayerComponent.h"
+#include "SSIMBaseEnemyComponent.h"
 
 #include "SSIM/SSIM.h"
-#include "SSIM/Player/SSIMPlayer.h"
+#include "SSIM/Enemies/Characters/SSIMBaseEnemy.h"
 
 
-// Overriden Functions
-USSIMBasePlayerComponent::USSIMBasePlayerComponent()
+USSIMBaseEnemyComponent::USSIMBaseEnemyComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
 }
 
 
-void USSIMBasePlayerComponent::BeginPlay()
+void USSIMBaseEnemyComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	SetReferences();
-	
 }
 
 
 // My Functions
-void USSIMBasePlayerComponent::SetReferences()
+void USSIMBaseEnemyComponent::SetReferences()
 {
-	// SSIMPlayer
+	// SSIMBaseEnemy
 	if (!IsValid(GetOwner()))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | GetOwner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	SSIMPlayer = Cast<ASSIMPlayer>(GetOwner());
+	SSIMBaseEnemy = Cast<ASSIMBaseEnemy>(GetOwner());
 	
 	// SSIM Anim Instance
-	if (!IsValid(SSIMPlayer->GetMesh()))
+	if (!IsValid(SSIMBaseEnemy->GetMesh()))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner mesh is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	if (!IsValid(SSIMPlayer->GetMesh()->GetAnimInstance()))
+	if (!IsValid(SSIMBaseEnemy->GetMesh()->GetAnimInstance()))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Anim Instance is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	SSIMAnimInstance = SSIMPlayer->GetMesh()->GetAnimInstance();
-	
+	SSIMAnimInstance = SSIMBaseEnemy->GetMesh()->GetAnimInstance();
 }
 

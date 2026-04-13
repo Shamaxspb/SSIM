@@ -3,5 +3,13 @@
 
 #include "SSIMBaseEnemy.h"
 
+#include "SSIM/Enemies/Components/SSIMEnemyHealthComponent.h"
+
+// Overriden Functions
+ASSIMBaseEnemy::ASSIMBaseEnemy()
+{
+	EnemyHealthComponent = CreateDefaultSubobject<USSIMEnemyHealthComponent>(TEXT("HealthComponent"));
+	// Combat Component
+}
 
 // My Functions
