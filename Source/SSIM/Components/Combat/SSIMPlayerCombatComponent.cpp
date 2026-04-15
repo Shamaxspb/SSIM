@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
@@ -175,7 +176,43 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 		}
 		
 		ISSIMEnemyCombatInterface::Execute_ReceiveDamage(Element, RegularAttackDamage);
+		LaunchTargetOnHit(Element);
 	}
+}
+
+void USSIMPlayerCombatComponent::LaunchTargetOnHit(AActor* InActor) const
+{
+	ACharacter* Target = Cast<ACharacter>(InActor);
+	
+	Target->LaunchCharacter(CalculateOnHitLaunchVelocity(Target), false, false);
+}
+
+FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* InActor) const
+{
+	FVector PlayerLocation = SSIMPlayer->GetActorLocation();
+	FVector EnemyLocation = InActor->GetActorLocation();
+	
+	// Determine if Enemy is to the right or to the left
+	bool bEnemyToTheRight = EnemyLocation.Y > PlayerLocation.Y;
+	
+	// Chose rotator based on that
+	FRotator ReboundRotation = UKismetMathLibrary::SelectRotator(ReboundRotator, ReboundRotator * -1.f, bEnemyToTheRight);
+	
+	// Get unit vector from Enemy to Player and Negate that vector
+	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
+	
+	// Add rotation to that vector
+	//FVector RotatedDirection = ReboundRotation.RotateVector(ReboundDirection);
+	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(ReboundAngle, FVector::ForwardVector);
+	
+	FVector ReboundVelocity = RotatedDirection * ReboundVelocityCoef;
+	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Rebound Direction: %s | Rotated Direction %s | ReboundVelocity: %s"), 
+											  *ReboundDirection.ToString(), *RotatedDirection.ToString(), *ReboundVelocity.ToString());
+	
+	return ReboundVelocity;
+	// It is so messy because it was hard to understand how the fck should I implement this
+	// would be nice to clean this up later
 }
 
 

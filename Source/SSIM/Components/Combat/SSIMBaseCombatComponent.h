@@ -17,7 +17,7 @@ class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 #pragma region Stats
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Stats")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
 	float RegularAttackDamage;
 	
 #pragma endregion Stats	

@@ -16,6 +16,13 @@ ASSIMBaseCharacter::ASSIMBaseCharacter()
 
 }
 
+void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
+	SetActorLocation(FVector(0.0f, Transform.GetLocation().Y, Transform.GetLocation().Z));
+}
+
 // My Functions
 void ASSIMBaseCharacter::RestrictXAxisMovement() const
 {

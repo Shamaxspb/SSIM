@@ -11,8 +11,11 @@ class SSIM_API ASSIMBaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+// Overriden Functions
 public:
 	ASSIMBaseCharacter();
+	
+	virtual void OnConstruction(const FTransform& Transform) override;		
 	
 // My Functions
 private:

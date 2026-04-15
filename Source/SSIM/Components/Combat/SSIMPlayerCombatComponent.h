@@ -52,6 +52,13 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	float ReboundAngle = 25.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	float ReboundVelocityCoef = 500.f;
+	
+	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
 	
 // My Functions
 public:
@@ -72,7 +79,8 @@ protected:
 	
 private:
 	void DealDamageToEnemy();
-	
+	void LaunchTargetOnHit(AActor* InActor) const; 
+	FVector CalculateOnHitLaunchVelocity(const AActor* InActor) const;
 	
 // DEBUG
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
