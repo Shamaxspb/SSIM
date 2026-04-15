@@ -18,49 +18,33 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 	GENERATED_BODY()
 
 // Variables
-	
-#pragma region Stats
-	
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Stats")
-	float MeleeDamage;
-	
-#pragma endregion Stats
-	
 #pragma region Montages
 	
-public:
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<UAnimMontage*> PlayerFrontalAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerFrontalAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<UAnimMontage*> PlayerAirFrontalAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerAirFrontalAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<UAnimMontage*> PlayerUpwardAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerUpwardAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<UAnimMontage*> PlayerAirUpwardAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerAirUpwardAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<UAnimMontage*> PlayerDownwardAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerDownwardAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<UAnimMontage*> PlayerAirDownwardAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerAirDownwardAttackMontages;
 
 #pragma endregion Montages
 	
 #pragma region Metadata
 	
-private:
-	bool bIsAttacking = false;
+public:
 	EPlayerAttackDirection PlayerAttackDirection;
-	
-	UPROPERTY()
-	TSet<AActor*> HitCharacters;
-	
-	UPROPERTY()
-	UBoxComponent* CurrentAttackCollision;
 	
 #pragma endregion Metadata
 	
@@ -71,33 +55,23 @@ protected:
 	
 // My Functions
 public:
-	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat")
-	void StartAttack();
-	void StartAttackFrontal();
-	void StartAttackUpward();
-	void StartAttackDownward();
-	void EndAttack();
-	
-	void StartAttackTrace();
-	void EndAttackTrace();
+	virtual void StartAttack() override;
+	virtual void StartAttackTrace() override;
 
 protected:
 	virtual void SetReferences() override;
-	
-private:
-	UAnimMontage* GetAttackMontage() const;
+	virtual UAnimMontage* GetAttackMontage() override;
 	
 	UFUNCTION()
-	void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	virtual void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 									   AActor* OtherActor,
 									   UPrimitiveComponent* OtherComp,
 									   int32 OtherBodyIndex,
 									   bool bFromSweep,
-									   const FHitResult& SweepResult);
+									   const FHitResult& SweepResult) override;
 	
+private:
 	void DealDamageToEnemy();
-	
 	
 	
 // DEBUG

@@ -102,17 +102,20 @@ void ASSIMPlayer::SetupAttackCollision()
 
 void ASSIMPlayer::HandleAttackFrontal()
 {
-	SSIMPlayerCombatComponent->StartAttackFrontal();
+	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
+	SSIMPlayerCombatComponent->StartAttack();
 }
 
 void ASSIMPlayer::HandleAttackUpward()
 {
-	SSIMPlayerCombatComponent->StartAttackUpward();
+	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Upward;
+	SSIMPlayerCombatComponent->StartAttack();
 }
 
 void ASSIMPlayer::HandleAttackDownward()
 {
-	SSIMPlayerCombatComponent->StartAttackDownward();
+	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
+	SSIMPlayerCombatComponent->StartAttack();
 }
 
 void ASSIMPlayer::HandleStartAttackTrace()

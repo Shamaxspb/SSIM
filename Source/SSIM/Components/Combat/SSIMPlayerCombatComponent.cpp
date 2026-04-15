@@ -14,56 +14,9 @@
 // My Functions
 void USSIMPlayerCombatComponent::StartAttack()
 {
-	if (bIsAttacking)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is still in process"), TEXT(__FUNCTION__));
-		return;
-	}
+	Super::StartAttack();
 	
-	if (!IsValid(GetAttackMontage()))
-	{
-		return;
-	}
-	UAnimMontage* AttackMontage = GetAttackMontage();
-	
-	bIsAttacking = true; // set to false in ANS_NotifyEnd, so ANS MUST be in AnimMontage
-	
-	AnimInstance->Montage_Play(AttackMontage);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
-
-}
-
-void USSIMPlayerCombatComponent::StartAttackFrontal()
-{
-	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
-	StartAttack();
-}
-
-void USSIMPlayerCombatComponent::StartAttackUpward()
-{
-	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Upward;
-	StartAttack();
-}
-
-void USSIMPlayerCombatComponent::StartAttackDownward()
-{
-	if (!SSIMPlayer->GetCharacterMovement()->IsFalling())
-	{
-		UE_LOG(LogSSIMValidations, Log, TEXT("%s | Can't attack downwards, while character stays on the ground. Frontal attack used instead"), TEXT(__FUNCTION__))
-		PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
-		StartAttack();
-		return;
-	}
-	
-	PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
-	StartAttack();
-}
-
-void USSIMPlayerCombatComponent::EndAttack()
-{
-	bIsAttacking = false;
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
 }
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
@@ -95,33 +48,7 @@ void USSIMPlayerCombatComponent::StartAttackTrace()
 		}
 	}
 	
-	CurrentAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap);
-
-	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CurrentAttackCollision->UpdateOverlaps();
-	
-	CurrentAttackCollision->SetHiddenInGame(false);
-	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
-	
-}
-
-void USSIMPlayerCombatComponent::EndAttackTrace()
-{
-	if (!CurrentAttackCollision)
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Couldn't receive Attack Collision to deactivate"), TEXT(__FUNCTION__));
-		return;
-	}
-	
-	CurrentAttackCollision->OnComponentBeginOverlap.RemoveDynamic(this, &USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap);
-	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CurrentAttackCollision->SetHiddenInGame(true);
-	
-	HitCharacters.Empty();
-	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
+	Super::StartAttackTrace();
 }
 
 void USSIMPlayerCombatComponent::SetReferences()
@@ -131,10 +58,8 @@ void USSIMPlayerCombatComponent::SetReferences()
 	SSIMPlayer = CastChecked<ASSIMPlayer>(GetOwner());
 }
 
-UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage() const
+UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 {
-	UAnimMontage* AttackMontage;
-	
 	if (SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{
 		// Air Attack Montage
@@ -234,11 +159,9 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	HitCharacters.Add(OtherActor);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+	Super::OnAttackCollisionBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 	
 	DealDamageToEnemy();
-	
 }
 
 void USSIMPlayerCombatComponent::DealDamageToEnemy()
@@ -251,7 +174,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 			return;
 		}
 		
-		ISSIMEnemyCombatInterface::Execute_ReceiveDamage(Element, MeleeDamage);
+		ISSIMEnemyCombatInterface::Execute_ReceiveDamage(Element, RegularAttackDamage);
 	}
 }
 
