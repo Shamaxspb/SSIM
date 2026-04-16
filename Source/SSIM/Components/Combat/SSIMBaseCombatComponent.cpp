@@ -35,6 +35,11 @@ void USSIMBaseCombatComponent::EndAttack()
 
 void USSIMBaseCombatComponent::StartAttackTrace()
 {
+	if (!IsValid(CurrentAttackCollision))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | CurrentAttackCollision is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
 	CurrentAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap);
 	
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -43,6 +48,7 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 	#if !UE_BUILD_SHIPPING
 	CurrentAttackCollision->SetHiddenInGame(false);
 	#endif
+	
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));

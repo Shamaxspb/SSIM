@@ -26,6 +26,29 @@ ASSIMPlayer::ASSIMPlayer()
 	
 }
 
+void ASSIMPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Frontal Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
+												*GetName(),
+												*FrontalAttackCollision.GetName(), *UEnum::GetValueAsString(FrontalAttackCollision->GetCollisionEnabled()),
+												FrontalAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
+	
+	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Upper Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
+												*GetName(),
+												*UpperAttackCollision.GetName(), *UEnum::GetValueAsString(UpperAttackCollision->GetCollisionEnabled()),
+												UpperAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
+	
+	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Bottom Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
+												*GetName(),
+												*BottomAttackCollision.GetName(), *UEnum::GetValueAsString(BottomAttackCollision->GetCollisionEnabled()),
+												BottomAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
+	
+	
+	
+}
+
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -93,9 +116,9 @@ void ASSIMPlayer::SetupAttackCollision()
 	for (auto const Element : AttackCollisions)
 	{
 		Element->SetupAttachment(RootAttackCollisionComponent);
-		Element->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Element->SetGenerateOverlapEvents(true);
 		Element->SetCollisionProfileName("AttackTrace", true);
+		Element->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	
 }

@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "SSIMBaseCharacter.generated.h"
 
+class UBoxComponent;
+
+
 UCLASS(Abstract)
 class SSIM_API ASSIMBaseCharacter : public ACharacter
 {

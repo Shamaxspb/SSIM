@@ -20,7 +20,10 @@ void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	
-	SetActorLocation(FVector(0.0f, Transform.GetLocation().Y, Transform.GetLocation().Z));
+	// Restrict X axis editor placement
+	FVector Location = GetActorLocation();
+	Location.X = 0.f;
+	SetActorLocation(Location);
 }
 
 // My Functions

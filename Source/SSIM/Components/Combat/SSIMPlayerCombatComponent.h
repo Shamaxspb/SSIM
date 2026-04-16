@@ -69,7 +69,6 @@ protected:
 	virtual void SetReferences() override;
 	virtual UAnimMontage* GetAttackMontage() override;
 	
-	UFUNCTION()
 	virtual void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 									   AActor* OtherActor,
 									   UPrimitiveComponent* OtherComp,

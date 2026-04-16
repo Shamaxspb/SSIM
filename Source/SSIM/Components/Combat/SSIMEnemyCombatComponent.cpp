@@ -2,24 +2,3 @@
 
 
 #include "SSIMEnemyCombatComponent.h"
-
-
-USSIMEnemyCombatComponent::USSIMEnemyCombatComponent()
-{
-	PrimaryComponentTick.bCanEverTick = true;
-
-}
-
-void USSIMEnemyCombatComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void USSIMEnemyCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                  FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-}
-

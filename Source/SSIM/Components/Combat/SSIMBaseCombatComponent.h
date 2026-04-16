@@ -49,6 +49,7 @@ public:
 protected:
 	virtual UAnimMontage* GetAttackMontage();
 	
+	UFUNCTION()
 	virtual void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 									   AActor* OtherActor,
 									   UPrimitiveComponent* OtherComp,

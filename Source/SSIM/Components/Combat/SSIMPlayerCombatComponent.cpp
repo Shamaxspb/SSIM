@@ -23,6 +23,8 @@ void USSIMPlayerCombatComponent::StartAttack()
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
 {	
+	
+
 	switch (PlayerAttackDirection)
 	{
 		case EPlayerAttackDirection::EPAD_Frontal:

@@ -86,6 +86,8 @@ protected:
 public:
 	ASSIMPlayer();
 	
+	virtual void BeginPlay() override;
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	
@@ -157,5 +159,5 @@ public:
 	virtual void EndDashInterface_Implementation() const override;
 	
 	virtual void ReceiveDamage_Implementation(int32 InDamage) const override;
-	
+
 };

@@ -15,5 +15,7 @@ class SSIM_API ASSIMKhaimeraEnemy : public ASSIMBaseEnemy
 // Overriden Functions
 public:
 	ASSIMKhaimeraEnemy();
+	
+	virtual void BeginPlay() override;
 
 };

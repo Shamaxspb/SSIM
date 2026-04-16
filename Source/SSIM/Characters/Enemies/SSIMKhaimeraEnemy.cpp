@@ -4,6 +4,8 @@
 #include "SSIMKhaimeraEnemy.h"
 
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
+#include "SSIM/SSIM.h"
 
 
 // Overriden Functions
@@ -18,4 +20,14 @@ ASSIMKhaimeraEnemy::ASSIMKhaimeraEnemy()
 		GetArrowComponent()->SetHiddenInGame(false);
 	}
 	
+}
+
+void ASSIMKhaimeraEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
+											    *GetName(),
+												*AttackBoxCollision.GetName(), *UEnum::GetValueAsString(AttackBoxCollision->GetCollisionEnabled()),
+												AttackBoxCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
 }
