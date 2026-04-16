@@ -8,6 +8,8 @@
 #include "GameFramework/PlayerController.h"
 #include "SSIMPlayerController.generated.h"
 
+class USSIMHealthBar;
+class USSIMBaseUI;
 class UEnhancedInputLocalPlayerSubsystem;
 class UInputMappingContext;
 class USSIMPlayerCombatComponent;
@@ -19,9 +21,11 @@ class SSIM_API ASSIMPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 // Variables
+#pragma region References
+	
 protected:
 	UPROPERTY(BlueprintReadWrite, DisplayName = "Player", Category = "SSIM|References")
-	TObjectPtr<ASSIMPlayer> SSIMPlayer = nullptr;
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerCombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
@@ -29,6 +33,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "PlayerFlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
 
+#pragma endregion References
+
+#pragma region UI
+	
+	UPROPERTY()
+	TObjectPtr<USSIMHealthBar> HealthBarWidget;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SSIM|UI")
+	TSubclassOf<USSIMHealthBar> HealthBarWidgetClass;
+	
+#pragma endregion UI
+	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SSIM|ToOverride")
 	UInputMappingContext* BaseInputContext;
 	
@@ -49,8 +65,9 @@ protected:
 // My Functions	
 private:
 	virtual void Init(); 
-	void SetSSIMPlayerReference(APawn *InPawn);
-	void SetSSIMActorComponentsReferences();
+	void SetPlayerReference(APawn *InPawn);
+	void SetActorComponentsReferences();
 	void InitBasicInputContext();
+	void InitUI();
 	
 };

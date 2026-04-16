@@ -7,8 +7,10 @@
 #include "SSIM/SSIM.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Blueprint/UserWidget.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
+#include "SSIM/Core/UI/SSIMHealthBar.h"
 
 
 // Overriden Functions
@@ -23,7 +25,6 @@ void ASSIMPlayerController::BeginPlay()
 	Super::BeginPlay();
 	
 	Init();
-	
 }
 
 // OnPossess called TWICE for some reason
@@ -32,9 +33,8 @@ void ASSIMPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
-	SetSSIMPlayerReference(InPawn);
-	SetSSIMActorComponentsReferences();
-	
+	SetPlayerReference(InPawn);
+	SetActorComponentsReferences();
 }
 
 
@@ -42,10 +42,11 @@ void ASSIMPlayerController::OnPossess(APawn* InPawn)
 void ASSIMPlayerController::Init()
 {
 	InitBasicInputContext();
+	InitUI();
 	
 }
 
-void ASSIMPlayerController::SetSSIMPlayerReference(APawn* InPawn)
+void ASSIMPlayerController::SetPlayerReference(APawn* InPawn)
 {
 	if (!InPawn)
 	{
@@ -65,7 +66,7 @@ void ASSIMPlayerController::SetSSIMPlayerReference(APawn* InPawn)
 }
 
 // Lost its purpose, won't delete for now
-void ASSIMPlayerController::SetSSIMActorComponentsReferences()
+void ASSIMPlayerController::SetActorComponentsReferences()
 {
 	if (!SSIMPlayer)
 	{
@@ -107,4 +108,15 @@ void ASSIMPlayerController::InitBasicInputContext()
 	EnhancedInputSubsystem->AddMappingContext(BaseInputContext, 1);
 	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s : EnhancedInputSubsystem %s added"), TEXT(__FUNCTION__), *BaseInputContext->GetName());
 	
+}
+
+void ASSIMPlayerController::InitUI()
+{
+	if (!IsValid(HealthBarWidgetClass))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : HealthBarWidget class is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	HealthBarWidget = CreateWidget<USSIMHealthBar>(this, HealthBarWidgetClass, TEXT("HealthBarWidget"));
+	HealthBarWidget->AddToViewport();
 }

@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
@@ -195,23 +196,23 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	// Determine if Enemy is to the right or to the left
 	bool bEnemyToTheRight = EnemyLocation.Y > PlayerLocation.Y;
 	
-	// Chose rotator based on that
-	FRotator ReboundRotation = UKismetMathLibrary::SelectRotator(ReboundRotator, ReboundRotator * -1.f, bEnemyToTheRight);
-	
 	// Get unit vector from Enemy to Player and Negate that vector
 	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
 	
 	// Add rotation to that vector
-	//FVector RotatedDirection = ReboundRotation.RotateVector(ReboundDirection);
-	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(ReboundAngle, FVector::ForwardVector);
+	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(bEnemyToTheRight ? ReboundAngle : -ReboundAngle, FVector::ForwardVector);
 	
+	// Multiply by coef for launch
 	FVector ReboundVelocity = RotatedDirection * ReboundVelocityCoef;
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Rebound Direction: %s | Rotated Direction %s | ReboundVelocity: %s"), 
-											  *ReboundDirection.ToString(), *RotatedDirection.ToString(), *ReboundVelocity.ToString());
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Enemy Is to the: %s"), (bEnemyToTheRight ? TEXT("Right") : TEXT("Left")));
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Direction: %s"), *ReboundDirection.ToString());
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rotated Direction: %s"), *RotatedDirection.ToString());
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Velocity: %s"),  *ReboundVelocity.ToString());
+	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, FLinearColor::Green, 3.f, 5.f);
 	
 	return ReboundVelocity;
-	// It is so messy because it was hard to understand how the fck should I implement this
+	// This is so messy because it was hard to understand how the fck should I implement this
 	// would be nice to clean this up later
 }
 
@@ -226,8 +227,6 @@ void USSIMPlayerCombatComponent::SwitchAttackCollision_DEBUG() const
 										TEXT("No current attack collision"), false, FVector2D(1.2f, 1.2f));
 		return;
 	}
-
-	
 	
 	if (CurrentAttackCollision->GetCollisionEnabled() == ECollisionEnabled::QueryOnly)
 	{

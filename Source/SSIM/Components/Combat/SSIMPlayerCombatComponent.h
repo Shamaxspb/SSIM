@@ -52,10 +52,10 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
 	float ReboundAngle = 25.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
 	float ReboundVelocityCoef = 500.f;
 	
 	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);

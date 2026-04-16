@@ -106,6 +106,12 @@ public:
 	}
 	
 	UFUNCTION()
+	FORCEINLINE USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
+	{
+		return SSIMPlayerStatsComponent;
+	}
+	
+	UFUNCTION()
 	FORCEINLINE UBoxComponent* GetFrontalAttackCollision() const
 	{
 		return FrontalAttackCollision;

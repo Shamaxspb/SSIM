@@ -7,6 +7,8 @@
 
 #include "SSIMPlayerStatsComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageReceivedSignature);
+
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
@@ -14,7 +16,10 @@ class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
 	GENERATED_BODY()
 
 // Variables
-protected:
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
+	FOnDamageReceivedSignature OnDamageReceived;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 MaxHealth = 5;
 	
@@ -23,10 +28,12 @@ protected:
 
 #pragma region Metadata
 	
+protected:
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Damage")
 	int32 ReceivedDamage;
 	
 #pragma endregion Metadata
+	
 	
 // My Functions
 public:

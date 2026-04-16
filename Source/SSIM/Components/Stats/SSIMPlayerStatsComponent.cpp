@@ -3,8 +3,6 @@
 
 #include "SSIMPlayerStatsComponent.h"
 
-#include "SSIM/Characters/Player/SSIMPlayer.h"
-
 void USSIMPlayerStatsComponent::SetReceivedDamage(int32 InReceivedDamage)
 {
 	ReceivedDamage = InReceivedDamage;
@@ -12,5 +10,6 @@ void USSIMPlayerStatsComponent::SetReceivedDamage(int32 InReceivedDamage)
 
 void USSIMPlayerStatsComponent::ReduceHealth()
 {
-	
+	Health--;
+	OnDamageReceived.Broadcast();
 }
