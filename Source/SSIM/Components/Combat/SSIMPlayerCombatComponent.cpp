@@ -178,7 +178,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 			return;
 		}
 		
-		ISSIMEnemyCombatInterface::Execute_ReceiveDamage(Element, RegularAttackDamage);
+		ISSIMEnemyCombatInterface::Execute_ReceiveDamageInterface(Element, RegularAttackDamage);
 		LaunchTargetOnHit(Element);
 	}
 }

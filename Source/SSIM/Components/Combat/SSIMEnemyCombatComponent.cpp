@@ -2,3 +2,10 @@
 
 
 #include "SSIMEnemyCombatComponent.h"
+
+void USSIMEnemyCombatComponent::StartAttack()
+{
+	Super::StartAttack();
+	
+	
+}

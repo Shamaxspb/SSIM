@@ -18,6 +18,14 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 	GENERATED_BODY()
 
 // Variables
+#pragma region Stats
+	
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	float RegularAttackDamage;
+	
+#pragma endregion Stats	
+	
 #pragma region Montages
 	
 protected:
@@ -59,6 +67,7 @@ protected:
 	float ReboundVelocityCoef = 500.f;
 	
 	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
+	
 	
 // My Functions
 public:

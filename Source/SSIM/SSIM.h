@@ -6,6 +6,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMInheritance,			 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMPlayerInitialization, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogSSIMEnemyInitialization,  Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMGameplayMessages,	 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMValidations,			 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMStatsCalculation,	 Log, All);

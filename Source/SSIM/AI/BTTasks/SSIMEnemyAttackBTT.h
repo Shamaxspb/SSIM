@@ -13,4 +13,13 @@ UCLASS()
 class SSIM_API USSIMEnemyAttackBTT : public USSIMBTTaskBase
 {
 	GENERATED_BODY()
+	
+private:
+	TWeakObjectPtr<UBehaviorTreeComponent> CachedOwnerComp; 
+	
+public:
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+private:
+	void OnEndAttack() const;
 };

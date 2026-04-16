@@ -28,8 +28,18 @@ void ASSIMBaseEnemy::SetupAttackCollision()
 
 
 // Interfaces
-void ASSIMBaseEnemy::ReceiveDamage_Implementation(float InDamage) const
+void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(float InDamage) const
 {
 	EnemyStatsComponent->SetReceivedDamage(InDamage);
 	EnemyStatsComponent->ReduceHealth();
+}
+
+void ASSIMBaseEnemy::StartAttackInterface_Implementation() const
+{
+	EnemyCombatComponent->StartAttack();
+}
+
+void ASSIMBaseEnemy::EndAttackInterface_Implementation() const
+{
+	EnemyCombatComponent->EndAttack();
 }

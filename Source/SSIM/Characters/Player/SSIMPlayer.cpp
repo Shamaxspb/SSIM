@@ -30,7 +30,7 @@ void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Frontal Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
+	/*UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Frontal Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
 												*GetName(),
 												*FrontalAttackCollision.GetName(), *UEnum::GetValueAsString(FrontalAttackCollision->GetCollisionEnabled()),
 												FrontalAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
@@ -43,7 +43,7 @@ void ASSIMPlayer::BeginPlay()
 	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Bottom Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
 												*GetName(),
 												*BottomAttackCollision.GetName(), *UEnum::GetValueAsString(BottomAttackCollision->GetCollisionEnabled()),
-												BottomAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
+												BottomAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));*/
 	
 	
 	
@@ -180,7 +180,7 @@ void ASSIMPlayer::EndDashInterface_Implementation() const
 }
 
 
-void ASSIMPlayer::ReceiveDamage_Implementation(int32 InDamage) const
+void ASSIMPlayer::ReceiveDamageInterface_Implementation(int32 InDamage) const
 {
 	SSIMPlayerStatsComponent->SetReceivedDamage(InDamage);
 	SSIMPlayerStatsComponent->ReduceHealth();

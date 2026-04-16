@@ -13,22 +13,16 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
+	
+	
 // Variables
-#pragma region Stats
-	
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
-	float RegularAttackDamage;
-	
-#pragma endregion Stats	
-	
 #pragma region Metadata
 
 protected:
 	bool bIsAttacking = false;
 	
-	UPROPERTY()
-	TObjectPtr<UAnimMontage> AttackMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TObjectPtr<UAnimMontage> AttackMontage;
 	
 	UPROPERTY()
 	UBoxComponent* CurrentAttackCollision;
@@ -38,7 +32,7 @@ protected:
 		
 #pragma endregion Metadata
 
-	
+		
 // My Functions
 public:
 	virtual void StartAttack();
@@ -47,6 +41,7 @@ public:
 	virtual void EndAttackTrace();
 	
 protected:
+	UFUNCTION()
 	virtual UAnimMontage* GetAttackMontage();
 	
 	UFUNCTION()

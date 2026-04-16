@@ -32,6 +32,7 @@ protected:
 	
 #pragma endregion Components
 	
+public:
 	
 // Overriden Functions
 public:
@@ -43,6 +44,9 @@ protected:
 	
 // Interfaces
 public:
-	virtual void ReceiveDamage_Implementation(float InDamage) const override;
+	virtual void ReceiveDamageInterface_Implementation(float InDamage) const override;
+	virtual void StartAttackInterface_Implementation() const override;
+	virtual void EndAttackInterface_Implementation() const override;
+	
 	
 };

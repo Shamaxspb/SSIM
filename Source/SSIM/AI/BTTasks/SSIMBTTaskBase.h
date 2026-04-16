@@ -6,11 +6,10 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "SSIMBTTaskBase.generated.h"
 
-/**
- * 
- */
-UCLASS()
+
+UCLASS(NotBlueprintable)
 class SSIM_API USSIMBTTaskBase : public UBTTaskNode
 {
 	GENERATED_BODY()
+
 };

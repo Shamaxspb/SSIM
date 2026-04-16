@@ -11,5 +11,20 @@ UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMEnemyCombatComponent : public USSIMBaseCombatComponent
 {
 	GENERATED_BODY()
+	
+	
+// Variables
+#pragma region Stats
+	
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	int32 RegularAttackDamage;
+	
+#pragma endregion Stats	
+	
 
+// My Functions
+public:
+	virtual void StartAttack() override;
+	
 };

@@ -8,7 +8,7 @@
 
 class AActor;
 
-UCLASS(meta = (DisplayName = "Attack Processing"))
+UCLASS(meta = (DisplayName = "SSIM Attack Processing"))
 class SSIM_API USSIMAttackProcessingNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()

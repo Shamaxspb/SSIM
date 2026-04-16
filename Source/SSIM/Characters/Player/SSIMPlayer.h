@@ -158,6 +158,6 @@ public:
 	
 	virtual void EndDashInterface_Implementation() const override;
 	
-	virtual void ReceiveDamage_Implementation(int32 InDamage) const override;
+	virtual void ReceiveDamageInterface_Implementation(int32 InDamage) const override;
 
 };

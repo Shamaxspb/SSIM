@@ -3,34 +3,13 @@
 
 #include "SSIMKhaimeraCombatComponent.h"
 
+#include "SSIM/SSIM.h"
 
-// Sets default values for this component's properties
-USSIMKhaimeraCombatComponent::USSIMKhaimeraCombatComponent()
+UAnimMontage* USSIMKhaimeraCombatComponent::GetAttackMontage()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	if (!IsValid(AttackMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Attack Montage is not valid"), TEXT(__FUNCTION__));
+	}
+	return AttackMontage;
 }
-
-
-// Called when the game starts
-void USSIMKhaimeraCombatComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void USSIMKhaimeraCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                 FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
