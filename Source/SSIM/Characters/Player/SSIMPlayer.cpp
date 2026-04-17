@@ -158,6 +158,16 @@ void ASSIMPlayer::HandleDash()
 }
 
 // Interfaces
+void ASSIMPlayer::StartAttackInterface_Implementation() const
+{
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Shouldn't call player's Start Attack from outside player related classes"), TEXT(__FUNCTION__));
+}
+
+void ASSIMPlayer::EndAttackInterface_Implementation() const
+{
+	SSIMPlayerCombatComponent->EndAttack();
+}
+
 void ASSIMPlayer::StartAttackTraceInterface_Implementation() const
 {
 	SSIMPlayerCombatComponent->StartAttackTrace();
@@ -166,11 +176,6 @@ void ASSIMPlayer::StartAttackTraceInterface_Implementation() const
 void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
 {
 	SSIMPlayerCombatComponent->EndAttackTrace();
-}
-
-void ASSIMPlayer::EndAttackInterface_Implementation() const
-{
-	SSIMPlayerCombatComponent->EndAttack();
 }
 
 

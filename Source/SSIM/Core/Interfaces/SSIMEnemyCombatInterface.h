@@ -21,9 +21,4 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Combat")
 	void ReceiveDamageInterface(float InDamage) const;
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Combat")
-	void StartAttackInterface() const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Combat")
-	void EndAttackInterface() const;
 };

@@ -24,6 +24,11 @@ void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
 	FVector Location = GetActorLocation();
 	Location.X = 0.f;
 	SetActorLocation(Location);
+	
+	// Set rotation
+	FRotator Rotation = GetActorRotation();
+	Rotation.Yaw = -90.f;
+	SetActorRotation(Rotation);
 }
 
 // My Functions

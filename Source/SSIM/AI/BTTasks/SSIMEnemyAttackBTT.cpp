@@ -6,7 +6,7 @@
 #include "AIController.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/SSIMBaseCharacter.h"
-#include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
 
 EBTNodeResult::Type USSIMEnemyAttackBTT::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -17,17 +17,17 @@ EBTNodeResult::Type USSIMEnemyAttackBTT::ExecuteTask(UBehaviorTreeComponent& Own
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner is not valid"), TEXT(__FUNCTION__));
 		return EBTNodeResult::Failed;
 	}
-	//ASSIMBaseCharacter* BaseCharacter = Cast<ASSIMBaseCharacter>(OwnerComp.GetOwner());
 	ASSIMBaseCharacter* BaseCharacter = Cast<ASSIMBaseCharacter>(CachedOwnerComp->GetAIOwner()->GetPawn());
 	
-	if (!BaseCharacter->Implements<USSIMEnemyCombatInterface>())
+	if (!BaseCharacter->Implements<USSIMCommonCombatInterface>())
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMEnemyCombatInterface"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCommonCombatInterface"), TEXT(__FUNCTION__));
 		return EBTNodeResult::Failed;
 	}
 	
-	ISSIMEnemyCombatInterface::Execute_StartAttackInterface(BaseCharacter);
 	BaseCharacter->OnAttackFinishedDelegate.AddUObject(this, &USSIMEnemyAttackBTT::OnEndAttack);
+	
+	ISSIMCommonCombatInterface::Execute_StartAttackInterface(BaseCharacter);
 	
 	return EBTNodeResult::InProgress;
 	
