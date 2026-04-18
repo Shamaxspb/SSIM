@@ -6,16 +6,13 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "SSIMDashEndNotify.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnNotifiedSignature);
 
-
-UCLASS()
+UCLASS(meta = (DisplayName = "SSIM Dash End"))
 class SSIM_API USSIMDashEndNotify : public UAnimNotify
 {
 	GENERATED_BODY()
 	
 public:
-	FOnNotifiedSignature OnNotified;
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, 
 						const FAnimNotifyEventReference& EventReference) override;
 	

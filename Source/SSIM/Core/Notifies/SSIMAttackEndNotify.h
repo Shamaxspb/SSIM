@@ -7,12 +7,12 @@
 #include "SSIMAttackEndNotify.generated.h"
 
 
-UCLASS(meta = (DisplayName = "Attack End"))
+UCLASS(meta = (DisplayName = "SSIM Attack End"))
 class SSIM_API USSIMAttackEndNotify : public UAnimNotify
 {
 	GENERATED_BODY()
 	
-// Overriden Functions
 public:
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;	
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, 
+					    const FAnimNotifyEventReference& EventReference) override;	
 };

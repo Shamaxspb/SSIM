@@ -6,10 +6,9 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "SSIMAttackProcessingNotifyState.generated.h"
 
-enum class EPlayerAttackDirection : uint8;
 class AActor;
 
-UCLASS(meta = (DisplayName = "Attack Processing"))
+UCLASS(meta = (DisplayName = "SSIM Attack Processing"))
 class SSIM_API USSIMAttackProcessingNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()

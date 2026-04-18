@@ -1,0 +1,166 @@
+﻿#pragma once
+
+#include "CoreMinimal.h"
+#include "SSIM/Characters/SSIMBaseCharacter.h"
+#include "SSIM/Core/Types/EPlayerState.h"
+#include "SSIM/Core/Interfaces/PlayerDataInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
+
+#include "SSIMPlayer.generated.h"
+
+class USSIMPlayerStatsComponent;
+class UBoxComponent;
+class UInputAction;
+class USSIMPlayerCombatComponent;
+class USSIMPlayerFlowComponent;
+
+
+UCLASS(meta = (PrioritizeCategories = "SSIM"))
+class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface,
+														public ISSIMCommonCombatInterface,
+														public ISSIMPlayerCombatInterface
+{
+	GENERATED_BODY()
+
+// Variables
+protected:
+#pragma region Components
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
+	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
+	TObjectPtr<USSIMPlayerStatsComponent> SSIMPlayerStatsComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FlowComponent")
+	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+	
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollisionRoot", 
+			  meta = (ToolTip = "This is blank component to group up attack collision components, just for clear hierarchy"))
+	TObjectPtr<USceneComponent> RootAttackCollisionComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FrontalAttackCollision")
+	TObjectPtr<UBoxComponent> FrontalAttackCollision;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "UpperAttackCollision")
+	TObjectPtr<UBoxComponent> UpperAttackCollision;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "BottomAttackCollision")
+	TObjectPtr<UBoxComponent> BottomAttackCollision;
+	
+#pragma endregion Components
+	
+#pragma region Input
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveRight")
+	UInputAction* MoveRightInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveLeft")
+	UInputAction* MoveLeftInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Dash")
+	UInputAction* DashInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_Attack")
+	UInputAction* AttackInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackUpward")
+	UInputAction* AttackUpwardInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackUpward_Chord")
+	UInputAction* UpwardAttackChord;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackDownward")
+	UInputAction* AttackDownwardInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackDownward_Chord")
+	UInputAction* DownwardAttackChord;
+	
+#pragma endregion Input	
+	
+	UPROPERTY()
+	EPlayerState CurrentPlayerState;
+	
+	
+// Overriden Functions
+public:
+	ASSIMPlayer();
+	
+	virtual void BeginPlay() override;
+	
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	
+// My Functions
+public:
+#pragma region Inline Getters
+	
+	UFUNCTION()
+	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
+	{
+		return SSIMPlayerCombatComponent;
+	}
+	
+	UFUNCTION()
+	FORCEINLINE USSIMPlayerFlowComponent* GetPlayerFlowComponent() const
+	{
+		return SSIMPlayerFlowComponent;
+	}
+	
+	UFUNCTION()
+	FORCEINLINE USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
+	{
+		return SSIMPlayerStatsComponent;
+	}
+	
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetFrontalAttackCollision() const
+	{
+		return FrontalAttackCollision;
+	}
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetUpperAttackCollision() const
+	{
+		return UpperAttackCollision;
+	}
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetBottomAttackCollision() const
+	{
+		return BottomAttackCollision;
+	}
+	
+#pragma endregion Inline Getters
+	
+private:
+	void MoveRight();
+	void MoveLeft();
+	
+	void SetupAttackCollision();
+	
+#pragma region Handler Functions
+	
+	void HandleAttackFrontal();
+	void HandleAttackUpward();
+	void HandleAttackDownward();
+	void HandleStartAttackTrace();
+	void HandleEndAttackTrace();
+	
+	void HandleDash(); 
+	
+#pragma endregion Handler Functions
+	
+	
+// Interfaces
+public:
+	virtual void StartAttackInterface_Implementation() const override;
+	virtual void EndAttackInterface_Implementation() const override;
+	virtual void StartAttackTraceInterface_Implementation() const override;
+	virtual void EndAttackTraceInterface_Implementation() const override;
+	
+	virtual void EndDashInterface_Implementation() const override;
+	
+	virtual void ReceiveDamageInterface_Implementation(int32 InDamage) const override;
+
+};

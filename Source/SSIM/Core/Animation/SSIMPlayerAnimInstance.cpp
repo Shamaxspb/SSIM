@@ -4,7 +4,7 @@
 #include "SSIMPlayerAnimInstance.h"
 
 #include "SSIM/SSIM.h"
-#include "SSIM/Player/SSIMPlayer.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
 
 void USSIMPlayerAnimInstance::SetOwnerReference()
 {
