@@ -169,6 +169,11 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 
 void USSIMPlayerCombatComponent::DealDamageToEnemy()
 {
+	if (HitEnemies.IsEmpty())
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+	}
+		
 	for (auto Element : HitEnemies)
 	{
 		if (!Element->Implements<USSIMEnemyCombatInterface>())
