@@ -7,7 +7,7 @@
 #include "SSIMDashEndNotify.generated.h"
 
 
-UCLASS(meta = (DisplayName = "Dash End"))
+UCLASS(meta = (DisplayName = "SSIM Dash End"))
 class SSIM_API USSIMDashEndNotify : public UAnimNotify
 {
 	GENERATED_BODY()

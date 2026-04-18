@@ -3,6 +3,7 @@
 
 #include "SSIMBaseEnemy.h"
 
+#include "Components/BoxComponent.h"
 #include "SSIM/Components/Combat/SSIMEnemyCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
 
@@ -11,11 +12,44 @@ ASSIMBaseEnemy::ASSIMBaseEnemy()
 {
 	EnemyCombatComponent = CreateDefaultSubobject<USSIMEnemyCombatComponent>(TEXT("CombatComponent"));
 	EnemyStatsComponent  = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
+	
+	SetupAttackCollision();
+}
+
+void ASSIMBaseEnemy::SetupAttackCollision()
+{
+	AttackBoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
+	AttackBoxCollision->SetupAttachment(GetRootComponent());
+	
+	AttackBoxCollision->SetGenerateOverlapEvents(true);
+	AttackBoxCollision->SetCollisionProfileName("AttackTrace", true);
+	AttackBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 
 // Interfaces
-void ASSIMBaseEnemy::ReceiveDamage_Implementation(float InDamage) const
+void ASSIMBaseEnemy::StartAttackInterface_Implementation() const
+{
+	EnemyCombatComponent->StartAttack();
+}
+
+void ASSIMBaseEnemy::EndAttackInterface_Implementation() const
+{
+	EnemyCombatComponent->EndAttack();
+}
+
+void ASSIMBaseEnemy::StartAttackTraceInterface_Implementation() const
+{
+	EnemyCombatComponent->StartAttackTrace();
+}
+
+void ASSIMBaseEnemy::EndAttackTraceInterface_Implementation() const
+{
+	EnemyCombatComponent->EndAttackTrace();
+}
+
+
+void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(float InDamage) const
 {
 	EnemyStatsComponent->SetReceivedDamage(InDamage);
 	EnemyStatsComponent->ReduceHealth();

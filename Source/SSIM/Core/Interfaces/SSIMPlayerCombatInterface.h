@@ -19,5 +19,5 @@ class SSIM_API ISSIMPlayerCombatInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Combat")
-	void ReceiveDamage(int32 InDamage) const;
+	void ReceiveDamageInterface(int32 InDamage) const;
 };

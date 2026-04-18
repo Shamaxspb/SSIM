@@ -7,7 +7,7 @@
 #include "SSIMAttackEndNotify.generated.h"
 
 
-UCLASS(meta = (DisplayName = "Attack End"))
+UCLASS(meta = (DisplayName = "SSIM Attack End"))
 class SSIM_API USSIMAttackEndNotify : public UAnimNotify
 {
 	GENERATED_BODY()

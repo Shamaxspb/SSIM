@@ -7,7 +7,8 @@
 
 #include "SSIMPlayerStatsComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageReceivedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReceivedSignature, int32, NewHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealReceivedSignature, int32, NewHealth);
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -18,7 +19,9 @@ class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
 // Variables
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
-	FOnDamageReceivedSignature OnDamageReceived;
+	FOnDamageReceivedSignature OnDamageReceivedDelegate;
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
+	FOnDamageReceivedSignature OnHealReceivedDelegate;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 MaxHealth = 5;
@@ -42,4 +45,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void ReduceHealth() override;
 	
+	// DEBUG
+public:
+	UFUNCTION(BlueprintCallable)
+	void IncrementHealth_DEBUG();
 };

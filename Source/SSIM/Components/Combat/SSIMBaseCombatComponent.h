@@ -13,32 +13,26 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
+	
+	
 // Variables
-#pragma region Stats
-	
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
-	float RegularAttackDamage;
-	
-#pragma endregion Stats	
-	
 #pragma region Metadata
 
 protected:
 	bool bIsAttacking = false;
 	
-	UPROPERTY()
-	TObjectPtr<UAnimMontage> AttackMontage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TObjectPtr<UAnimMontage> AttackMontage;
 	
 	UPROPERTY()
 	UBoxComponent* CurrentAttackCollision;
 	
 	UPROPERTY()
-	TSet<AActor*> HitCharacters;
+	TSet<AActor*> HitEnemies;
 		
 #pragma endregion Metadata
 
-	
+		
 // My Functions
 public:
 	virtual void StartAttack();
@@ -47,12 +41,14 @@ public:
 	virtual void EndAttackTrace();
 	
 protected:
+	UFUNCTION()
 	virtual UAnimMontage* GetAttackMontage();
 	
+	UFUNCTION()
 	virtual void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-									   AActor* OtherActor,
-									   UPrimitiveComponent* OtherComp,
-									   int32 OtherBodyIndex,
-									   bool bFromSweep,
-									   const FHitResult& SweepResult);
+											   AActor* OtherActor,
+											   UPrimitiveComponent* OtherComp,
+											   int32 OtherBodyIndex,
+											   bool bFromSweep,
+											   const FHitResult& SweepResult);
 };

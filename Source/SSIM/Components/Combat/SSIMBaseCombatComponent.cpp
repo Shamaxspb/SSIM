@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "SSIM/SSIM.h"
 
+
 void USSIMBaseCombatComponent::StartAttack()
 {
 	if (bIsAttacking)
@@ -35,6 +36,11 @@ void USSIMBaseCombatComponent::EndAttack()
 
 void USSIMBaseCombatComponent::StartAttackTrace()
 {
+	if (!IsValid(CurrentAttackCollision))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | CurrentAttackCollision is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
 	CurrentAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap);
 	
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -43,6 +49,7 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 	#if !UE_BUILD_SHIPPING
 	CurrentAttackCollision->SetHiddenInGame(false);
 	#endif
+	
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
@@ -63,7 +70,7 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 	CurrentAttackCollision->SetHiddenInGame(true);
 	#endif
 
-	HitCharacters.Empty();
+	HitEnemies.Empty();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
 }
@@ -78,6 +85,6 @@ void USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	HitCharacters.Add(OtherActor);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Overlapped Actor : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | OnAttackCollisionBeginOverlap() is not overriden"), *GetOwner()->GetName());
+	return;
 }

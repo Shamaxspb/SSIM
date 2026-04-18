@@ -4,6 +4,7 @@
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
 #include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
 
 #include "SSIMPlayer.generated.h"
@@ -17,6 +18,7 @@ class USSIMPlayerFlowComponent;
 
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
 class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface,
+														public ISSIMCommonCombatInterface,
 														public ISSIMPlayerCombatInterface
 {
 	GENERATED_BODY()
@@ -86,6 +88,8 @@ protected:
 public:
 	ASSIMPlayer();
 	
+	virtual void BeginPlay() override;
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	
@@ -150,12 +154,13 @@ private:
 	
 // Interfaces
 public:
+	virtual void StartAttackInterface_Implementation() const override;
+	virtual void EndAttackInterface_Implementation() const override;
 	virtual void StartAttackTraceInterface_Implementation() const override;
 	virtual void EndAttackTraceInterface_Implementation() const override;
-	virtual void EndAttackInterface_Implementation() const override;
 	
 	virtual void EndDashInterface_Implementation() const override;
 	
-	virtual void ReceiveDamage_Implementation(int32 InDamage) const override;
-	
+	virtual void ReceiveDamageInterface_Implementation(int32 InDamage) const override;
+
 };

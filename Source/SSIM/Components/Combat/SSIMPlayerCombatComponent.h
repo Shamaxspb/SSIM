@@ -18,6 +18,14 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 	GENERATED_BODY()
 
 // Variables
+#pragma region Stats
+	
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
+	float RegularAttackDamage;
+	
+#pragma endregion Stats	
+	
 #pragma region Montages
 	
 protected:
@@ -60,6 +68,7 @@ protected:
 	
 	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
 	
+	
 // My Functions
 public:
 	virtual void StartAttack() override;
@@ -69,13 +78,12 @@ protected:
 	virtual void SetReferences() override;
 	virtual UAnimMontage* GetAttackMontage() override;
 	
-	UFUNCTION()
 	virtual void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-									   AActor* OtherActor,
-									   UPrimitiveComponent* OtherComp,
-									   int32 OtherBodyIndex,
-									   bool bFromSweep,
-									   const FHitResult& SweepResult) override;
+											   AActor* OtherActor,
+											   UPrimitiveComponent* OtherComp,
+											   int32 OtherBodyIndex,
+											   bool bFromSweep,
+											   const FHitResult& SweepResult) override;
 	
 private:
 	void DealDamageToEnemy();

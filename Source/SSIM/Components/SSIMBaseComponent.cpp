@@ -5,8 +5,6 @@
 
 #include "GameFramework/Character.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Characters/Player/SSIMPlayer.h"
-#include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 
 
 USSIMBaseComponent::USSIMBaseComponent()
