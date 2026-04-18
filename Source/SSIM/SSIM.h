@@ -12,6 +12,9 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSSIMGameplayMessages,	 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMValidations,			 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMStatsCalculation,	 Log, All);
 
-constexpr ECollisionChannel ECC_Player		= ECC_GameTraceChannel1;
-constexpr ECollisionChannel ECC_AttackTrace = ECC_GameTraceChannel2;
-constexpr ECollisionChannel ECC_Enemy		= ECC_GameTraceChannel3;
+constexpr ECollisionChannel ECC_Player			= ECC_GameTraceChannel1;
+constexpr ECollisionChannel ECC_Enemy			= ECC_GameTraceChannel2;
+constexpr ECollisionChannel ECC_MeleeAttack		= ECC_GameTraceChannel3;
+constexpr ECollisionChannel ECC_Projectile		= ECC_GameTraceChannel4;
+constexpr ECollisionChannel ECC_HitRegistration	= ECC_GameTraceChannel5;
+constexpr ECollisionChannel ECC_ContactDamage	= ECC_GameTraceChannel6;

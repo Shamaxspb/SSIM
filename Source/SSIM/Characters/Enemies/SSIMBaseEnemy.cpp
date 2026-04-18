@@ -4,12 +4,15 @@
 #include "SSIMBaseEnemy.h"
 
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "SSIM/Components/Combat/SSIMEnemyCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
 
 // Overriden Functions
 ASSIMBaseEnemy::ASSIMBaseEnemy()
 {
+	GetCapsuleComponent()->SetCollisionProfileName("Enemy", true);
+	
 	EnemyCombatComponent = CreateDefaultSubobject<USSIMEnemyCombatComponent>(TEXT("CombatComponent"));
 	EnemyStatsComponent  = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
 	

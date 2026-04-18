@@ -13,6 +13,7 @@ ASSIMBaseCharacter::ASSIMBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	RestrictXAxisMovement();
+	SetupDamageRegistrationCollision();
 
 }
 
@@ -57,13 +58,17 @@ void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
 	ContactDamageCollision	= CreateDefaultSubobject<UCapsuleComponent>(TEXT("ContactDamageCollision"));
 
 	TArray<TObjectPtr<UCapsuleComponent>> DamageRegistrationCollisions;
+	DamageRegistrationCollisions.Add(HitRegistrationCollision);
+	DamageRegistrationCollisions.Add(ContactDamageCollision);
+	
 	for (auto const Element : DamageRegistrationCollisions)
 	{
 		Element->SetupAttachment(DamageRegistrationGroup);
 		Element->SetGenerateOverlapEvents(true);
 		Element->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
-		HitRegistrationCollision->SetCollisionProfileName("AttackTrace", true);
-		ContactDamageCollision->SetCollisionProfileName("AttackTrace", true);
+	
+	HitRegistrationCollision->SetCollisionProfileName("HitRegistration", true);
+	ContactDamageCollision->SetCollisionProfileName("ContactDamage", true);
 
 }

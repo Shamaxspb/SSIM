@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "SSIMPlayerController.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
@@ -16,7 +17,7 @@ ASSIMPlayer::ASSIMPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CurrentPlayerState = EPlayerState::EPS_Movement;
+	GetCapsuleComponent()->SetCollisionProfileName("Player", true);
 	
 	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
 	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
@@ -117,8 +118,7 @@ void ASSIMPlayer::SetupAttackCollision()
 	{
 		Element->SetupAttachment(RootAttackCollisionComponent);
 		Element->SetGenerateOverlapEvents(true);
-		Element->SetCollisionProfileName("AttackTrace", true);
-		Element->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Element->SetCollisionProfileName("MeleeAttack", true);
 	}
 	
 }

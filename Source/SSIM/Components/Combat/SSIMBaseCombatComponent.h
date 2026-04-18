@@ -24,7 +24,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Components|Attack")
 	UBoxComponent* CurrentAttackCollision;
 	
 	UPROPERTY()
