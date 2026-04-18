@@ -6,6 +6,7 @@
 DEFINE_LOG_CATEGORY(LogSSIMInheritance);
 DEFINE_LOG_CATEGORY(LogSSIMPlayerInitialization);
 DEFINE_LOG_CATEGORY(LogSSIMEnemyInitialization);
+DEFINE_LOG_CATEGORY(LogSSIMUIInitialization);
 DEFINE_LOG_CATEGORY(LogSSIMGameplayMessages);
 DEFINE_LOG_CATEGORY(LogSSIMValidations);
 DEFINE_LOG_CATEGORY(LogSSIMStatsCalculation);

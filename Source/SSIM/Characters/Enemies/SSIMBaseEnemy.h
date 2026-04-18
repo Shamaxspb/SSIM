@@ -40,6 +40,12 @@ public:
 public:
 	ASSIMBaseEnemy();
 	
+	UFUNCTION()
+	FORCEINLINE UBoxComponent* GetAttackCollision() const
+	{
+		return AttackBoxCollision;
+	}
+	
 // My Functions
 protected:
 	void SetupAttackCollision();

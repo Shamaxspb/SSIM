@@ -20,7 +20,13 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
-private:
+// Overriden Functions
+protected:
+	virtual void NativeConstruct() override;
+	
+	
+// My Functions
+protected:
 	virtual void SetReferences();
 	
 };

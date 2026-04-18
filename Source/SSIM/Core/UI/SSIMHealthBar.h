@@ -16,23 +16,30 @@ class SSIM_API USSIMHealthBar : public USSIMBaseUI
 {
 	GENERATED_BODY()
 	
-	// Variables
+// Variables
 protected:
-	float Health;
-	float MaxHealth;
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|HealthBar")
+	int32 CachedHealth;
+	int32 MaxHealth;
 
 private:
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
 	
 	
-	// My Functions
+// Overriden Functions
+protected:
+	virtual void NativeConstruct() override;
+	
+	
+// My Functions
 protected:	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnHealthChanged();
+	void OnHealthChanged(int32 NewHealth);
+	
+	virtual void SetReferences() override;
 
 private:
 	void Init();
-	virtual void SetReferences() override;
 	void InitStatsValues();
 };

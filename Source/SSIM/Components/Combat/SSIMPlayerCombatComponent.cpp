@@ -23,8 +23,6 @@ void USSIMPlayerCombatComponent::StartAttack()
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
 {	
-	
-
 	switch (PlayerAttackDirection)
 	{
 		case EPlayerAttackDirection::EPAD_Frontal:
@@ -163,14 +161,15 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	Super::OnAttackCollisionBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	HitEnemies.Add(OtherActor);
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Enemy : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
 	
 	DealDamageToEnemy();
 }
 
 void USSIMPlayerCombatComponent::DealDamageToEnemy()
 {
-	for (auto Element : HitCharacters)
+	for (auto Element : HitEnemies)
 	{
 		if (!Element->Implements<USSIMEnemyCombatInterface>())
 		{
