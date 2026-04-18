@@ -215,7 +215,13 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Direction: %s"), *ReboundDirection.ToString());
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rotated Direction: %s"), *RotatedDirection.ToString());
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Velocity: %s"),  *ReboundVelocity.ToString());
-	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, FLinearColor::Green, 3.f, 5.f);
+	
+	#if !UE_BUILD_SHIPPING
+	if (bReboundShowDebug)
+	{
+		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, ReboundDirectionArrowColor, 3.f, 5.f);
+	}
+	#endif !UE_BUILD_SHIPPING
 	
 	return ReboundVelocity;
 	// This is so messy because it was hard to understand how the fck should I implement this

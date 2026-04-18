@@ -60,14 +60,27 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
-	float ReboundAngle = 25.f;
+#pragma region Rebound
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
-	float ReboundVelocityCoef = 500.f;
+	float ReboundAngle = 45.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
+	float ReboundVelocityCoef = 700.f;
 	
 	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
 	
+	// Debug
+	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG")
+	bool bReboundShowDebug;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	bool bDrawReboundDirectionArrow;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.287f, 0.017f, 1.f);
+	
+#pragma endregion Rebound
 	
 // My Functions
 public:
