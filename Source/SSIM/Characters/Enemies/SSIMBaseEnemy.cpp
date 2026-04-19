@@ -12,6 +12,7 @@
 ASSIMBaseEnemy::ASSIMBaseEnemy()
 {
 	GetCapsuleComponent()->SetCollisionProfileName("Enemy", true);
+	GetMesh()->SetCollisionProfileName("Enemy", true);
 	
 	EnemyCombatComponent = CreateDefaultSubobject<USSIMEnemyCombatComponent>(TEXT("CombatComponent"));
 	EnemyStatsComponent  = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
@@ -25,7 +26,7 @@ void ASSIMBaseEnemy::SetupAttackCollision()
 	AttackBoxCollision->SetupAttachment(GetRootComponent());
 	
 	AttackBoxCollision->SetGenerateOverlapEvents(true);
-	AttackBoxCollision->SetCollisionProfileName("AttackTrace", true);
+	AttackBoxCollision->SetCollisionProfileName("MeleeAttack", true);
 	AttackBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
@@ -52,8 +53,9 @@ void ASSIMBaseEnemy::EndAttackTraceInterface_Implementation() const
 }
 
 
-void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(float InDamage) const
+void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(float InDamage, AActor* InDamageInstigator) const
 {
 	EnemyStatsComponent->SetReceivedDamage(InDamage);
+	EnemyStatsComponent->SetDamageInstigator(InDamageInstigator);
 	EnemyStatsComponent->ReduceHealth();
 }

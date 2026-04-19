@@ -8,6 +8,7 @@
 #include "SSIMPlayerController.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
@@ -18,6 +19,7 @@ ASSIMPlayer::ASSIMPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCapsuleComponent()->SetCollisionProfileName("Player", true);
+	GetMesh()->SetCollisionProfileName("Player", true);
 	
 	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
 	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
@@ -25,28 +27,12 @@ ASSIMPlayer::ASSIMPlayer()
 
 	SetupAttackCollision();
 	
+	
 }
 
 void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	/*UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Frontal Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
-												*GetName(),
-												*FrontalAttackCollision.GetName(), *UEnum::GetValueAsString(FrontalAttackCollision->GetCollisionEnabled()),
-												FrontalAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
-	
-	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Upper Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
-												*GetName(),
-												*UpperAttackCollision.GetName(), *UEnum::GetValueAsString(UpperAttackCollision->GetCollisionEnabled()),
-												UpperAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
-	
-	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Bottom Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
-												*GetName(),
-												*BottomAttackCollision.GetName(), *UEnum::GetValueAsString(BottomAttackCollision->GetCollisionEnabled()),
-												BottomAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));*/
-	
-	
 	
 }
 
@@ -80,7 +66,7 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // My Functions
 void ASSIMPlayer::MoveRight()
 {
-	if (SSIMPlayerFlowComponent->bDashing)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerFlowComponent->bStaggered)
 	{
 		return;
 	}
@@ -91,7 +77,7 @@ void ASSIMPlayer::MoveRight()
 
 void ASSIMPlayer::MoveLeft()
 {
-	if (SSIMPlayerFlowComponent->bDashing)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerFlowComponent->bStaggered)
 	{
 		return;
 	}
@@ -185,8 +171,9 @@ void ASSIMPlayer::EndDashInterface_Implementation() const
 }
 
 
-void ASSIMPlayer::ReceiveDamageInterface_Implementation(int32 InDamage) const
+void ASSIMPlayer::ReceiveDamageInterface_Implementation(int32 InDamage, AActor* InDamageInstigator) const
 {
 	SSIMPlayerStatsComponent->SetReceivedDamage(InDamage);
+	SSIMPlayerStatsComponent->SetDamageInstigator(InDamageInstigator);
 	SSIMPlayerStatsComponent->ReduceHealth();
 }

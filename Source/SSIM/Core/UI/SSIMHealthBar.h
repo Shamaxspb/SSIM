@@ -42,4 +42,10 @@ protected:
 private:
 	void Init();
 	void InitStatsValues();
+	
+	UFUNCTION()
+	void OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator);
+	
+	UFUNCTION()
+	void OnHealReceived(int32 NewHealth);
 };

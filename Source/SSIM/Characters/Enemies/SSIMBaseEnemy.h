@@ -57,7 +57,7 @@ public:
 	virtual void StartAttackTraceInterface_Implementation() const override;
 	virtual void EndAttackTraceInterface_Implementation() const override;
 	
-	virtual void ReceiveDamageInterface_Implementation(float InDamage) const override;
+	virtual void ReceiveDamageInterface_Implementation(float InDamage, AActor* InDamageInstigator) const override;
 	
 	
 };

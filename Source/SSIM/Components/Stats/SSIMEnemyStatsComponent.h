@@ -23,7 +23,7 @@ protected:
 	
 #pragma region Metadata
 	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Damage")
+	UPROPERTY()
 	float ReceivedDamage;
 	
 #pragma endregion Metadata

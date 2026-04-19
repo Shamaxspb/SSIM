@@ -12,8 +12,14 @@ class SSIM_API USSIMBaseStatsComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
 
+// Variables
+protected:
+	UPROPERTY()
+	TObjectPtr<AActor> DamageInstigator;
 	
 // My Functions
 public:
 	virtual void ReduceHealth();
+	
+	void SetDamageInstigator(AActor* InDamageInstigator);
 };

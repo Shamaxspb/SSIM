@@ -24,9 +24,9 @@ class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterf
 	GENERATED_BODY()
 
 // Variables
-protected:
 #pragma region Components
 	
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
@@ -80,9 +80,10 @@ protected:
 	
 #pragma endregion Input	
 	
+protected:
 	UPROPERTY()
 	EPlayerState CurrentPlayerState;
-	
+
 	
 // Overriden Functions
 public:
@@ -94,9 +95,9 @@ public:
 	
 	
 // My Functions
-public:
 #pragma region Inline Getters
 	
+public:
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
@@ -161,6 +162,6 @@ public:
 	
 	virtual void EndDashInterface_Implementation() const override;
 	
-	virtual void ReceiveDamageInterface_Implementation(int32 InDamage) const override;
+	virtual void ReceiveDamageInterface_Implementation(int32 InDamage, AActor* InDamageInstigator) const override;
 
 };

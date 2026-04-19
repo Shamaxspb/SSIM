@@ -3,10 +3,16 @@
 
 #include "SSIMBaseStatsComponent.h"
 
+#include "SSIM/SSIM.h"
+
 
 // My Functions
 void USSIMBaseStatsComponent::ReduceHealth()
 {
-	// No base implementation intended
-	// Must be overriden in derived classes
+	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | ReduceHealth() is not overriden"), *GetOwner()->GetName());
+}
+
+void USSIMBaseStatsComponent::SetDamageInstigator(AActor* InDamageInstigator)
+{
+	DamageInstigator = InDamageInstigator;
 }

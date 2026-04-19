@@ -7,7 +7,29 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
+#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
+
+// Overriden Functions
+void USSIMPlayerFlowComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	SetReferences();
+	
+	SSIMPlayer->GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
+	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedRebound);
+}
+
+void USSIMPlayerFlowComponent::SetReferences()
+{
+	Super::SetReferences();
+	
+	SSIMPlayer = CastChecked<ASSIMPlayer>(GetOwner());
+}
 
 // My Functions
 void USSIMPlayerFlowComponent::StartDash()
@@ -26,7 +48,7 @@ void USSIMPlayerFlowComponent::StartDash()
 	bDashing = true;
 	bCanDash = false;
 	
-	SSIMCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
+	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
 	if (!IsValid(PlayerDashAnimation))
 	{
@@ -45,10 +67,9 @@ void USSIMPlayerFlowComponent::StartDash()
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
 }
 
-
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
-	FVector CurrentVelocity = SSIMCharacter->GetVelocity();
+	FVector CurrentVelocity = SSIMOwnerCharacter->GetVelocity();
 	FVector OutLaunchVelocity;
 	
 	if (CurrentVelocity.IsNearlyZero())
@@ -57,7 +78,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		
 		// Calculate Player direction
 		FVector DashDirectionVector;
-		float DirectionDotProduct = FVector::DotProduct(SSIMCharacter->GetActorForwardVector(), FVector::RightVector);
+		float DirectionDotProduct = FVector::DotProduct(SSIMOwnerCharacter->GetActorForwardVector(), FVector::RightVector);
 		
 		
 		if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
@@ -75,28 +96,72 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		}
 		
 		OutLaunchVelocity =  DashDirectionVector *
-							 SSIMCharacter->GetCharacterMovement()->GetMaxSpeed() *
+							 SSIMOwnerCharacter->GetCharacterMovement()->GetMaxSpeed() *
 							 DashVelocityCoef;
 		
 	}
 	else
 	{
 		// Dash in motion
-		OutLaunchVelocity = FVector(0.f, SSIMCharacter->GetVelocity().Y * DashVelocityCoef,0.f);
+		OutLaunchVelocity = FVector(0.f, SSIMOwnerCharacter->GetVelocity().Y * DashVelocityCoef,0.f);
 	}
 		
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
 	return OutLaunchVelocity;
 }
 
-
 void USSIMPlayerFlowComponent::EndDash()
 {
 	bDashing = false;
 }
 
-
 void USSIMPlayerFlowComponent::ResetDash()
 {
 	bCanDash = true;
+}
+
+void USSIMPlayerFlowComponent::OnDamageReceivedRebound(int32 NewHealth, AActor* InDamageInstigator)
+{
+	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
+	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.f;
+	bStaggered = true;
+	
+	FTimerHandle ReceivedDamageLogicDelayedTimerHandle;
+	FTimerDelegate ReceivedDamageLogicDelayedTimerDelegate;
+	ReceivedDamageLogicDelayedTimerDelegate.BindUObject(this, &USSIMPlayerFlowComponent::ReceivedDamageLogicDelayed, InDamageInstigator);
+	GetWorld()->GetTimerManager().SetTimer(ReceivedDamageLogicDelayedTimerHandle, ReceivedDamageLogicDelayedTimerDelegate, ReboundDelay, false);
+	
+}
+
+void USSIMPlayerFlowComponent::ReceivedDamageLogicDelayed(AActor* InDamageInstigator)
+{
+	bStaggered = false;
+	FVector ReboundVelocity = CalculateReboundVelocity(InDamageInstigator);
+	SSIMPlayer->LaunchCharacter(ReboundVelocity, true, true);
+}
+
+FVector USSIMPlayerFlowComponent::CalculateReboundVelocity(AActor* InDamageInstigator) const
+{
+	FVector PlayerLocation = SSIMPlayer->GetActorLocation();
+	FVector EnemyLocation = InDamageInstigator->GetActorLocation();
+	
+	// Determine if Enemy is to the right or to the left
+	bool bEnemyToTheRight = EnemyLocation.Y > PlayerLocation.Y;
+	
+	// Get unit vector from Enemy to Player and Negate that vector (around X axis)
+	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
+	
+	// Add rotation to that vector
+	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(bEnemyToTheRight ? ReboundAngle : -ReboundAngle, FVector::ForwardVector);
+	
+	FVector ReboundVelocity = FVector(RotatedDirection.X, RotatedDirection.Y * ReboundVelocityCoefY, RotatedDirection.Z * ReboundVelocityCoefZ);
+
+#if !UE_BUILD_SHIPPING
+	if (bReboundShowDebug)
+	{
+		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, ReboundDirectionArrowColor, 3.f, 5.f);
+	}
+#endif !UE_BUILD_SHIPPING
+	
+	return ReboundVelocity;
 }

@@ -182,7 +182,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 			return;
 		}
 		
-		ISSIMEnemyCombatInterface::Execute_ReceiveDamageInterface(Element, RegularAttackDamage);
+		ISSIMEnemyCombatInterface::Execute_ReceiveDamageInterface(Element, RegularAttackDamage, SSIMOwnerCharacter);
 		LaunchTargetOnHit(Element);
 	}
 }
@@ -205,7 +205,7 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	// Get unit vector from Enemy to Player and Negate that vector
 	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
 	
-	// Add rotation to that vector
+	// Add rotation to that vector (around X axis)
 	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(bEnemyToTheRight ? ReboundAngle : -ReboundAngle, FVector::ForwardVector);
 	
 	// Multiply by coef for launch
