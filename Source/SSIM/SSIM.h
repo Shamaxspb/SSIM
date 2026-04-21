@@ -21,3 +21,4 @@ constexpr ECollisionChannel ECC_ContactDamage	= ECC_GameTraceChannel6;
 
 // Globals
 /*const*/ inline float DEFAULT_GRAVITY_SCALE = 7.f;
+/*const*/ inline float DEFAULT_BRAKING_DECELERATION_WALKING = 10000.f;

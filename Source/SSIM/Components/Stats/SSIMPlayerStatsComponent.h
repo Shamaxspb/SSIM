@@ -32,6 +32,11 @@ public:
 	bool bInvulnerable;
 	
 	
+	
+// Overriden Functions
+protected:
+	virtual void BeginPlay() override;
+	
 // My Functions
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
@@ -40,6 +45,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void IncreaseHealth(int32 InHealValue) override;
 
+private:
+	void InterruptStates();
 	
 // DEBUG
 public:

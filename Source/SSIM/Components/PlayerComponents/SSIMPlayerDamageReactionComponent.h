@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 
 #include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIMPlayerDamageReactionComponent.generated.h"
 
 
-struct FDamageData;
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
+
 
 struct FStaggerSequenceStep
 {
@@ -27,6 +28,9 @@ class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseComponent
 // Variables
 protected:
 	// Damage processing
+	
+	FDamageData DamageData;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animations|Stagger")
 	TObjectPtr<UAnimMontage> StaggeredFirstFrame;
 	
@@ -86,9 +90,11 @@ private:
 	void StartStaggerSequence();
 	void ExecuteNextStaggerSequenceStep();
 	void StartStopFrame() const;
-	void StopFrameToStagger() const;
+	void EndStopFrame() const;
+	void StartStagger() const;
 	void EndStagger() const;
 	void EndInvulnerability() const;
+	bool ShouldRotatePlayerAround() const;
 	
 	// DEBUG
 protected:

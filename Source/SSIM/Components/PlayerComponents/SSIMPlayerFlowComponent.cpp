@@ -7,7 +7,6 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
-#include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 
@@ -16,15 +15,15 @@ void USSIMPlayerFlowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetReferences();
+	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	if (!IsValid(StatsComponent))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stats component is not valid"), TEXT(__FUNCTION__));
+	}
+	StatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedHandler);
+	
 }
 
-void USSIMPlayerFlowComponent::SetReferences()
-{
-	Super::SetReferences();
-	
-	SSIMPlayer = CastChecked<ASSIMPlayer>(GetOwner());
-}
 
 // My Functions
 void USSIMPlayerFlowComponent::StartDash()
@@ -42,6 +41,7 @@ void USSIMPlayerFlowComponent::StartDash()
 	
 	bDashing = true;
 	bCanDash = false;
+	SSIMOwnerCharacter->GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
 	
 	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
@@ -108,11 +108,17 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 void USSIMPlayerFlowComponent::EndDash()
 {
 	bDashing = false;
+	SSIMOwnerCharacter->GetCharacterMovement()->BrakingDecelerationWalking = DEFAULT_BRAKING_DECELERATION_WALKING;
 }
 
 void USSIMPlayerFlowComponent::ResetDash()
 {
 	bCanDash = true;
+}
+
+void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData DamageData)
+{
+	EndDash();
 }
 
 

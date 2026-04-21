@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
@@ -34,8 +35,11 @@ void USSIMPlayerDamageReactionComponent::SetReferences()
 }
 
 #pragma region Stagger processing
-void USSIMPlayerDamageReactionComponent::InitStagger(const FDamageData DamageData)
+void USSIMPlayerDamageReactionComponent::InitStagger(const FDamageData InDamageData)
 {
+	DamageData.Instigator = InDamageData.Instigator;
+	DamageData.Value = InDamageData.Value;
+	
 	SSIMOwnerCharacter->GetCharacterMovement()->StopMovementImmediately();
 	SSIMOwnerCharacter->GetCharacterMovement()->GravityScale = 0.0f;
 	
@@ -61,7 +65,7 @@ void USSIMPlayerDamageReactionComponent::StartStaggerSequence()
 	
 	Steps = {
 		{ StaggeredFirstFrameBlendInTime, [this]() {StartStopFrame();}},
-		{StopFrameDuration * 0.001f,		[this]() {StopFrameToStagger();}},
+		{StopFrameDuration * 0.001f,		[this]() {StartStagger();}},
 		{StaggerDuration,					[this]() {EndStagger();}},
 		{InvulnerabilityDuration,			[this]() {EndInvulnerability(); }}
 	};
@@ -97,20 +101,32 @@ void USSIMPlayerDamageReactionComponent::StartStopFrame() const
 	
 }
 
-void USSIMPlayerDamageReactionComponent::StopFrameToStagger() const
+void USSIMPlayerDamageReactionComponent::EndStopFrame() const
 {
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+}
 
+void USSIMPlayerDamageReactionComponent::StartStagger() const
+{
+	EndStopFrame();
+	
+	if (ShouldRotatePlayerAround())
+	{
+		FRotator PlayerRotation = SSIMOwnerCharacter->GetActorRotation(); 
+		PlayerRotation.Yaw *= -1.f;
+		SSIMOwnerCharacter->SetActorRotation(PlayerRotation);
+	}
+	
 	FVector ReboundLaunchVelocity = FVector(
 							0.0f, 
-							SSIMOwnerCharacter->GetActorForwardVector().Y * ReboundVelocityY * -1.f, 
-								ReboundVelocityZ);
+							DamageData.Instigator->GetActorForwardVector().Y * ReboundVelocityY, 
+							ReboundVelocityZ);
+	
 	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
 	#if !UE_BUILD_SHIPPING
 	if (bReboundShowDebug)
 	{
-		//FVector2D(ReboundVelocityY * -1.f, ReboundVelocityZ).Normalize() * 400.f;
 		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
 									SSIMOwnerCharacter->GetActorLocation(), 
 									 SSIMOwnerCharacter->GetActorLocation() + ReboundLaunchVelocity.Normalize() * 400.f, 
@@ -143,6 +159,30 @@ void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
 	PlayerStatsComponent->bInvulnerable = false;
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED"), TEXT(__FUNCTION__));
+}
+
+bool USSIMPlayerDamageReactionComponent::ShouldRotatePlayerAround() const
+{
+	FVector PlayerForwardVector = SSIMOwnerCharacter->GetActorForwardVector();
+	if (!IsValid(DamageData.Instigator))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | DamageData.Instigator is not valid"), TEXT(__FUNCTION__));
+		return 0.f;
+	}
+	FVector EnemyForwardVector = DamageData.Instigator->GetActorForwardVector();
+	
+	float DotProduct = UKismetMathLibrary::Dot_VectorVector(PlayerForwardVector, EnemyForwardVector);
+	
+	if (UKismetMathLibrary::NearlyEqual_FloatFloat(DotProduct, 1.f))
+	{
+		return true;
+	}
+	if (UKismetMathLibrary::NearlyEqual_FloatFloat(DotProduct, -1.f))
+	{
+		return false;
+	}
+	UE_LOG(LogSSIMValidations, Warning, TEXT("%s | Couldn't decide, whether rotate player or not"), TEXT(__FUNCTION__));
+	return false;
 }
 
 #pragma endregion Stagger processing

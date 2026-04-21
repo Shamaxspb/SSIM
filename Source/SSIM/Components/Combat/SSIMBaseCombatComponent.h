@@ -20,7 +20,7 @@ class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 #pragma region Metadata
 
 protected:
-	bool bIsAttacking = false;
+	bool bAttacking = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TObjectPtr<UAnimMontage> AttackMontage;

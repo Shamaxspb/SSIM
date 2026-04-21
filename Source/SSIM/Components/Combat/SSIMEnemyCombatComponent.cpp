@@ -61,8 +61,8 @@ void USSIMEnemyCombatComponent::DealDamageToPlayer()
 		return;
 	}
 	
-	DamageData.DamageInstigator = SSIMOwnerCharacter;
-	DamageData.DamageValue = RegularAttackDamage;
+	DamageData.Instigator = SSIMOwnerCharacter;
+	DamageData.Value = RegularAttackDamage;
 	
 	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(PlayerPawn, DamageData);
 }

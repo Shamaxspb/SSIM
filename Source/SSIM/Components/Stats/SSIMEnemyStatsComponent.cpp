@@ -9,7 +9,7 @@
 // My Functions
 void USSIMEnemyStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
-	Health -= InDamageData.DamageValue;
+	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s Health: %d/%d"),TEXT(__FUNCTION__), 

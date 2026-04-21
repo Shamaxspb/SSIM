@@ -10,7 +10,7 @@
 
 class ASSIMPlayer;
 class UBoxComponent;
-
+class USSIMPlayerStatsComponent;
 
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
@@ -56,12 +56,16 @@ public:
 	
 #pragma endregion Metadata
 	
-protected:
+private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
+	
 #pragma region Rebound
 	
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
 	float ReboundAngle = 45.f;
 	
@@ -82,7 +86,11 @@ protected:
 	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.287f, 0.017f, 1.f);
 	
 #pragma endregion Rebound
-	
+
+// Overriden Functions
+protected:
+	virtual void BeginPlay() override;
+
 // My Functions
 public:
 	virtual void StartAttack() override;
@@ -103,6 +111,9 @@ private:
 	void DealDamageToEnemy();
 	void LaunchTargetOnHit(AActor* InActor) const; 
 	FVector CalculateOnHitLaunchVelocity(const AActor* InActor) const;
+	
+	UFUNCTION()
+	void OnDamageReceivedHandler(const FDamageData InDamageData);
 	
 // DEBUG
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")

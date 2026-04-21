@@ -178,5 +178,10 @@ void ASSIMPlayer::EndDashInterface_Implementation() const
 
 void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {
+	if (SSIMPlayerStatsComponent->bInvulnerable)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+		return;
+	}
 	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }

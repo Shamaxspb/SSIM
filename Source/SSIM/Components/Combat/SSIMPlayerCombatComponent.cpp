@@ -3,15 +3,24 @@
 
 #include "SSIMPlayerCombatComponent.h"
 
+#include "SSIM/SSIM.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
+#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "SSIM/SSIM.h"
-#include "SSIM/Characters/Player/SSIMPlayer.h"
-#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
+
+void USSIMPlayerCombatComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	StatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
+}
 
 // My Functions
 void USSIMPlayerCombatComponent::StartAttack()
@@ -175,8 +184,8 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 		return;
 	}
 	
-	DamageData.DamageInstigator = SSIMPlayer;
-	DamageData.DamageValue = RegularAttackDamage;
+	DamageData.Instigator = SSIMPlayer;
+	DamageData.Value = RegularAttackDamage;
 	
 	for (auto Element : HitEnemies)
 	{
@@ -236,6 +245,11 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	return ReboundVelocity;
 	// This is so messy because it was hard to understand how the fck should I implement this
 	// would be nice to clean this up later
+}
+
+void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData InDamageData)
+{
+	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
 }
 
 

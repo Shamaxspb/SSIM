@@ -3,14 +3,22 @@
 
 #include "SSIMPlayerStatsComponent.h"
 
+#include "GameFramework/Character.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 
+void USSIMPlayerStatsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	
+}
+
 // My Functions
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
-	Health -= InDamageData.DamageValue;
+	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
@@ -30,6 +38,11 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 													MaxHealth);
 	
 	OnHealReceivedDelegate.Broadcast(InHealValue);
+}
+
+void USSIMPlayerStatsComponent::InterruptStates()
+{
+	
 }
 
 
