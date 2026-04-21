@@ -55,10 +55,14 @@ void USSIMEnemyCombatComponent::SetReferences()
 
 void USSIMEnemyCombatComponent::DealDamageToPlayer()
 {
-	if (!PlayerPawn->Implements<USSIMPlayerCombatInterface>())
+	if (!PlayerPawn->Implements<USSIMDamageableInterface>())
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerPawn doesn't implement USSIMPlayerCombatInterface"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerPawn doesn't implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
 		return;
 	}
-	ISSIMPlayerCombatInterface::Execute_ReceiveDamageInterface(PlayerPawn, RegularAttackDamage, SSIMOwnerCharacter);
+	
+	DamageData.DamageInstigator = SSIMOwnerCharacter;
+	DamageData.DamageValue = RegularAttackDamage;
+	
+	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(PlayerPawn, DamageData);
 }

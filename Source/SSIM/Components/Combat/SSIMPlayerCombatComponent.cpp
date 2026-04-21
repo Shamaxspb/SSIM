@@ -9,7 +9,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
-#include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 
@@ -173,16 +173,19 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
 	}
-		
+	
+	DamageData.DamageInstigator = SSIMPlayer;
+	DamageData.DamageValue = RegularAttackDamage;
+	
 	for (auto Element : HitEnemies)
 	{
-		if (!Element->Implements<USSIMEnemyCombatInterface>())
+		if (!Element->Implements<USSIMDamageableInterface>())
 		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMEnemyCombatInterface"), TEXT(__FUNCTION__));
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
 			return;
 		}
 		
-		ISSIMEnemyCombatInterface::Execute_ReceiveDamageInterface(Element, RegularAttackDamage, SSIMOwnerCharacter);
+		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
 		LaunchTargetOnHit(Element);
 	}
 }

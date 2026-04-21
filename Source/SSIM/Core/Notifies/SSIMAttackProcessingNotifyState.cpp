@@ -3,7 +3,7 @@
 
 #include "SSIMAttackProcessingNotifyState.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 
 
 void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
@@ -19,13 +19,13 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 	Owner = MeshComp->GetOwner();
 	
 									
-	if (!Owner->Implements<USSIMCommonCombatInterface>())  
+	if (!Owner->Implements<USSIMCombatInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCommonCombatInterface"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCombatInterface"), TEXT(__FUNCTION__));
 		return;
 	}
 	
-	ISSIMCommonCombatInterface::Execute_StartAttackTraceInterface(Owner);
+	ISSIMCombatInterface::Execute_StartAttackTraceInterface(Owner);
 	
 }
 
@@ -40,11 +40,11 @@ void USSIMAttackProcessingNotifyState::NotifyEnd(USkeletalMeshComponent* MeshCom
 		return;
 	}
 	
-	if (!Owner->Implements<USSIMCommonCombatInterface>())  
+	if (!Owner->Implements<USSIMCombatInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCommonCombatInterface"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCombatInterface"), TEXT(__FUNCTION__));
 		return;
 	}
 	
-	ISSIMCommonCombatInterface::Execute_EndAttackTraceInterface(Owner);
+	ISSIMCombatInterface::Execute_EndAttackTraceInterface(Owner);
 }

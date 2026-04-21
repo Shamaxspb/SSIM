@@ -7,8 +7,9 @@
 
 #include "SSIMPlayerStatsComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageReceivedSignature, int32, NewHealth, AActor*, DamageInstigator);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealReceivedSignature, int32, NewHealth);
+struct FStaggerSequenceStep;
+struct FDamageData;
+
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -18,35 +19,25 @@ class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
 
 // Variables
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
-	FOnDamageReceivedSignature OnDamageReceivedDelegate;
-	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
-	FOnHealReceivedSignature OnHealReceivedDelegate;
-	
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 MaxHealth = 5;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 Health = MaxHealth;
-
-#pragma region Metadata
 	
-protected:
-	UPROPERTY()
-	int32 ReceivedDamage;
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger", meta = (ClampMin = 0))	
+	bool bStaggered;
 	
-#pragma endregion Metadata
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger", meta = (ClampMin = 0))	
+	bool bInvulnerable;
 	
 	
 // My Functions
 public:
-	void SetReceivedDamage(int32 InReceivedDamage);
-	
-	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
-	virtual void ReduceHealth() override;
+	virtual void ReduceHealth(const FDamageData& InDamageData) override;
+
 	
 // DEBUG
 public:

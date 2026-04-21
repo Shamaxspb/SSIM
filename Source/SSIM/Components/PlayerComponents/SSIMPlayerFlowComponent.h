@@ -30,7 +30,6 @@ protected:
 
 public:
 	bool bDashing = false;
-	bool bStaggered = false;
 	
 private:	
 	bool bCanDash = true;
@@ -100,5 +99,9 @@ private:
 	
 	void ReceivedDamageLogicDelayed(AActor* InDamageInstigator);
 	FVector CalculateReboundVelocity(AActor* InDamageInstigator) const;
+	
+	// DEBUG
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG|TakeDamage")
+	void TakeDamageFromNearestEnemy();
 	
 };

@@ -4,7 +4,8 @@
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
-#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
 
 #include "SSIMPlayer.generated.h"
@@ -18,12 +19,13 @@ class USSIMPlayerFlowComponent;
 
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
 class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface,
-														public ISSIMCommonCombatInterface,
-														public ISSIMPlayerCombatInterface
+														public ISSIMCombatInterface,
+														public ISSIMPlayerCombatInterface,
+														public ISSIMDamageableInterface
 {
 	GENERATED_BODY()
 
-// Variables
+// Variables	
 #pragma region Components
 	
 protected:
@@ -85,6 +87,7 @@ protected:
 	EPlayerState CurrentPlayerState;
 
 	
+	
 // Overriden Functions
 public:
 	ASSIMPlayer();
@@ -142,6 +145,7 @@ private:
 	
 #pragma region Handler Functions
 	
+private:
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
@@ -151,6 +155,11 @@ private:
 	void HandleDash(); 
 	
 #pragma endregion Handler Functions
+	
+	// Damage processing
+private:
+	UFUNCTION()
+	void OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator);
 	
 	
 // Interfaces
@@ -162,6 +171,6 @@ public:
 	
 	virtual void EndDashInterface_Implementation() const override;
 	
-	virtual void ReceiveDamageInterface_Implementation(int32 InDamage, AActor* InDamageInstigator) const override;
+	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
 
 };

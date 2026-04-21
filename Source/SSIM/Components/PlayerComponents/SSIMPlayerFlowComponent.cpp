@@ -21,7 +21,6 @@ void USSIMPlayerFlowComponent::BeginPlay()
 	SetReferences();
 	
 	SSIMPlayer->GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
-	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedRebound);
 }
 
 void USSIMPlayerFlowComponent::SetReferences()
@@ -122,27 +121,25 @@ void USSIMPlayerFlowComponent::ResetDash()
 
 void USSIMPlayerFlowComponent::OnDamageReceivedRebound(int32 NewHealth, AActor* InDamageInstigator)
 {
-	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
+	/*SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
 	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.f;
-	bStaggered = true;
 	
 	FTimerHandle ReceivedDamageLogicDelayedTimerHandle;
 	FTimerDelegate ReceivedDamageLogicDelayedTimerDelegate;
 	ReceivedDamageLogicDelayedTimerDelegate.BindUObject(this, &USSIMPlayerFlowComponent::ReceivedDamageLogicDelayed, InDamageInstigator);
-	GetWorld()->GetTimerManager().SetTimer(ReceivedDamageLogicDelayedTimerHandle, ReceivedDamageLogicDelayedTimerDelegate, ReboundDelay, false);
+	GetWorld()->GetTimerManager().SetTimer(ReceivedDamageLogicDelayedTimerHandle, ReceivedDamageLogicDelayedTimerDelegate, ReboundDelay, false);*/
 	
 }
 
 void USSIMPlayerFlowComponent::ReceivedDamageLogicDelayed(AActor* InDamageInstigator)
 {
-	bStaggered = false;
-	FVector ReboundVelocity = CalculateReboundVelocity(InDamageInstigator);
-	SSIMPlayer->LaunchCharacter(ReboundVelocity, true, true);
+	/*FVector ReboundVelocity = CalculateReboundVelocity(InDamageInstigator);
+	SSIMPlayer->LaunchCharacter(ReboundVelocity, true, true);*/
 }
 
 FVector USSIMPlayerFlowComponent::CalculateReboundVelocity(AActor* InDamageInstigator) const
 {
-	FVector PlayerLocation = SSIMPlayer->GetActorLocation();
+	/*FVector PlayerLocation = SSIMPlayer->GetActorLocation();
 	FVector EnemyLocation = InDamageInstigator->GetActorLocation();
 	
 	// Determine if Enemy is to the right or to the left
@@ -163,5 +160,13 @@ FVector USSIMPlayerFlowComponent::CalculateReboundVelocity(AActor* InDamageInsti
 	}
 #endif !UE_BUILD_SHIPPING
 	
-	return ReboundVelocity;
+	return ReboundVelocity;*/
+	return FVector::ZeroVector;
+}
+
+
+// DEBUG
+void USSIMPlayerFlowComponent::TakeDamageFromNearestEnemy()
+{
+	
 }

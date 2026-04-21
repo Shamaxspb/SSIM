@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIMBaseCombatComponent.generated.h"
 
 class UBoxComponent;
-
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
@@ -29,6 +29,8 @@ protected:
 	
 	UPROPERTY()
 	TSet<AActor*> HitEnemies;
+	
+	FDamageData DamageData;
 		
 #pragma endregion Metadata
 

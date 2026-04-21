@@ -4,22 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIMBaseStatsComponent.generated.h"
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReceivedSignature, FDamageData, DamageData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealReceivedSignature, FDamageData, DamageData);
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMBaseStatsComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
-
+	
 // Variables
-protected:
-	UPROPERTY()
-	TObjectPtr<AActor> DamageInstigator;
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
+	FOnDamageReceivedSignature OnDamageReceivedDelegate;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
+	FOnHealReceivedSignature OnHealReceivedDelegate;
 	
 // My Functions
 public:
-	virtual void ReduceHealth();
+	virtual void ReduceHealth(const FDamageData& InDamageData);
 	
-	void SetDamageInstigator(AActor* InDamageInstigator);
 };

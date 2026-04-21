@@ -53,9 +53,7 @@ void ASSIMBaseEnemy::EndAttackTraceInterface_Implementation() const
 }
 
 
-void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(float InDamage, AActor* InDamageInstigator) const
+void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {
-	EnemyStatsComponent->SetReceivedDamage(InDamage);
-	EnemyStatsComponent->SetDamageInstigator(InDamageInstigator);
-	EnemyStatsComponent->ReduceHealth();
+	EnemyStatsComponent->ReduceHealth(InDamageData);
 }

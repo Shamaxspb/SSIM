@@ -7,12 +7,7 @@
 
 
 // My Functions
-void USSIMBaseStatsComponent::ReduceHealth()
+void USSIMBaseStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | ReduceHealth() is not overriden"), *GetOwner()->GetName());
-}
-
-void USSIMBaseStatsComponent::SetDamageInstigator(AActor* InDamageInstigator)
-{
-	DamageInstigator = InDamageInstigator;
 }

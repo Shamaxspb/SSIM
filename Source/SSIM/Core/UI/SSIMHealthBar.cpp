@@ -18,8 +18,8 @@ void USSIMHealthBar::Init()
 {
 	SetReferences();
 	InitStatsValues();
-	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnDamageReceived);
-	PlayerStatsComponent->OnHealReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnHealReceived);
+	//PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnDamageReceived);
+	//PlayerStatsComponent->OnHealReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnHealReceived);
 }
 
 void USSIMHealthBar::SetReferences()
@@ -41,12 +41,12 @@ void USSIMHealthBar::InitStatsValues()
 	
 }
 
-void USSIMHealthBar::OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator)
+void USSIMHealthBar::OnDamageReceived(const FDamageData& InDamageData)
 {
-	OnHealthChanged(NewHealth);
+	OnHealthChanged(InDamageData);
 }
 
-void USSIMHealthBar::OnHealReceived(int32 NewHealth)
+void USSIMHealthBar::OnHealReceived(const FDamageData& InDamageData)
 {
-	OnHealthChanged(NewHealth);
+	OnHealthChanged(InDamageData);
 }

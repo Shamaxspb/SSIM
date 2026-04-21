@@ -71,6 +71,7 @@ protected:
 	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
 	
 	// Debug
+	
 	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG")
 	bool bReboundShowDebug;
 	

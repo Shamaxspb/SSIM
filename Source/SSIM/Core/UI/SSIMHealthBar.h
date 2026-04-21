@@ -6,6 +6,7 @@
 #include "SSIMBaseUI.h"
 #include "SSIMHealthBar.generated.h"
 
+struct FDamageData;
 class ASSIMPlayer;
 class USSIMPlayerStatsComponent;
 /**
@@ -35,7 +36,7 @@ protected:
 // My Functions
 protected:	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnHealthChanged(int32 NewHealth);
+	void OnHealthChanged(const FDamageData& InDamageData);
 	
 	virtual void SetReferences() override;
 
@@ -44,8 +45,8 @@ private:
 	void InitStatsValues();
 	
 	UFUNCTION()
-	void OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator);
+	void OnDamageReceived(const FDamageData& InDamageData);
 	
 	UFUNCTION()
-	void OnHealReceived(int32 NewHealth);
+	void OnHealReceived(const FDamageData& InDamageData);
 };

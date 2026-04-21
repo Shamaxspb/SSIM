@@ -9,6 +9,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
@@ -33,6 +34,9 @@ ASSIMPlayer::ASSIMPlayer()
 void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// Damage processing, mb should move to some player state component
+	//SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceived);
 	
 }
 
@@ -66,7 +70,7 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // My Functions
 void ASSIMPlayer::MoveRight()
 {
-	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerFlowComponent->bStaggered)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerStatsComponent->bStaggered)
 	{
 		return;
 	}
@@ -77,7 +81,7 @@ void ASSIMPlayer::MoveRight()
 
 void ASSIMPlayer::MoveLeft()
 {
-	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerFlowComponent->bStaggered)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerStatsComponent->bStaggered)
 	{
 		return;
 	}
@@ -143,6 +147,15 @@ void ASSIMPlayer::HandleDash()
 	SSIMPlayerFlowComponent->StartDash();
 }
 
+void ASSIMPlayer::OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator)
+{
+	
+	
+	
+	
+}
+
+
 // Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const
 {
@@ -171,9 +184,7 @@ void ASSIMPlayer::EndDashInterface_Implementation() const
 }
 
 
-void ASSIMPlayer::ReceiveDamageInterface_Implementation(int32 InDamage, AActor* InDamageInstigator) const
+void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {
-	SSIMPlayerStatsComponent->SetReceivedDamage(InDamage);
-	SSIMPlayerStatsComponent->SetDamageInstigator(InDamageInstigator);
-	SSIMPlayerStatsComponent->ReduceHealth();
+	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }
