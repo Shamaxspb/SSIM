@@ -223,7 +223,13 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	#if !UE_BUILD_SHIPPING
 	if (bReboundShowDebug)
 	{
-		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, ReboundDirectionArrowColor, 3.f, 5.f);
+		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+									EnemyLocation, 
+									 EnemyLocation + (RotatedDirection * 250.f), 
+								   25.f, 
+											 ReboundDirectionArrowColor, 
+									 3.f, 
+								   5.f);
 	}
 	#endif !UE_BUILD_SHIPPING
 	

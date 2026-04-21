@@ -8,6 +8,7 @@
 #include "SSIMPlayerDamageReactionComponent.generated.h"
 
 
+struct FDamageData;
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
 
@@ -47,6 +48,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
 	float ReboundVelocityZ = 2000.f;
 	
+	// DEBUG
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger|DEBUG")
+	bool bReboundShowDebug;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|Stagger|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	bool bDrawReboundDirectionArrow;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|Stagger|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
+	
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
 	
@@ -70,11 +81,17 @@ protected:
 	
 private:
 	// Damage processing
-	void InitStagger();
+	UFUNCTION()
+	void InitStagger(const FDamageData DamageData);
 	void StartStaggerSequence();
+	void ExecuteNextStaggerSequenceStep();
 	void StartStopFrame() const;
-	void StopFrameToStagger();
-	void EndStagger();
-	void EndInvulnerability();
+	void StopFrameToStagger() const;
+	void EndStagger() const;
+	void EndInvulnerability() const;
 	
+	// DEBUG
+protected:
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
+	void ManualStagger_DEBUG();
 };
