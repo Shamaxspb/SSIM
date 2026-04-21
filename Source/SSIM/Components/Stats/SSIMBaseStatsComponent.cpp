@@ -11,3 +11,8 @@ void USSIMBaseStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | ReduceHealth() is not overriden"), *GetOwner()->GetName());
 }
+
+void USSIMBaseStatsComponent::IncreaseHealth(int32 InHealValue)
+{
+	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | IncreaseHealth() is not overriden"), *GetOwner()->GetName());
+}

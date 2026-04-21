@@ -7,8 +7,6 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
@@ -19,8 +17,6 @@ void USSIMPlayerFlowComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	SetReferences();
-	
-	SSIMPlayer->GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
 }
 
 void USSIMPlayerFlowComponent::SetReferences()
@@ -117,51 +113,6 @@ void USSIMPlayerFlowComponent::EndDash()
 void USSIMPlayerFlowComponent::ResetDash()
 {
 	bCanDash = true;
-}
-
-void USSIMPlayerFlowComponent::OnDamageReceivedRebound(int32 NewHealth, AActor* InDamageInstigator)
-{
-	/*SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
-	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.f;
-	
-	FTimerHandle ReceivedDamageLogicDelayedTimerHandle;
-	FTimerDelegate ReceivedDamageLogicDelayedTimerDelegate;
-	ReceivedDamageLogicDelayedTimerDelegate.BindUObject(this, &USSIMPlayerFlowComponent::ReceivedDamageLogicDelayed, InDamageInstigator);
-	GetWorld()->GetTimerManager().SetTimer(ReceivedDamageLogicDelayedTimerHandle, ReceivedDamageLogicDelayedTimerDelegate, ReboundDelay, false);*/
-	
-}
-
-void USSIMPlayerFlowComponent::ReceivedDamageLogicDelayed(AActor* InDamageInstigator)
-{
-	/*FVector ReboundVelocity = CalculateReboundVelocity(InDamageInstigator);
-	SSIMPlayer->LaunchCharacter(ReboundVelocity, true, true);*/
-}
-
-FVector USSIMPlayerFlowComponent::CalculateReboundVelocity(AActor* InDamageInstigator) const
-{
-	/*FVector PlayerLocation = SSIMPlayer->GetActorLocation();
-	FVector EnemyLocation = InDamageInstigator->GetActorLocation();
-	
-	// Determine if Enemy is to the right or to the left
-	bool bEnemyToTheRight = EnemyLocation.Y > PlayerLocation.Y;
-	
-	// Get unit vector from Enemy to Player and Negate that vector (around X axis)
-	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
-	
-	// Add rotation to that vector
-	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(bEnemyToTheRight ? ReboundAngle : -ReboundAngle, FVector::ForwardVector);
-	
-	FVector ReboundVelocity = FVector(RotatedDirection.X, RotatedDirection.Y * ReboundVelocityCoefY, RotatedDirection.Z * ReboundVelocityCoefZ);
-
-#if !UE_BUILD_SHIPPING
-	if (bReboundShowDebug)
-	{
-		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, ReboundDirectionArrowColor, 3.f, 5.f);
-	}
-#endif !UE_BUILD_SHIPPING
-	
-	return ReboundVelocity;*/
-	return FVector::ZeroVector;
 }
 
 

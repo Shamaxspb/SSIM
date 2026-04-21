@@ -19,8 +19,9 @@ struct FDamageData
 {
 	GENERATED_BODY()
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AActor> DamageInstigator;
 	
+	UPROPERTY(BlueprintReadOnly)
 	int32 DamageValue;
 };

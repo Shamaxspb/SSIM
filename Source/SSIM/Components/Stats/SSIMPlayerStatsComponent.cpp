@@ -20,19 +20,44 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 	OnDamageReceivedDelegate.Broadcast(InDamageData);
 }
 
+void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
+{
+	Health += InHealValue;
+	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
+	
+	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
+													Health, 
+													MaxHealth);
+	
+	OnHealReceivedDelegate.Broadcast(InHealValue);
+}
+
 
 // DEBUG
-void USSIMPlayerStatsComponent::IncrementHealth_DEBUG()
+void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()
 {
-	Health++;
+	Health--;
+	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
 														Health, 
 														MaxHealth);	
-	FDamageData DebugDamageData 
+	
+	FDamageData InDamageData
 	{
-		DebugDamageData.DamageInstigator = nullptr,
-		DebugDamageData.DamageValue = 1
+		GetOwner(),
+		1
 	};
-	OnHealReceivedDelegate.Broadcast(DebugDamageData);
+	OnDamageReceivedDelegate.Broadcast(InDamageData);
+}
+
+void USSIMPlayerStatsComponent::IncrementHealth_DEBUG()
+{
+	Health++;
+	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
+	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
+														Health, 
+														MaxHealth);	
+	
+	OnHealReceivedDelegate.Broadcast(1);
 }
  

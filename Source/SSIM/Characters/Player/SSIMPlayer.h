@@ -6,7 +6,6 @@
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
 
 #include "SSIMPlayer.generated.h"
 
@@ -20,7 +19,6 @@ class USSIMPlayerFlowComponent;
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
 class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface,
 														public ISSIMCombatInterface,
-														public ISSIMPlayerCombatInterface,
 														public ISSIMDamageableInterface
 {
 	GENERATED_BODY()
@@ -155,11 +153,6 @@ private:
 	void HandleDash(); 
 	
 #pragma endregion Handler Functions
-	
-	// Damage processing
-private:
-	UFUNCTION()
-	void OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator);
 	
 	
 // Interfaces

@@ -172,6 +172,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	if (HitEnemies.IsEmpty())
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+		return;
 	}
 	
 	DamageData.DamageInstigator = SSIMPlayer;

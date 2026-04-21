@@ -36,7 +36,10 @@ protected:
 // My Functions
 protected:	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnHealthChanged(const FDamageData& InDamageData);
+	void OnDamageReceived(const FDamageData InDamageData);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHealReceived(int32 InHealValue);
 	
 	virtual void SetReferences() override;
 
@@ -44,9 +47,4 @@ private:
 	void Init();
 	void InitStatsValues();
 	
-	UFUNCTION()
-	void OnDamageReceived(const FDamageData& InDamageData);
-	
-	UFUNCTION()
-	void OnHealReceived(const FDamageData& InDamageData);
 };

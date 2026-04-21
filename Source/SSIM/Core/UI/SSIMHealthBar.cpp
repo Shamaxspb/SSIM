@@ -18,8 +18,9 @@ void USSIMHealthBar::Init()
 {
 	SetReferences();
 	InitStatsValues();
-	//PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnDamageReceived);
-	//PlayerStatsComponent->OnHealReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnHealReceived);
+	
+	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnDamageReceived);
+	PlayerStatsComponent->OnHealReceivedDelegate.AddDynamic(this, &USSIMHealthBar::OnHealReceived);
 }
 
 void USSIMHealthBar::SetReferences()
@@ -39,14 +40,4 @@ void USSIMHealthBar::InitStatsValues()
 	CachedHealth = PlayerStatsComponent->Health; // Should get from GameInstance for level transition in the future
 	MaxHealth = PlayerStatsComponent->MaxHealth;
 	
-}
-
-void USSIMHealthBar::OnDamageReceived(const FDamageData& InDamageData)
-{
-	OnHealthChanged(InDamageData);
-}
-
-void USSIMHealthBar::OnHealReceived(const FDamageData& InDamageData)
-{
-	OnHealthChanged(InDamageData);
 }

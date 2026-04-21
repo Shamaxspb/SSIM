@@ -32,6 +32,7 @@ void USSIMBaseCombatComponent::EndAttack()
 {
 	bIsAttacking = false;
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
+	HitEnemies.Empty();
 }
 
 void USSIMBaseCombatComponent::StartAttackTrace()

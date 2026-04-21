@@ -16,7 +16,6 @@ class UBoxComponent;
 
 UCLASS(Abstract)
 class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMCombatInterface,
-														   public ISSIMEnemyCombatInterface,
 														   public ISSIMDamageableInterface
 {
 	GENERATED_BODY()
@@ -36,7 +35,6 @@ protected:
 	
 #pragma endregion Components
 	
-public:
 	
 // Overriden Functions
 public:

@@ -35,8 +35,7 @@ void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Damage processing, mb should move to some player state component
-	//SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceived);
+	GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
 	
 }
 
@@ -145,14 +144,6 @@ void ASSIMPlayer::HandleEndAttackTrace()
 void ASSIMPlayer::HandleDash()
 {
 	SSIMPlayerFlowComponent->StartDash();
-}
-
-void ASSIMPlayer::OnDamageReceived(int32 NewHealth, AActor* InDamageInstigator)
-{
-	
-	
-	
-	
 }
 
 

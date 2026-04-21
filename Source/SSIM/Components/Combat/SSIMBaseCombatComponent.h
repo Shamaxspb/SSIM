@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "SSIM/Components/SSIMBaseComponent.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+
 #include "SSIMBaseCombatComponent.generated.h"
 
 class UBoxComponent;

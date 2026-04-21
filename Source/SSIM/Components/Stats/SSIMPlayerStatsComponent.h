@@ -11,7 +11,6 @@ struct FStaggerSequenceStep;
 struct FDamageData;
 
 
-
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
 {
@@ -37,10 +36,16 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void ReduceHealth(const FDamageData& InDamageData) override;
+	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
+	virtual void IncreaseHealth(int32 InHealValue) override;
 
 	
 // DEBUG
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
+	void DecrementHealth_DEBUG();
+	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
 	void IncrementHealth_DEBUG();
 };
