@@ -3,6 +3,7 @@
 
 #include "SSIMBaseCharacter.h"
 
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "SSIM/SSIM.h"
 
@@ -10,9 +11,9 @@
 ASSIMBaseCharacter::ASSIMBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	RestrictXAxisMovement();
-	SetActorLocation(FVector(0.0f, GetActorLocation().Y, GetActorLocation().Z));
+	SetupDamageRegistrationCollision();
 
 }
 
@@ -46,4 +47,28 @@ void ASSIMBaseCharacter::RestrictXAxisMovement() const
 											 TEXT(__FUNCTION__), 
 											 *UEnum::GetValueAsString(GetMovementComponent()->GetPlaneConstraintAxisSetting()),
 											 *GetName());
+}
+
+void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
+{
+	DamageRegistrationGroup = CreateDefaultSubobject<USceneComponent>(TEXT("DamageRegistrationGroup"));
+	DamageRegistrationGroup->SetupAttachment(GetRootComponent());
+	
+	HitRegistrationCollision	= CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitRegistrationCollision"));
+	ContactDamageCollision	= CreateDefaultSubobject<UCapsuleComponent>(TEXT("ContactDamageCollision"));
+
+	TArray<TObjectPtr<UCapsuleComponent>> DamageRegistrationCollisions;
+	DamageRegistrationCollisions.Add(HitRegistrationCollision);
+	DamageRegistrationCollisions.Add(ContactDamageCollision);
+	
+	for (auto const Element : DamageRegistrationCollisions)
+	{
+		Element->SetupAttachment(DamageRegistrationGroup);
+		Element->SetGenerateOverlapEvents(true);
+		Element->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+	
+	HitRegistrationCollision->SetCollisionProfileName("HitRegistration", true);
+	ContactDamageCollision->SetCollisionProfileName("ContactDamage", true);
+
 }

@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+
 #include "SSIMBaseCombatComponent.generated.h"
 
 class UBoxComponent;
-
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
@@ -19,16 +20,18 @@ class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 #pragma region Metadata
 
 protected:
-	bool bIsAttacking = false;
+	bool bAttacking = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Components|Attack")
 	UBoxComponent* CurrentAttackCollision;
 	
 	UPROPERTY()
 	TSet<AActor*> HitEnemies;
+	
+	FDamageData DamageData;
 		
 #pragma endregion Metadata
 

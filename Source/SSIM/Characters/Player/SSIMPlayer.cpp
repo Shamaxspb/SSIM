@@ -7,7 +7,10 @@
 #include "EnhancedInputComponent.h"
 #include "SSIMPlayerController.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
@@ -16,13 +19,16 @@ ASSIMPlayer::ASSIMPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CurrentPlayerState = EPlayerState::EPS_Movement;
+	GetCapsuleComponent()->SetCollisionProfileName("Player", true);
+	GetMesh()->SetCollisionProfileName("Player", true);
 	
-	SSIMPlayerFlowComponent	  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
-	SSIMPlayerCombatComponent = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
-	SSIMPlayerStatsComponent  = CreateDefaultSubobject<USSIMPlayerStatsComponent>(TEXT("PlayerStatsComponent"));
+	SSIMPlayerFlowComponent	  		  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
+	SSIMPlayerCombatComponent 		  = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
+	SSIMPlayerStatsComponent  		  = CreateDefaultSubobject<USSIMPlayerStatsComponent>(TEXT("PlayerStatsComponent"));
+	SSIMPlayerDamageReactionComponent = CreateDefaultSubobject<USSIMPlayerDamageReactionComponent>(TEXT("PlayerDamageReactionComponent"));
 
 	SetupAttackCollision();
+	
 	
 }
 
@@ -30,22 +36,7 @@ void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	/*UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Frontal Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
-												*GetName(),
-												*FrontalAttackCollision.GetName(), *UEnum::GetValueAsString(FrontalAttackCollision->GetCollisionEnabled()),
-												FrontalAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
-	
-	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Upper Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
-												*GetName(),
-												*UpperAttackCollision.GetName(), *UEnum::GetValueAsString(UpperAttackCollision->GetCollisionEnabled()),
-												UpperAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));
-	
-	UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s || Bottom Attack Collision: %s | Collision Enabled: %s | GenerateOverlapEvents: %s"),
-												*GetName(),
-												*BottomAttackCollision.GetName(), *UEnum::GetValueAsString(BottomAttackCollision->GetCollisionEnabled()),
-												BottomAttackCollision->GetGenerateOverlapEvents() ? TEXT("True") : TEXT("False"));*/
-	
-	
+	GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
 	
 }
 
@@ -79,7 +70,7 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // My Functions
 void ASSIMPlayer::MoveRight()
 {
-	if (SSIMPlayerFlowComponent->bDashing)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerStatsComponent->bStaggered)
 	{
 		return;
 	}
@@ -90,7 +81,7 @@ void ASSIMPlayer::MoveRight()
 
 void ASSIMPlayer::MoveLeft()
 {
-	if (SSIMPlayerFlowComponent->bDashing)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerStatsComponent->bStaggered)
 	{
 		return;
 	}
@@ -117,8 +108,7 @@ void ASSIMPlayer::SetupAttackCollision()
 	{
 		Element->SetupAttachment(RootAttackCollisionComponent);
 		Element->SetGenerateOverlapEvents(true);
-		Element->SetCollisionProfileName("AttackTrace", true);
-		Element->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Element->SetCollisionProfileName("MeleeAttack", true);
 	}
 	
 }
@@ -157,6 +147,7 @@ void ASSIMPlayer::HandleDash()
 	SSIMPlayerFlowComponent->StartDash();
 }
 
+
 // Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const
 {
@@ -185,8 +176,12 @@ void ASSIMPlayer::EndDashInterface_Implementation() const
 }
 
 
-void ASSIMPlayer::ReceiveDamageInterface_Implementation(int32 InDamage) const
+void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {
-	SSIMPlayerStatsComponent->SetReceivedDamage(InDamage);
-	SSIMPlayerStatsComponent->ReduceHealth();
+	if (SSIMPlayerStatsComponent->bInvulnerable)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+		return;
+	}
+	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }

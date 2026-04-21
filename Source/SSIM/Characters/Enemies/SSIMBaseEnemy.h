@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Characters/SSIMBaseCharacter.h"
-#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
 
 #include "SSIMBaseEnemy.generated.h"
@@ -14,8 +15,8 @@ class USSIMEnemyStatsComponent;
 class UBoxComponent;
 
 UCLASS(Abstract)
-class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMCommonCombatInterface,
-														   public ISSIMEnemyCombatInterface
+class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMCombatInterface,
+														   public ISSIMDamageableInterface
 {
 	GENERATED_BODY()
 	
@@ -34,7 +35,6 @@ protected:
 	
 #pragma endregion Components
 	
-public:
 	
 // Overriden Functions
 public:
@@ -57,7 +57,7 @@ public:
 	virtual void StartAttackTraceInterface_Implementation() const override;
 	virtual void EndAttackTraceInterface_Implementation() const override;
 	
-	virtual void ReceiveDamageInterface_Implementation(float InDamage) const override;
+	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
 	
 	
 };

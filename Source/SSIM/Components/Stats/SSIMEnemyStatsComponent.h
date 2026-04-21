@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SSIMBaseStatsComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 #include "SSIMEnemyStatsComponent.generated.h"
 
@@ -16,23 +17,14 @@ class SSIM_API USSIMEnemyStatsComponent : public USSIMBaseStatsComponent
 // Variables
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))
-	float MaxHealth = 50.f;
+	int32 MaxHealth = 50;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))
-	float Health = MaxHealth;
-	
-#pragma region Metadata
-	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Damage")
-	float ReceivedDamage;
-	
-#pragma endregion Metadata
+	int32 Health = MaxHealth;
 	
 // My Functions
 public:
-	void SetReceivedDamage(float InReceivedDamage);
-	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
-	virtual void ReduceHealth() override;
+	virtual void ReduceHealth(const FDamageData& InDamageData) override;
 	
 };

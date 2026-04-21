@@ -8,6 +8,10 @@
 #include "SSIMPlayerFlowComponent.generated.h"
 
 
+struct FDamageData;
+class USSIMPlayerStatsComponent;
+class ASSIMPlayer;
+
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent
 {
@@ -35,6 +39,14 @@ private:
 
 #pragma endregion Metadata
 	
+private:
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
+	
+// Overriden Functions
+protected:
+	virtual void BeginPlay() override;
+	
 	
 // My Functions
 public:
@@ -45,5 +57,12 @@ public:
 private:
 	FVector GetDashLaunchVelocity() const;
 	void ResetDash();
+	
+	UFUNCTION()
+	void OnDamageReceivedHandler(const FDamageData DamageData);
+	
+	// DEBUG
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG|TakeDamage")
+	void TakeDamageFromNearestEnemy();
 	
 };

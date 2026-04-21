@@ -4,11 +4,12 @@
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
-#include "SSIM/Core/Interfaces/SSIMCommonCombatInterface.h"
-#include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
+#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 
 #include "SSIMPlayer.generated.h"
 
+class USSIMPlayerDamageReactionComponent;
 class USSIMPlayerStatsComponent;
 class UBoxComponent;
 class UInputAction;
@@ -18,15 +19,15 @@ class USSIMPlayerFlowComponent;
 
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
 class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterface,
-														public ISSIMCommonCombatInterface,
-														public ISSIMPlayerCombatInterface
+														public ISSIMCombatInterface,
+														public ISSIMDamageableInterface
 {
 	GENERATED_BODY()
 
-// Variables
-protected:
+// Variables	
 #pragma region Components
 	
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
@@ -35,6 +36,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	TObjectPtr<USSIMPlayerDamageReactionComponent> SSIMPlayerDamageReactionComponent;
 	
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollisionRoot", 
@@ -80,8 +84,10 @@ protected:
 	
 #pragma endregion Input	
 	
+protected:
 	UPROPERTY()
 	EPlayerState CurrentPlayerState;
+
 	
 	
 // Overriden Functions
@@ -94,9 +100,9 @@ public:
 	
 	
 // My Functions
-public:
 #pragma region Inline Getters
 	
+public:
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
@@ -141,6 +147,7 @@ private:
 	
 #pragma region Handler Functions
 	
+private:
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
@@ -161,6 +168,6 @@ public:
 	
 	virtual void EndDashInterface_Implementation() const override;
 	
-	virtual void ReceiveDamageInterface_Implementation(int32 InDamage) const override;
+	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
 
 };

@@ -7,6 +7,22 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
+#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+
+
+// Overriden Functions
+void USSIMPlayerFlowComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	if (!IsValid(StatsComponent))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stats component is not valid"), TEXT(__FUNCTION__));
+	}
+	StatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedHandler);
+	
+}
 
 
 // My Functions
@@ -25,8 +41,9 @@ void USSIMPlayerFlowComponent::StartDash()
 	
 	bDashing = true;
 	bCanDash = false;
+	SSIMOwnerCharacter->GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
 	
-	SSIMCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
+	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
 	if (!IsValid(PlayerDashAnimation))
 	{
@@ -45,10 +62,9 @@ void USSIMPlayerFlowComponent::StartDash()
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
 }
 
-
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
-	FVector CurrentVelocity = SSIMCharacter->GetVelocity();
+	FVector CurrentVelocity = SSIMOwnerCharacter->GetVelocity();
 	FVector OutLaunchVelocity;
 	
 	if (CurrentVelocity.IsNearlyZero())
@@ -57,7 +73,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		
 		// Calculate Player direction
 		FVector DashDirectionVector;
-		float DirectionDotProduct = FVector::DotProduct(SSIMCharacter->GetActorForwardVector(), FVector::RightVector);
+		float DirectionDotProduct = FVector::DotProduct(SSIMOwnerCharacter->GetActorForwardVector(), FVector::RightVector);
 		
 		
 		if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
@@ -75,28 +91,39 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 		}
 		
 		OutLaunchVelocity =  DashDirectionVector *
-							 SSIMCharacter->GetCharacterMovement()->GetMaxSpeed() *
+							 SSIMOwnerCharacter->GetCharacterMovement()->GetMaxSpeed() *
 							 DashVelocityCoef;
 		
 	}
 	else
 	{
 		// Dash in motion
-		OutLaunchVelocity = FVector(0.f, SSIMCharacter->GetVelocity().Y * DashVelocityCoef,0.f);
+		OutLaunchVelocity = FVector(0.f, SSIMOwnerCharacter->GetVelocity().Y * DashVelocityCoef,0.f);
 	}
 		
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
 	return OutLaunchVelocity;
 }
 
-
 void USSIMPlayerFlowComponent::EndDash()
 {
 	bDashing = false;
+	SSIMOwnerCharacter->GetCharacterMovement()->BrakingDecelerationWalking = DEFAULT_BRAKING_DECELERATION_WALKING;
 }
-
 
 void USSIMPlayerFlowComponent::ResetDash()
 {
 	bCanDash = true;
+}
+
+void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData DamageData)
+{
+	EndDash();
+}
+
+
+// DEBUG
+void USSIMPlayerFlowComponent::TakeDamageFromNearestEnemy()
+{
+	
 }

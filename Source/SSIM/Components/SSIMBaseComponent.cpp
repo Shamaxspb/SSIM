@@ -30,18 +30,18 @@ void USSIMBaseComponent::SetReferences()
 		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Owner is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	SSIMCharacter = CastChecked<ACharacter>(GetOwner());
+	SSIMOwnerCharacter = CastChecked<ACharacter>(GetOwner());
 	
 	// Anim Instance
-	if (!IsValid(SSIMCharacter->GetMesh()))
+	if (!IsValid(SSIMOwnerCharacter->GetMesh()))
 	{
 		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Mesh is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	if (!IsValid(SSIMCharacter->GetMesh()->GetAnimInstance()))
+	if (!IsValid(SSIMOwnerCharacter->GetMesh()->GetAnimInstance()))
 	{
 		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Anim Instance is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	AnimInstance = SSIMCharacter->GetMesh()->GetAnimInstance();
+	AnimInstance = SSIMOwnerCharacter->GetMesh()->GetAnimInstance();
 }

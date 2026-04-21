@@ -3,15 +3,24 @@
 
 #include "SSIMPlayerCombatComponent.h"
 
+#include "SSIM/SSIM.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
+#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "SSIM/SSIM.h"
-#include "SSIM/Characters/Player/SSIMPlayer.h"
-#include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
-#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
+
+void USSIMPlayerCombatComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	StatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
+}
 
 // My Functions
 void USSIMPlayerCombatComponent::StartAttack()
@@ -172,17 +181,21 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	if (HitEnemies.IsEmpty())
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+		return;
 	}
-		
+	
+	DamageData.Instigator = SSIMPlayer;
+	DamageData.Value = RegularAttackDamage;
+	
 	for (auto Element : HitEnemies)
 	{
-		if (!Element->Implements<USSIMEnemyCombatInterface>())
+		if (!Element->Implements<USSIMDamageableInterface>())
 		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMEnemyCombatInterface"), TEXT(__FUNCTION__));
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
 			return;
 		}
 		
-		ISSIMEnemyCombatInterface::Execute_ReceiveDamageInterface(Element, RegularAttackDamage);
+		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
 		LaunchTargetOnHit(Element);
 	}
 }
@@ -205,7 +218,7 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	// Get unit vector from Enemy to Player and Negate that vector
 	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
 	
-	// Add rotation to that vector
+	// Add rotation to that vector (around X axis)
 	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(bEnemyToTheRight ? ReboundAngle : -ReboundAngle, FVector::ForwardVector);
 	
 	// Multiply by coef for launch
@@ -215,11 +228,28 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Direction: %s"), *ReboundDirection.ToString());
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rotated Direction: %s"), *RotatedDirection.ToString());
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Velocity: %s"),  *ReboundVelocity.ToString());
-	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), EnemyLocation, EnemyLocation + (RotatedDirection * 250.f), 25.f, FLinearColor::Green, 3.f, 5.f);
+	
+	#if !UE_BUILD_SHIPPING
+	if (bReboundShowDebug)
+	{
+		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+									EnemyLocation, 
+									 EnemyLocation + (RotatedDirection * 250.f), 
+								   25.f, 
+											 ReboundDirectionArrowColor, 
+									 3.f, 
+								   5.f);
+	}
+	#endif !UE_BUILD_SHIPPING
 	
 	return ReboundVelocity;
 	// This is so messy because it was hard to understand how the fck should I implement this
 	// would be nice to clean this up later
+}
+
+void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData InDamageData)
+{
+	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
 }
 
 

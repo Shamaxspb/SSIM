@@ -19,7 +19,7 @@ class SSIM_API USSIMBaseComponent : public UActorComponent
 
 protected:
 	UPROPERTY()
-	TObjectPtr<ACharacter> SSIMCharacter;
+	TObjectPtr<ACharacter> SSIMOwnerCharacter;
 	
 	UPROPERTY()
 	TObjectPtr<UAnimInstance> AnimInstance;
