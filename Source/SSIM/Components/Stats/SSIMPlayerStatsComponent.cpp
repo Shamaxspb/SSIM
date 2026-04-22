@@ -3,7 +3,6 @@
 
 #include "SSIMPlayerStatsComponent.h"
 
-#include "GameFramework/Character.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 

@@ -24,14 +24,7 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 Health = MaxHealth;
-	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger", meta = (ClampMin = 0))	
-	bool bStaggered;
-	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger", meta = (ClampMin = 0))	
-	bool bInvulnerable;
-	
-	
+		
 	
 // Overriden Functions
 protected:
