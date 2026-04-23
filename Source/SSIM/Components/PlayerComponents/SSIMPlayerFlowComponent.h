@@ -67,13 +67,12 @@ public:
 
 private:
 	FVector GetDashLaunchVelocity() const;
+	
 	void ResetDash();
+	UFUNCTION()
+	void ResetDashFromAir(const FHitResult& Hit);
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData DamageData);
-	
-	// DEBUG
-	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG|TakeDamage")
-	void TakeDamageFromNearestEnemy();
 	
 };

@@ -7,6 +7,7 @@
 #include "SSIM/SSIM.h"
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 
@@ -16,7 +17,6 @@ void USSIMPlayerFlowComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
-	
 	
 	if (!IsValid(StatsComponent))
 	{
@@ -65,7 +65,21 @@ void USSIMPlayerFlowComponent::StartDash()
 	GetWorld()->GetTimerManager().SetTimer(DashInProcessTimerHandle, this, &USSIMPlayerFlowComponent::EndDash, PlayerDashAnimation->GetPlayLength(), false);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashAnimation->GetPlayLength());
 	
-	GetWorld()->GetTimerManager().SetTimer(DashCooldownTimerHandle, this, &USSIMPlayerFlowComponent::ResetDash, DashCooldown, false);
+	if (SSIMOwnerCharacter->GetCharacterMovement()->IsFalling())
+	{
+		ASSIMPlayer* SSIMPlayer = Cast<ASSIMPlayer>(SSIMOwnerCharacter);
+		SSIMPlayer->LandedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			DashCooldownTimerHandle, 
+			this, 
+			&USSIMPlayerFlowComponent::ResetDash, 
+			DashCooldown, 
+			false);
+	}
+	
 	
 	OnStartDashDelegate.Broadcast();
 	
@@ -112,14 +126,15 @@ void USSIMPlayerFlowComponent::ResetDash()
 	bCanDash = true;
 }
 
+void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
+{
+	ASSIMPlayer* SSIMPlayer = Cast<ASSIMPlayer>(SSIMOwnerCharacter);
+	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
+	
+	bCanDash = true;
+}
+
 void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData DamageData)
 {
 	EndDash();
-}
-
-
-// DEBUG
-void USSIMPlayerFlowComponent::TakeDamageFromNearestEnemy()
-{
-	
 }
