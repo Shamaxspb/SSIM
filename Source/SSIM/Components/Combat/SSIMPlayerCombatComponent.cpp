@@ -237,7 +237,7 @@ FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* I
 									 EnemyLocation + (RotatedDirection * 250.f), 
 								   25.f, 
 											 ReboundDirectionArrowColor, 
-									 3.f, 
+											 DrawDuration, 
 								   5.f);
 	}
 	#endif !UE_BUILD_SHIPPING

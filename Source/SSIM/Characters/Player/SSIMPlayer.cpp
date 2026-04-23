@@ -132,6 +132,14 @@ void ASSIMPlayer::HandleAttackUpward()
 
 void ASSIMPlayer::HandleAttackDownward()
 {
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
+		
+		SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
+		SSIMPlayerCombatComponent->StartAttack();
+		return;
+	}
 	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
 	SSIMPlayerCombatComponent->StartAttack();
 }

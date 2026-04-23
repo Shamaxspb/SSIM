@@ -11,9 +11,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartDashSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndDashSignature);
 
 class UCapsuleComponent;
-struct FDamageData;
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
+
+struct FDamageData;
+
 
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
 class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent

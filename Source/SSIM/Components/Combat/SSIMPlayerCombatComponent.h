@@ -75,12 +75,14 @@ protected:
 	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
 	
 	// Debug
-	
 	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG")
 	bool bReboundShowDebug;
 	
 	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
 	bool bDrawReboundDirectionArrow;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	float DrawDuration = 3.f;
 	
 	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
 	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.287f, 0.017f, 1.f);

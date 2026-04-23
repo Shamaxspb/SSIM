@@ -74,42 +74,27 @@ void USSIMPlayerFlowComponent::StartDash()
 
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
-	FVector CurrentVelocity = SSIMOwnerCharacter->GetVelocity();
-	FVector OutLaunchVelocity;
-	
-	if (CurrentVelocity.IsNearlyZero())
+	// Calculate Player direction
+	FVector DashDirectionVector;
+	float DirectionDotProduct = FVector::DotProduct(SSIMOwnerCharacter->GetActorForwardVector(), FVector::RightVector);
+		
+	if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
 	{
-		// Dash in place
-		
-		// Calculate Player direction
-		FVector DashDirectionVector;
-		float DirectionDotProduct = FVector::DotProduct(SSIMOwnerCharacter->GetActorForwardVector(), FVector::RightVector);
-		
-		
-		if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
-		{
-			DashDirectionVector = FVector::RightVector;
-		}
-		else if (FMath::IsNearlyEqual(DirectionDotProduct, -1.f))
-		{
-			DashDirectionVector = FVector::RightVector * -1.f;
-		}
-		else
-		{
-			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Couldn't determine player direction. Return -1.f"), TEXT(__FUNCTION__));
-			return FVector(-1.f, -1.f, -1.f);
-		}
-		
-		OutLaunchVelocity =  DashDirectionVector *
-							 SSIMOwnerCharacter->GetCharacterMovement()->GetMaxSpeed() *
-							 DashVelocityCoef;
-		
+		DashDirectionVector = FVector::RightVector;
+	}
+	else if (FMath::IsNearlyEqual(DirectionDotProduct, -1.f))
+	{
+		DashDirectionVector = FVector::RightVector * -1.f;
 	}
 	else
 	{
-		// Dash in motion
-		OutLaunchVelocity = FVector(0.f, SSIMOwnerCharacter->GetVelocity().Y * DashVelocityCoef,0.f);
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Couldn't determine player direction. Return -1.f"), TEXT(__FUNCTION__));
+		return FVector(-1.f, -1.f, -1.f);
 	}
+	
+	FVector OutLaunchVelocity =  DashDirectionVector *
+								 SSIMOwnerCharacter->GetCharacterMovement()->GetMaxSpeed() *
+								 DashVelocityCoef;
 		
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
 	return OutLaunchVelocity;

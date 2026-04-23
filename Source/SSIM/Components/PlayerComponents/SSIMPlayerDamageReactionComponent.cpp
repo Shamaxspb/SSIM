@@ -117,9 +117,8 @@ void USSIMPlayerDamageReactionComponent::StartStagger() const
 	bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMOwnerCharacter->GetActorLocation().Y;
 	FVector ReboundLaunchVelocity = FVector(
 							0.0f, 
-							(bEnemyIsToTheRight ? -1.f : 1.f) * ReboundVelocityY, 
+							ReboundVelocityY * (bEnemyIsToTheRight ? -1.f : 1.f), 
 							ReboundVelocityZ);
-	
 	
 	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
@@ -128,10 +127,10 @@ void USSIMPlayerDamageReactionComponent::StartStagger() const
 	{
 		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
 									SSIMOwnerCharacter->GetActorLocation(), 
-									 SSIMOwnerCharacter->GetActorLocation() + ReboundLaunchVelocity.Normalize() * 400.f, 
+									 SSIMOwnerCharacter->GetActorLocation() + ReboundLaunchVelocity.GetSafeNormal() * 400.f, 
 								   25.f, 
 											 ReboundDirectionArrowColor, 
-									 3.f, 
+											 DrawDuration, 
 								   5.f);
 	}
 	#endif !UE_BUILD_SHIPPING
