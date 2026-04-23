@@ -3,10 +3,11 @@
 
 #include "SSIMEnemyCombatComponent.h"
 
-#include "Components/CapsuleComponent.h"
 #include "SSIM/SSIM.h"
+#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
-#include "SSIM/Core/Interfaces/SSIMPlayerCombatInterface.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
 
 
 // Overriden Functions
@@ -16,31 +17,7 @@ void USSIMEnemyCombatComponent::BeginPlay()
 	
 	SetReferences();
 	SSIMEnemy->GetContactDamageCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap);
-}
-
-void USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-                                                              AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                                              const FHitResult& SweepResult)
-{
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Character : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
-	
-	if (OtherActor == PlayerPawn)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Character is Player"), TEXT(__FUNCTION__));
-		DealDamageToPlayer();
-	}
-}
-
-void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
-	if (OtherActor == PlayerPawn)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Character is Player"), TEXT(__FUNCTION__));
-		DealDamageToPlayer();
-	}
+	SSIMEnemy->GetContactDamageCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionEndOverlap);
 }
 
 void USSIMEnemyCombatComponent::SetReferences()
@@ -49,11 +26,91 @@ void USSIMEnemyCombatComponent::SetReferences()
 	
 	SSIMEnemy = CastChecked<ASSIMBaseEnemy>(SSIMOwnerCharacter);
 	CurrentAttackCollision = SSIMEnemy->GetAttackCollision();
-	
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
-void USSIMEnemyCombatComponent::DealDamageToPlayer()
+void USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+                                                              AActor* OtherActor, 
+                                                              UPrimitiveComponent* OtherComp, 
+                                                              int32 OtherBodyIndex, 
+                                                              bool bFromSweep,
+                                                              const FHitResult& SweepResult)
+{
+	if (OtherActor == PlayerPawn)
+	{
+		StartContinuousAttackDamage();
+	}
+}
+
+void USSIMEnemyCombatComponent::StartContinuousAttackDamage()
+{
+	ContinuousAttackDamageTimerDelegate.BindUObject(
+						this,
+						&USSIMEnemyCombatComponent::DealDamageToPlayer, 
+						static_cast<UShapeComponent*>(CurrentAttackCollision));
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		ContinuousAttackDamageTimerHandle,
+		ContinuousAttackDamageTimerDelegate,
+		0.05f,
+		true);
+}
+
+void USSIMEnemyCombatComponent::EndContinuousAttackDamage()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ContinuousAttackDamageTimerHandle);
+}
+
+void USSIMEnemyCombatComponent::EndAttack()
+{
+	Super::EndAttack();
+	
+	EndContinuousAttackDamage();
+}
+
+void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+																	 AActor* OtherActor, 
+																	 UPrimitiveComponent* OtherComp, 
+																	 int32 OtherBodyIndex, 
+																	 bool bFromSweep,
+																	 const FHitResult& SweepResult)
+{
+	if (OtherActor == PlayerPawn)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
+		StartContinuousContactDamage();
+	}
+}
+
+void USSIMEnemyCombatComponent::OnContactDamageCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent,
+																   AActor* OtherActor, 
+																   UPrimitiveComponent* OtherComp, 
+																   int32 OtherBodyIndex)
+{
+	EndContinuousContactDamage();
+}
+
+
+void USSIMEnemyCombatComponent::StartContinuousContactDamage()
+{
+	ContinuousContactDamageTimerDelegate.BindUObject(
+						this,
+						&USSIMEnemyCombatComponent::DealDamageToPlayer, 
+						static_cast<UShapeComponent*>(SSIMEnemy->GetContactDamageCollision()));
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		ContinuousContactDamageTimerHandle,
+		ContinuousContactDamageTimerDelegate,
+		0.05f,
+		true);
+}
+
+void USSIMEnemyCombatComponent::EndContinuousContactDamage()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ContinuousContactDamageTimerHandle);
+}
+
+void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollision)
 {
 	if (!PlayerPawn->Implements<USSIMDamageableInterface>())
 	{
@@ -61,8 +118,15 @@ void USSIMEnemyCombatComponent::DealDamageToPlayer()
 		return;
 	}
 	
-	DamageData.Instigator = SSIMOwnerCharacter;
-	DamageData.Value = RegularAttackDamage;
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | %s : Try Deal Damage"), TEXT(__FUNCTION__), *DamageCollision->GetName());
 	
-	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(PlayerPawn, DamageData);
+	if (DamageCollision->IsOverlappingActor(PlayerPawn))
+	{
+		DamageData.Instigator = SSIMOwnerCharacter;
+		DamageData.Value = RegularAttackDamage;
+		
+		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Character is %s"), TEXT(__FUNCTION__), *PlayerPawn->GetName());
+
+		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(PlayerPawn, DamageData);
+	}
 }

@@ -77,7 +77,7 @@ void USSIMPlayerDamageReactionComponent::ExecuteNextStaggerSequenceStep()
 {
 	if (!Steps.IsValidIndex(CurrentStaggerSequenceStep))
 	{
-		UE_LOG(LogSSIMValidations, Warning, TEXT("%s | Stagger Steps Array has ended (invalid index)"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Log, TEXT("%s | Stagger Sequence ended"), TEXT(__FUNCTION__));
 		return;
 	}
 	
@@ -110,17 +110,16 @@ void USSIMPlayerDamageReactionComponent::StartStagger() const
 {
 	EndStopFrame();
 	
-	if (ShouldRotatePlayerAround())
-	{
-		FRotator PlayerRotation = SSIMOwnerCharacter->GetActorRotation(); 
-		PlayerRotation.Yaw *= -1.f;
-		SSIMOwnerCharacter->SetActorRotation(PlayerRotation);
-	}
+	FRotator PlayerRotation = SSIMOwnerCharacter->GetActorRotation(); 
+	PlayerRotation.Yaw = FVector(DamageData.Instigator->GetActorLocation() - SSIMOwnerCharacter->GetActorLocation()).Rotation().Yaw;
+	SSIMOwnerCharacter->SetActorRotation(PlayerRotation);
 	
+	bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMOwnerCharacter->GetActorLocation().Y;
 	FVector ReboundLaunchVelocity = FVector(
 							0.0f, 
-							DamageData.Instigator->GetActorForwardVector().Y * ReboundVelocityY, 
+							(bEnemyIsToTheRight ? -1.f : 1.f) * ReboundVelocityY, 
 							ReboundVelocityZ);
+	
 	
 	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
@@ -157,32 +156,9 @@ void USSIMPlayerDamageReactionComponent::EndStagger() const
 void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
 {
 	PlayerStatsComponent->bInvulnerable = false;
+	OnEndInvulnerabilityDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED"), TEXT(__FUNCTION__));
-}
-
-bool USSIMPlayerDamageReactionComponent::ShouldRotatePlayerAround() const
-{
-	FVector PlayerForwardVector = SSIMOwnerCharacter->GetActorForwardVector();
-	if (!IsValid(DamageData.Instigator))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | DamageData.Instigator is not valid"), TEXT(__FUNCTION__));
-		return 0.f;
-	}
-	FVector EnemyForwardVector = DamageData.Instigator->GetActorForwardVector();
-	
-	float DotProduct = UKismetMathLibrary::Dot_VectorVector(PlayerForwardVector, EnemyForwardVector);
-	
-	if (UKismetMathLibrary::NearlyEqual_FloatFloat(DotProduct, 1.f))
-	{
-		return true;
-	}
-	if (UKismetMathLibrary::NearlyEqual_FloatFloat(DotProduct, -1.f))
-	{
-		return false;
-	}
-	UE_LOG(LogSSIMValidations, Warning, TEXT("%s | Couldn't decide, whether rotate player or not"), TEXT(__FUNCTION__));
-	return false;
 }
 
 #pragma endregion Stagger processing

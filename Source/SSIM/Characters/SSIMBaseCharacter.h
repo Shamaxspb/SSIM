@@ -57,4 +57,5 @@ public:
 private:
 	void RestrictXAxisMovement() const;
 	void SetupDamageRegistrationCollision();
+	
 };

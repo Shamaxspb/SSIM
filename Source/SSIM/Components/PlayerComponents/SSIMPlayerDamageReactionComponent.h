@@ -9,6 +9,8 @@
 #include "SSIMPlayerDamageReactionComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndInvulnerabilitySignature);
+
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
 
@@ -26,40 +28,44 @@ class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseComponent
 	GENERATED_BODY()
 
 // Variables
+public:
+	// Delegates
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|DamageProcessing")
+	FOnEndInvulnerabilitySignature OnEndInvulnerabilityDelegate;
+	
 protected:
 	// Damage processing
-	
 	FDamageData DamageData;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animations|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
 	TObjectPtr<UAnimMontage> StaggeredFirstFrame;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animations|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
 	TObjectPtr<UAnimMontage> StaggeredAnimation;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float StopFrameDuration = 0.2f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float StaggerDuration = 0.4f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float InvulnerabilityDuration = 1.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityY = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityZ = 2000.f;
 	
 	// DEBUG
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger|DEBUG")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
 	bool bReboundShowDebug;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|Stagger|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
 	bool bDrawReboundDirectionArrow;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|Stagger|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
 	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
 	
 private:
@@ -94,7 +100,6 @@ private:
 	void StartStagger() const;
 	void EndStagger() const;
 	void EndInvulnerability() const;
-	bool ShouldRotatePlayerAround() const;
 	
 	// DEBUG
 protected:

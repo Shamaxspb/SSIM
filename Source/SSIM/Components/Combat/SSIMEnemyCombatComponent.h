@@ -26,17 +26,34 @@ public:
 	
 #pragma endregion Stats	
 	
+protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMBaseEnemy> SSIMEnemy;
 	
-protected:
 	UPROPERTY()
 	TObjectPtr<APawn> PlayerPawn;
 
+private:
+	FTimerHandle ContinuousAttackDamageTimerHandle;
+	FTimerDelegate ContinuousAttackDamageTimerDelegate;
+	
+	FTimerHandle ContinuousContactDamageTimerHandle;
+	FTimerDelegate ContinuousContactDamageTimerDelegate;
+
+
 // Overriden Functions
+protected:
 	virtual void BeginPlay() override;
 	
 // My Functions
+public:
+	virtual void EndAttack() override;
+	
+protected:
+	virtual void SetReferences() override;
+	
+#pragma region Attack Damage
+	
 protected:
 	virtual void OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 									   		   AActor* OtherActor,
@@ -44,7 +61,15 @@ protected:
 									   		   int32 OtherBodyIndex,
 									   		   bool bFromSweep,
 									   		   const FHitResult& SweepResult) override;
+
+private:
+	void StartContinuousAttackDamage();
+	void EndContinuousAttackDamage();
 	
+#pragma endregion Attack Damage
+	
+#pragma region Contact Damage
+private:
 	UFUNCTION()
 	void OnContactDamageCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 											  AActor* OtherActor,
@@ -53,9 +78,17 @@ protected:
 											  bool bFromSweep,
 											  const FHitResult& SweepResult);
 	
-	virtual void SetReferences() override;
+	UFUNCTION()
+	void OnContactDamageCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent,
+										    AActor* OtherActor,
+										    UPrimitiveComponent* OtherComp,
+										    int32 OtherBodyIndex);
 	
-private:
-	virtual void DealDamageToPlayer();
+	void StartContinuousContactDamage();
+	void EndContinuousContactDamage();
 
+#pragma endregion Contact Damage
+
+	UFUNCTION()
+	virtual void DealDamageToPlayer(UShapeComponent* DamageCollision);
 };

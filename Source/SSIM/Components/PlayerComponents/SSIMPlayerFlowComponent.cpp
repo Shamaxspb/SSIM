@@ -16,6 +16,8 @@ void USSIMPlayerFlowComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	
+	
 	if (!IsValid(StatsComponent))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stats component is not valid"), TEXT(__FUNCTION__));
@@ -28,20 +30,26 @@ void USSIMPlayerFlowComponent::BeginPlay()
 // My Functions
 void USSIMPlayerFlowComponent::StartDash()
 {
-	if (bDashing || !bCanDash)
+	if (bDashing || !bCanDash || StatsComponent->bStaggered)
 	{
 		if (bDashing)
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
 		}
-		
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
-		return;
+		if (!bCanDash)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
+			return;	
+		}
+		if (StatsComponent->bStaggered)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
+			return;	
+		}
 	}
 	
 	bDashing = true;
-	bCanDash = false;
-	SSIMOwnerCharacter->GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
+	bCanDash = false;	
 	
 	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
@@ -58,6 +66,8 @@ void USSIMPlayerFlowComponent::StartDash()
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashAnimation->GetPlayLength());
 	
 	GetWorld()->GetTimerManager().SetTimer(DashCooldownTimerHandle, this, &USSIMPlayerFlowComponent::ResetDash, DashCooldown, false);
+	
+	OnStartDashDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
 }
@@ -108,7 +118,8 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 void USSIMPlayerFlowComponent::EndDash()
 {
 	bDashing = false;
-	SSIMOwnerCharacter->GetCharacterMovement()->BrakingDecelerationWalking = DEFAULT_BRAKING_DECELERATION_WALKING;
+	
+	OnEndDashDelegate.Broadcast();
 }
 
 void USSIMPlayerFlowComponent::ResetDash()

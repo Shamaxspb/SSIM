@@ -54,8 +54,13 @@ void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
 	DamageRegistrationGroup = CreateDefaultSubobject<USceneComponent>(TEXT("DamageRegistrationGroup"));
 	DamageRegistrationGroup->SetupAttachment(GetRootComponent());
 	
+	
 	HitRegistrationCollision	= CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitRegistrationCollision"));
+	HitRegistrationCollision->ComponentTags.Add("HitRegistrationCollision");
+	
 	ContactDamageCollision	= CreateDefaultSubobject<UCapsuleComponent>(TEXT("ContactDamageCollision"));
+	ContactDamageCollision->ComponentTags.Add("ContactDamageCollision");
+	
 
 	TArray<TObjectPtr<UCapsuleComponent>> DamageRegistrationCollisions;
 	DamageRegistrationCollisions.Add(HitRegistrationCollision);
@@ -72,3 +77,5 @@ void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
 	ContactDamageCollision->SetCollisionProfileName("ContactDamage", true);
 
 }
+
+

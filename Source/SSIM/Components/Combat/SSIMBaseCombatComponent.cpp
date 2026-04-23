@@ -52,7 +52,7 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 	#endif
 	
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
+	//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
 }
 
@@ -83,8 +83,11 @@ UAnimMontage* USSIMBaseCombatComponent::GetAttackMontage()
 }
 
 void USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
+															 AActor* OtherActor, 
+															 UPrimitiveComponent* OtherComp, 
+															 int32 OtherBodyIndex, 
+															 bool bFromSweep,
+															 const FHitResult& SweepResult)
 {
 	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | OnAttackCollisionBeginOverlap() is not overriden"), *GetOwner()->GetName());
 	return;

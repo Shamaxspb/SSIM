@@ -6,7 +6,6 @@
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Interfaces/SSIMEnemyCombatInterface.h"
 
 #include "SSIMBaseEnemy.generated.h"
 

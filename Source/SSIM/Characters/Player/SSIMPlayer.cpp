@@ -29,6 +29,7 @@ ASSIMPlayer::ASSIMPlayer()
 
 	SetupAttackCollision();
 	
+	ContactDamageCollision->SetCapsuleRadius(ContactDamageCollisionDefaultRadius);
 	
 }
 
@@ -38,6 +39,10 @@ void ASSIMPlayer::BeginPlay()
 	
 	GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
 	
+	SSIMPlayerDamageReactionComponent->OnEndInvulnerabilityDelegate.AddDynamic(this, &ASSIMPlayer::OnEndEndInvulnerabilityCollisionUpdate);
+	
+	SSIMPlayerFlowComponent->OnStartDashDelegate.AddDynamic(this, &ASSIMPlayer::StartDashHandler);
+	SSIMPlayerFlowComponent->OnEndDashDelegate.AddDynamic(this, &ASSIMPlayer::EndDashHandler);
 }
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -147,6 +152,23 @@ void ASSIMPlayer::HandleDash()
 	SSIMPlayerFlowComponent->StartDash();
 }
 
+void ASSIMPlayer::OnEndEndInvulnerabilityCollisionUpdate()
+{
+	HitRegistrationCollision->UpdateOverlaps();
+	ContactDamageCollision->UpdateOverlaps();
+}
+
+void ASSIMPlayer::StartDashHandler()
+{
+	GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
+	GetContactDamageCollision()->SetCapsuleRadius(GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),true);
+}
+
+void ASSIMPlayer::EndDashHandler()
+{
+	GetCharacterMovement()->BrakingDecelerationWalking = DEFAULT_BRAKING_DECELERATION_WALKING;
+	ContactDamageCollision->SetCapsuleRadius(ContactDamageCollisionDefaultRadius);
+}
 
 // Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const

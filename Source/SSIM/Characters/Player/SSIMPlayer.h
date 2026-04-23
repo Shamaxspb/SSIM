@@ -88,6 +88,8 @@ protected:
 	UPROPERTY()
 	EPlayerState CurrentPlayerState;
 
+private:
+	float ContactDamageCollisionDefaultRadius = 22.f;
 	
 	
 // Overriden Functions
@@ -158,6 +160,14 @@ private:
 	
 #pragma endregion Handler Functions
 	
+private:
+	UFUNCTION()
+	void OnEndEndInvulnerabilityCollisionUpdate();
+	
+	UFUNCTION()
+	void StartDashHandler();
+	UFUNCTION()
+	void EndDashHandler();
 	
 // Interfaces
 public:

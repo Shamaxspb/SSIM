@@ -7,7 +7,10 @@
 
 #include "SSIMPlayerFlowComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartDashSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndDashSignature);
 
+class UCapsuleComponent;
 struct FDamageData;
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
@@ -18,6 +21,11 @@ class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent
 	GENERATED_BODY()
 
 // Variables
+public:
+	// Delegates
+	FOnStartDashSignature OnStartDashDelegate;
+	FOnEndDashSignature OnEndDashDelegate;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashCooldown = 2.f;
@@ -42,6 +50,7 @@ private:
 private:
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
+	
 	
 // Overriden Functions
 protected:
