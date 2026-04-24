@@ -73,6 +73,6 @@ private:
 	void ResetDashFromAir(const FHitResult& Hit);
 	
 	UFUNCTION()
-	void OnDamageReceivedHandler(const FDamageData DamageData);
+	void OnDamageReceivedHandler(const FDamageData& DamageData);
 	
 };

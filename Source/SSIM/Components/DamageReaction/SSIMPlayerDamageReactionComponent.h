@@ -35,7 +35,7 @@ public:
 	
 protected:
 	// Damage processing
-	FDamageData DamageData;
+	
 	
 #pragma region Stagger
 	
@@ -62,7 +62,7 @@ protected:
 	float ReboundVelocityZ = 2000.f;
 	
 	// DEBUG
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
+	/*UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
 	bool bReboundShowDebug;
 	
 	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
@@ -73,7 +73,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
 	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
-	
+	*/
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
 	
@@ -83,6 +83,11 @@ private:
 	
 #pragma endregion Stagger
 	
+#pragma region Metadata
+
+	FVector ReboundLaunchVelocity = FVector::ZeroVector;
+	
+#pragma endregion Metadata
 	
 // Overriden Functions
 protected:
@@ -90,22 +95,22 @@ protected:
 
 // My Functions
 protected:
-	virtual void OnDamageReceivedHandler(FDamageData InDamageData) override;
-	
+	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
+
 private:
 	// Damage processing
 	UFUNCTION()
-	void InitStagger(const FDamageData DamageData);
+	void InitStagger();
 	void StartStaggerSequence();
 	void ExecuteNextStaggerSequenceStep();
 	void StartStopFrame() const;
 	void EndStopFrame() const;
-	void StartStagger() const;
+	void StartStagger();
 	void EndStagger() const;
 	void EndInvulnerability() const;
 	
-	// DEBUG
+	// Debug
 protected:
-	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
-	void ManualStagger_DEBUG();
+	virtual void ReboundDrawDebug() override;
+	
 };

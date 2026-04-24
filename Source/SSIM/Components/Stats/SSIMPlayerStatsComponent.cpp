@@ -17,6 +17,8 @@ void USSIMPlayerStatsComponent::BeginPlay()
 // My Functions
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
+	
+	
 	if (bInvulnerable)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
@@ -30,7 +32,7 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 													Health, 
 													MaxHealth);
 	
-	OnDamageReceivedDelegate.Broadcast(InDamageData);
+	Super::ReduceHealth(InDamageData);
 }
 
 void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
@@ -41,12 +43,6 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
 													Health, 
 													MaxHealth);
-	
-	OnHealReceivedDelegate.Broadcast(InHealValue);
-}
-
-void USSIMPlayerStatsComponent::InterruptStates()
-{
 	
 }
 
@@ -65,7 +61,6 @@ void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()
 		GetOwner(),
 		1
 	};
-	OnDamageReceivedDelegate.Broadcast(InDamageData);
 }
 
 void USSIMPlayerStatsComponent::IncrementHealth_DEBUG()
@@ -76,6 +71,5 @@ void USSIMPlayerStatsComponent::IncrementHealth_DEBUG()
 														Health, 
 														MaxHealth);	
 	
-	OnHealReceivedDelegate.Broadcast(1);
 }
  

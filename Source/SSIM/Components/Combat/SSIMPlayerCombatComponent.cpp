@@ -196,58 +196,10 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 		}
 		
 		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
-		LaunchTargetOnHit(Element);
 	}
 }
 
-void USSIMPlayerCombatComponent::LaunchTargetOnHit(AActor* InActor) const
-{
-	ACharacter* Target = Cast<ACharacter>(InActor);
-	
-	Target->LaunchCharacter(CalculateOnHitLaunchVelocity(Target), false, false);
-}
-
-FVector USSIMPlayerCombatComponent::CalculateOnHitLaunchVelocity(const AActor* InActor) const
-{
-	FVector PlayerLocation = SSIMPlayer->GetActorLocation();
-	FVector EnemyLocation = InActor->GetActorLocation();
-	
-	// Determine if Enemy is to the right or to the left
-	bool bEnemyToTheRight = EnemyLocation.Y > PlayerLocation.Y;
-	
-	// Get unit vector from Enemy to Player and Negate that vector
-	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
-	
-	// Add rotation to that vector (around X axis)
-	FVector RotatedDirection = ReboundDirection.RotateAngleAxis(bEnemyToTheRight ? ReboundAngle : -ReboundAngle, FVector::ForwardVector);
-	
-	// Multiply by coef for launch
-	FVector ReboundVelocity = RotatedDirection * ReboundVelocityCoef;
-	
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Enemy Is to the: %s"), (bEnemyToTheRight ? TEXT("Right") : TEXT("Left")));
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Direction: %s"), *ReboundDirection.ToString());
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rotated Direction: %s"), *RotatedDirection.ToString());
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Velocity: %s"),  *ReboundVelocity.ToString());
-	
-	#if !UE_BUILD_SHIPPING
-	if (bReboundShowDebug)
-	{
-		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
-									EnemyLocation, 
-									 EnemyLocation + (RotatedDirection * 250.f), 
-								   25.f, 
-											 ReboundDirectionArrowColor, 
-											 DrawDuration, 
-								   5.f);
-	}
-	#endif !UE_BUILD_SHIPPING
-	
-	return ReboundVelocity;
-	// This is so messy because it was hard to understand how the fck should I implement this
-	// would be nice to clean this up later
-}
-
-void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData InDamageData)
+void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
 }

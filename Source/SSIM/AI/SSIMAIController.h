@@ -44,7 +44,7 @@ private:
 	void SetReferences();
 	
 	UFUNCTION()
-	void OnDamageReceivedHandler(FDamageData InDamageData);
+	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
 	void SetBlackboardEnemyState(EEnemyState InNewState);
 	

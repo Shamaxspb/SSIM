@@ -13,10 +13,13 @@
 void USSIMEnemyCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	SetReferences();
+	
 	SSIMEnemy->GetContactDamageCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap);
 	SSIMEnemy->GetContactDamageCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionEndOverlap);
+	
+	//SSIMEnemy->GetHitRegistrationCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap);
+	//SSIMEnemy->GetHitRegistrationCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap);
 }
 
 void USSIMEnemyCombatComponent::SetReferences()
@@ -28,6 +31,7 @@ void USSIMEnemyCombatComponent::SetReferences()
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
+#pragma region AttackDamage 
 void USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
                                                               AActor* OtherActor, 
                                                               UPrimitiveComponent* OtherComp, 
@@ -66,7 +70,9 @@ void USSIMEnemyCombatComponent::EndAttack()
 	
 	EndContinuousAttackDamage();
 }
+#pragma endregion AttackDamage 
 
+#pragma region ContactDamage 
 void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 																	 AActor* OtherActor, 
 																	 UPrimitiveComponent* OtherComp, 
@@ -108,6 +114,7 @@ void USSIMEnemyCombatComponent::EndContinuousContactDamage()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ContinuousContactDamageTimerHandle);
 }
+#pragma endregion ContactDamage 
 
 void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollision)
 {

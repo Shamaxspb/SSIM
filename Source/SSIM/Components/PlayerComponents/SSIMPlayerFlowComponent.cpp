@@ -134,7 +134,7 @@ void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
 	bCanDash = true;
 }
 
-void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData DamageData)
+void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData& DamageData)
 {
 	EndDash();
 }

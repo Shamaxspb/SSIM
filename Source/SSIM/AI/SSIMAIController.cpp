@@ -46,7 +46,7 @@ void ASSIMAIController::SetReferences()
 	EnemyStatsComponent = BaseEnemy->GetEnemyStatsComponent();
 }
 
-void ASSIMAIController::OnDamageReceivedHandler(FDamageData InDamageData)
+void ASSIMAIController::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	SetBlackboardEnemyState(EEnemyState::EES_Staggered);
 }

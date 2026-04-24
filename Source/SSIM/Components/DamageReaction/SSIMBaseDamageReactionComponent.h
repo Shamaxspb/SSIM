@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 #include "SSIMBaseDamageReactionComponent.generated.h"
 
-struct FDamageData;
 class USSIMBaseStatsComponent;
 
 
@@ -17,12 +17,32 @@ class SSIM_API USSIMBaseDamageReactionComponent : public USSIMBaseComponent
 	GENERATED_BODY()
 
 // Variables
-public:
-	
 protected:
+	FDamageData DamageData;
+
 	UPROPERTY()
 	TObjectPtr<USSIMBaseStatsComponent> BaseStatsComponent;
 
+#pragma region Rebound Debug
+	
+	// DEBUG
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
+	bool bReboundShowDebug;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	bool bReboundShowLogs;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	bool bDrawReboundDirectionArrow;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	float DrawDuration = 3.f;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
+	
+#pragma endregion Rebound Debug
+	
 // Overriden Functions
 protected:
 	virtual void BeginPlay() override;
@@ -32,6 +52,8 @@ protected:
 	virtual void SetReferences() override;
 	
 	UFUNCTION()
-	virtual void OnDamageReceivedHandler(FDamageData DamageData);
+	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	
+	virtual void ReboundDrawDebug();
 	
 };

@@ -17,5 +17,5 @@ void USSIMEnemyStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 										 Health,
 										 MaxHealth);
 	
-	OnDamageReceivedDelegate.Broadcast(InDamageData);
+	Super::ReduceHealth(InDamageData);
 }

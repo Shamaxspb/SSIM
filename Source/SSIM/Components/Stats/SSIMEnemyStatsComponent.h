@@ -16,7 +16,7 @@ class SSIM_API USSIMEnemyStatsComponent : public USSIMBaseStatsComponent
 
 // Variables
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat")
+	UPROPERTY()
 	EEnemyState EnemyState;
 
 protected:
@@ -25,7 +25,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))
 	int32 Health = MaxHealth;
-	
 	
 // My Functions
 public:

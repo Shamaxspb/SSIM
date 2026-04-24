@@ -3,13 +3,10 @@
 
 #include "SSIMPlayerController.h" 
 
-#include "SSIMPlayer.h" 
 #include "SSIM/SSIM.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "Blueprint/UserWidget.h"
-#include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 #include "SSIM/Core/UI/SSIMHealthBar.h"
 
 
@@ -27,66 +24,11 @@ void ASSIMPlayerController::BeginPlay()
 	Init();
 }
 
-// OnPossess called TWICE for some reason
-// It doesn't affect anything yet, but should be considered in the future
-void ASSIMPlayerController::OnPossess(APawn* InPawn)
-{
-	Super::OnPossess(InPawn);
-	
-	SetPlayerReference(InPawn);
-	SetActorComponentsReferences();
-}
-
-
 // My Functions
 void ASSIMPlayerController::Init()
 {
 	InitBasicInputContext();
 	InitUI();
-	
-}
-
-void ASSIMPlayerController::SetPlayerReference(APawn* InPawn)
-{
-	if (!InPawn)
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s : Possessed pawn is not valid"), TEXT(__FUNCTION__));
-	}
-	
-	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s: InPawn = %s"), TEXT(__FUNCTION__), *InPawn->GetName());
-
-	SSIMPlayer = CastChecked<ASSIMPlayer>(InPawn);
-
-	if (!IsValid(SSIMPlayer))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s : Failed cast PlayerPawn to SSIMPlayer %s"), TEXT(__FUNCTION__), *InPawn->GetName());
-		return;
-	}
-	
-}
-
-// Lost its purpose, won't delete for now
-void ASSIMPlayerController::SetActorComponentsReferences()
-{
-	if (!SSIMPlayer)
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : SSIMPlayer is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
-	
-	if (!IsValid(SSIMPlayer->GetPlayerFlowComponent()))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : SSIMPlayerFlowComponent is not valid"), TEXT(__FUNCTION__))
-	}
-	SSIMPlayerFlowComponent = SSIMPlayer->GetPlayerFlowComponent();
-	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s : %s is set"), TEXT(__FUNCTION__), *SSIMPlayerFlowComponent->GetName());
-	
-	if (!IsValid(SSIMPlayer->GetPlayerCombatComponent()))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : SSIMPlayerCombatComponent is not valid"), TEXT(__FUNCTION__))
-	}
-	SSIMPlayerCombatComponent = SSIMPlayer->GetPlayerCombatComponent();
-	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s : %s is set"), TEXT(__FUNCTION__), *SSIMPlayerCombatComponent->GetName());
 	
 }
 
@@ -112,6 +54,7 @@ void ASSIMPlayerController::InitBasicInputContext()
 
 void ASSIMPlayerController::InitUI()
 {
+	// Health Bar
 	if (!IsValid(HealthBarWidgetClass))
 	{
 		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s : HealthBarWidget class is not valid"), TEXT(__FUNCTION__));

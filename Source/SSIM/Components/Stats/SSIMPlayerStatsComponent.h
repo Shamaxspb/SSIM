@@ -38,8 +38,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void IncreaseHealth(int32 InHealValue) override;
 
-private:
-	void InterruptStates();
 	
 // DEBUG
 public:

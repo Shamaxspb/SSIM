@@ -20,10 +20,10 @@ struct FDamageData
 	GENERATED_BODY()
 	
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<AActor> Instigator;
+	TObjectPtr<AActor> Instigator = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly)
-	int32 Value ;
+	int32 Value = 0;
 };
 
 UENUM(BlueprintType)
