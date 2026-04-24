@@ -6,35 +6,31 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Components/Stats/SSIMBaseStatsComponent.h"
 
 
 // Overriden functions
-USSIMPlayerDamageReactionComponent::USSIMPlayerDamageReactionComponent()
-{
-}
-
 void USSIMPlayerDamageReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetReferences();
 	StaggeredFirstFrame->BlendIn = StaggeredFirstFrameBlendInTime;
 	
-	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerDamageReactionComponent::InitStagger);
 }
 
 // My Functions
-void USSIMPlayerDamageReactionComponent::SetReferences()
+
+
+void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(FDamageData InDamageData)
 {
-	Super::SetReferences();
+	Super::OnDamageReceivedHandler(DamageData);
 	
-	PlayerStatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	InitStagger(DamageData);
 }
 
 #pragma region Stagger processing
+
 void USSIMPlayerDamageReactionComponent::InitStagger(const FDamageData InDamageData)
 {
 	DamageData.Instigator = InDamageData.Instigator;
@@ -50,8 +46,8 @@ void USSIMPlayerDamageReactionComponent::InitStagger(const FDamageData InDamageD
 	}
 	SSIMOwnerCharacter->PlayAnimMontage(StaggeredFirstFrame, 0.f);
 		
-	PlayerStatsComponent->bStaggered = true;
-	PlayerStatsComponent->bInvulnerable = true;
+	BaseStatsComponent->bStaggered = true;
+	BaseStatsComponent->bInvulnerable = true;
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED"), TEXT(__FUNCTION__));
@@ -147,14 +143,14 @@ void USSIMPlayerDamageReactionComponent::StartStagger() const
 
 void USSIMPlayerDamageReactionComponent::EndStagger() const
 {
-	PlayerStatsComponent->bStaggered = false;
+	BaseStatsComponent->bStaggered = false;
 	SSIMOwnerCharacter->StopAnimMontage(StaggeredAnimation);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
 }
 
 void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
 {
-	PlayerStatsComponent->bInvulnerable = false;
+	BaseStatsComponent->bInvulnerable = false;
 	OnEndInvulnerabilityDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED"), TEXT(__FUNCTION__));

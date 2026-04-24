@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "SSIMCombatDataTypes.generated.h"
 
-UENUM(Blueprintable)
+UENUM(BlueprintType)
 enum class EPlayerAttackDirection : uint8
 {
 	EPAD_Default	UMETA(Hidden),
@@ -23,5 +23,15 @@ struct FDamageData
 	TObjectPtr<AActor> Instigator;
 	
 	UPROPERTY(BlueprintReadOnly)
-	int32 Value;
+	int32 Value ;
+};
+
+UENUM(BlueprintType)
+enum class EEnemyState : uint8
+{
+	EES_Default		UMETA(Hidden),
+	EES_Idle		UMETA(DisplayName = "Idle"),
+	EES_Combat 		UMETA(DisplayName = "Combat"),
+	EES_Staggered	UMETA(DisplayName = "Staggered"),
+	EES_Dead		UMETA(DisplayName = "Dead")
 };

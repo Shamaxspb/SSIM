@@ -7,7 +7,6 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
-#include "SSIM/Characters/Player/SSIMPlayer.h"
 
 
 // Overriden Functions

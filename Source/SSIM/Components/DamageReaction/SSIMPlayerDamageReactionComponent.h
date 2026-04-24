@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIMBaseDamageReactionComponent.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+
 #include "SSIMPlayerDamageReactionComponent.generated.h"
 
 
@@ -23,7 +23,7 @@ struct FStaggerSequenceStep
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseComponent
+class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseDamageReactionComponent
 {
 	GENERATED_BODY()
 
@@ -37,6 +37,9 @@ protected:
 	// Damage processing
 	FDamageData DamageData;
 	
+#pragma region Stagger
+	
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
 	TObjectPtr<UAnimMontage> StaggeredFirstFrame;
 	
@@ -78,19 +81,16 @@ private:
 	int32 CurrentStaggerSequenceStep = 0;
 	FTimerHandle StaggerSequenceHandle;
 	
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
+#pragma endregion Stagger
+	
 	
 // Overriden Functions
-public:
-	USSIMPlayerDamageReactionComponent();
-
 protected:
 	virtual void BeginPlay() override;
 
 // My Functions
 protected:
-	virtual void SetReferences() override;
+	virtual void OnDamageReceivedHandler(FDamageData InDamageData) override;
 	
 private:
 	// Damage processing

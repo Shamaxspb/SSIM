@@ -17,6 +17,12 @@ void USSIMPlayerStatsComponent::BeginPlay()
 // My Functions
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
+	if (bInvulnerable)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+		return;
+	}
+	
 	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
