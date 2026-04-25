@@ -56,6 +56,8 @@ public:
 protected:
 	virtual void SetReferences() override;
 	
+	virtual UAnimMontage* GetAttackMontage() override;
+	
 #pragma region Attack Damage
 	
 protected:

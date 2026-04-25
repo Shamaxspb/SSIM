@@ -31,6 +31,16 @@ void USSIMEnemyCombatComponent::SetReferences()
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
+UAnimMontage* USSIMEnemyCombatComponent::GetAttackMontage()
+{
+	if (!IsValid(AttackMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Attack Montage is not valid"), TEXT(__FUNCTION__));
+		return nullptr;
+	}
+	return AttackMontage;
+}
+
 #pragma region AttackDamage 
 void USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
                                                               AActor* OtherActor, 
