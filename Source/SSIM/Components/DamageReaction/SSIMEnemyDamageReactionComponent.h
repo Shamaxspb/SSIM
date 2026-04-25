@@ -25,6 +25,7 @@ public:
 	FOnStartStaggerSignature OnStartStaggerDelegate;
 	FOnEndStaggerSignature OnEndStaggerDelegate;
 	
+	
 protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMBaseEnemy> SSIMEnemy;
@@ -55,11 +56,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Stagger|Rebound")
 	float ReboundVelocityCoef = 700.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Stagger|Rebound")
+	float ReboundVelocityZ = 250.f;
+	
 #pragma endregion Rebound
 
 #pragma region Metadata
 	
 	FVector RotatedDirection = FVector::ZeroVector;
+	
+	EPlayerAttackDirectionType PlayerAttackDirectionType;
 	
 #pragma endregion Metadata
 
@@ -69,6 +75,9 @@ protected:
 	virtual void SetReferences() override;
 	
 // My Functions
+public:
+	void ReceivePlayerAttackDirectionType(EPlayerAttackDirectionType InPlayerAttackDirectionType);
+	
 protected:
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
 	

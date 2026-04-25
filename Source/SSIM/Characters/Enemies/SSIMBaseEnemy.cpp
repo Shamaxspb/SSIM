@@ -59,3 +59,9 @@ void ASSIMBaseEnemy::ReceiveDamageInterface_Implementation(const FDamageData& In
 {
 	EnemyStatsComponent->ReduceHealth(InDamageData);
 }
+
+void ASSIMBaseEnemy::ReceivePlayerAttackDirectionType_Implementation(
+	EPlayerAttackDirectionType InPlayerAttackDirectionType) const
+{
+	EnemyDamageReactionComponent->ReceivePlayerAttackDirectionType(InPlayerAttackDirectionType);
+}

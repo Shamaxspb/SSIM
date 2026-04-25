@@ -29,7 +29,7 @@ protected:
 	UBoxComponent* CurrentAttackCollision;
 	
 	UPROPERTY()
-	TSet<AActor*> HitEnemies;
+	TArray<AActor*> HitEnemies;
 	
 	FDamageData DamageData;
 		

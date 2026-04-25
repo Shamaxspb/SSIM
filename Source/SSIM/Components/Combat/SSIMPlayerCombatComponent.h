@@ -42,9 +42,6 @@ protected:
 	TArray<TObjectPtr<UAnimMontage>> PlayerAirUpwardAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<TObjectPtr<UAnimMontage>> PlayerDownwardAttackMontages;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TArray<TObjectPtr<UAnimMontage>> PlayerAirDownwardAttackMontages;
 
 #pragma endregion Montages
@@ -52,7 +49,7 @@ protected:
 #pragma region Metadata
 	
 public:
-	EPlayerAttackDirection PlayerAttackDirection;
+	EPlayerAttackDirectionType PlayerAttackDirectionType;
 	
 #pragma endregion Metadata
 	
@@ -63,6 +60,11 @@ private:
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Rebound On Downward Attack")
+	float ReboundAngle = 50.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Rebound On Downward Attack")
+	float ReboundVelocityZ = 400.f;
 
 // Overriden Functions
 protected:
@@ -87,10 +89,9 @@ protected:
 private:
 	void DealDamageToEnemy();
 	
+	void ReboundOnDownwardAttack();
+	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
-// DEBUG
-	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
-	void SwitchAttackCollision_DEBUG() const;
 };

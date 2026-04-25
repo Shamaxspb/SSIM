@@ -120,13 +120,13 @@ void ASSIMPlayer::SetupAttackCollision()
 
 void ASSIMPlayer::HandleAttackFrontal()
 {
-	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
+	SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Frontal;
 	SSIMPlayerCombatComponent->StartAttack();
 }
 
 void ASSIMPlayer::HandleAttackUpward()
 {
-	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Upward;
+	SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Upward;
 	SSIMPlayerCombatComponent->StartAttack();
 }
 
@@ -136,11 +136,11 @@ void ASSIMPlayer::HandleAttackDownward()
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
 		
-		SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
+		SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Frontal;
 		SSIMPlayerCombatComponent->StartAttack();
 		return;
 	}
-	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
+	SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Downward;
 	SSIMPlayerCombatComponent->StartAttack();
 }
 

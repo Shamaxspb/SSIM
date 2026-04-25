@@ -85,8 +85,8 @@ protected:
 #pragma endregion Input	
 	
 protected:
-	UPROPERTY()
-	EPlayerState CurrentPlayerState;
+	/*UPROPERTY()
+	EPlayerState CurrentPlayerState;*/
 
 private:
 	float ContactDamageCollisionDefaultRadius = 22.f;

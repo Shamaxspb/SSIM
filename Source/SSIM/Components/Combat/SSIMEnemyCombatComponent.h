@@ -27,7 +27,7 @@ public:
 #pragma endregion Stats	
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat")
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Combat")
 	EEnemyState EnemyState;
 	
 protected:

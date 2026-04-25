@@ -22,9 +22,6 @@ class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMCombatInt
 	
 // Variables
 #pragma region Components
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
-	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMEnemyCombatComponent> EnemyCombatComponent;
@@ -32,8 +29,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
 	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
 	
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
-	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollision")
 	TObjectPtr<UBoxComponent> AttackBoxCollision;
@@ -78,6 +75,8 @@ public:
 	virtual void EndAttackTraceInterface_Implementation() const override;
 	
 	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
-	
+	virtual void ReceivePlayerAttackDirectionType_Implementation(
+		EPlayerAttackDirectionType InPlayerAttackDirectionType) const override;
+
 	
 };

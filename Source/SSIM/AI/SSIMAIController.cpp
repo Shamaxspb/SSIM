@@ -42,14 +42,13 @@ void ASSIMAIController::OnPossess(APawn* InPawn)
 	
 	EnemyDamageReactionComponent->OnStartStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnStartStaggerHandler);
 	EnemyDamageReactionComponent->OnEndStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnEndStaggerHandler);
-	DebugComponents();
 }
 
 
 void ASSIMAIController::SetReferences()
 {
 	BaseEnemy = Cast<ASSIMBaseEnemy>(GetPawn());
-	EnemyDamageReactionComponent = BaseEnemy->EnemyDamageReactionComponent;
+	EnemyDamageReactionComponent = BaseEnemy->GetEnemyDamageReactionComponent();
 }
 
 void ASSIMAIController::OnStartStaggerHandler()

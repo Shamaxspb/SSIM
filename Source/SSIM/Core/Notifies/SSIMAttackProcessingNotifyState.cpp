@@ -21,7 +21,13 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 									
 	if (!Owner->Implements<USSIMCombatInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCombatInterface"), TEXT(__FUNCTION__));
+		if (IsValid(GetWorld()))
+		{
+			if (GetWorld()->IsGameWorld())
+			{
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s : %s does not implement USSIMCombatInterface"), TEXT(__FUNCTION__), *Owner->GetName());
+			}
+		}
 		return;
 	}
 	
@@ -42,7 +48,13 @@ void USSIMAttackProcessingNotifyState::NotifyEnd(USkeletalMeshComponent* MeshCom
 	
 	if (!Owner->Implements<USSIMCombatInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCombatInterface"), TEXT(__FUNCTION__));
+		if (IsValid(GetWorld()))
+		{
+			if (GetWorld()->IsGameWorld())
+			{
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s : %s does not implement USSIMCombatInterface"), TEXT(__FUNCTION__), *Owner->GetName());
+			}
+		}
 		return;
 	}
 	

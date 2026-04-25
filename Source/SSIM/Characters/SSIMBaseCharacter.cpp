@@ -43,10 +43,10 @@ void ASSIMBaseCharacter::RestrictXAxisMovement() const
 	GetMovementComponent()->SetPlaneConstraintEnabled(true);
 	GetMovementComponent()->SetPlaneConstraintAxisSetting(EPlaneConstraintAxisSetting::X);
 	
-	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s | Plane Constraint Axis Setting: %s (%s)"),
+	/*UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s | Plane Constraint Axis Setting: %s (%s)"),
 											 TEXT(__FUNCTION__), 
 											 *UEnum::GetValueAsString(GetMovementComponent()->GetPlaneConstraintAxisSetting()),
-											 *GetName());
+											 *GetName());*/
 }
 
 void ASSIMBaseCharacter::SetupDamageRegistrationCollision()

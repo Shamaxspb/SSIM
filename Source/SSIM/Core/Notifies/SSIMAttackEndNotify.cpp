@@ -20,7 +20,13 @@ void USSIMAttackEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 	
 	if (!MeshComp->GetOwner()->Implements<USSIMCombatInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner does not implement USSIMCombatInterface"), TEXT(__FUNCTION__));
+		if (IsValid(GetWorld()))
+		{
+			if (GetWorld()->IsGameWorld())
+			{
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s | %s does not implement USSIMCombatInterface"), TEXT(__FUNCTION__), *MeshComp->GetOwner()->GetName());
+			}
+		}
 		return;
 	}
 	

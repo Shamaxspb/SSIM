@@ -9,6 +9,7 @@
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -28,27 +29,27 @@ void USSIMPlayerCombatComponent::StartAttack()
 	Super::StartAttack();
 	if (bShowLogs)
     {
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
     }
 }
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
 {	
-	switch (PlayerAttackDirection)
+	switch (PlayerAttackDirectionType)
 	{
-		case EPlayerAttackDirection::EPAD_Frontal:
+		case EPlayerAttackDirectionType::EPADT_Frontal:
 		{
 			CurrentAttackCollision = SSIMPlayer->GetFrontalAttackCollision();
 			break;
 		}
 		
-		case EPlayerAttackDirection::EPAD_Upward:
+		case EPlayerAttackDirectionType::EPADT_Upward:
 		{
 			CurrentAttackCollision = SSIMPlayer->GetUpperAttackCollision();
 			break;
 		}
 		
-		case EPlayerAttackDirection::EPAD_Downward:
+		case EPlayerAttackDirectionType::EPADT_Downward:
 		{
 			CurrentAttackCollision = SSIMPlayer->GetBottomAttackCollision();
 			break;
@@ -76,9 +77,9 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 	if (SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{
 		// Air Attack Montage
-		switch (PlayerAttackDirection)
+		switch (PlayerAttackDirectionType)
 		{
-		case EPlayerAttackDirection::EPAD_Frontal:
+		case EPlayerAttackDirectionType::EPADT_Frontal:
 			{
 				if (PlayerAirFrontalAttackMontages.IsEmpty())
 				{
@@ -89,7 +90,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Upward:
+		case EPlayerAttackDirectionType::EPADT_Upward:
 			{
 				if (PlayerAirUpwardAttackMontages.IsEmpty())
 				{
@@ -100,7 +101,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Downward:
+		case EPlayerAttackDirectionType::EPADT_Downward:
 			{
 				if (PlayerAirDownwardAttackMontages.IsEmpty())
 				{
@@ -122,9 +123,9 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 	else
 	{
 		// Ground Attack Montage
-		switch (PlayerAttackDirection)
+		switch (PlayerAttackDirectionType)
 		{
-		case EPlayerAttackDirection::EPAD_Frontal:
+		case EPlayerAttackDirectionType::EPADT_Frontal:
 			{
 				if (PlayerFrontalAttackMontages.IsEmpty())
 				{
@@ -135,7 +136,7 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 				break;
 			}
 	
-		case EPlayerAttackDirection::EPAD_Upward:
+		case EPlayerAttackDirectionType::EPADT_Upward:
 			{
 				if (PlayerUpwardAttackMontages.IsEmpty())
 				{
@@ -143,17 +144,6 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 					return nullptr;
 				}
 				AttackMontage = PlayerUpwardAttackMontages[FMath::RandHelper(PlayerUpwardAttackMontages.Num())];
-				break;
-			}
-	
-		case EPlayerAttackDirection::EPAD_Downward:
-			{
-				if (PlayerDownwardAttackMontages.IsEmpty())
-				{
-					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No DOWNWARD Attack Montages found"), TEXT(__FUNCTION__));
-					return nullptr;
-				}
-				AttackMontage = PlayerDownwardAttackMontages[FMath::RandHelper(PlayerDownwardAttackMontages.Num())];
 				break;
 			}
 			
@@ -195,6 +185,11 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
 	
+	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
+	{
+		ReboundOnDownwardAttack();
+	}
+	
 	for (auto Element : HitEnemies)
 	{
 		if (!Element->Implements<USSIMDamageableInterface>())
@@ -207,37 +202,31 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	}
 }
 
+void USSIMPlayerCombatComponent::ReboundOnDownwardAttack()
+{
+	if (FVector::DotProduct(SSIMPlayer->GetActorForwardVector(), FVector::RightVector) < 0.f)
+	{
+		ReboundAngle *= -1.f;
+	}
+	FVector ReboundDirection = SSIMPlayer->GetActorForwardVector().RotateAngleAxis(ReboundAngle,FVector::ForwardVector);
+	
+	ACharacter* FirstHitEnemy = Cast<ACharacter>(HitEnemies[0]);
+	
+	// Adjust rebound start location
+	FVector AdjustedPlayerLocation = SSIMPlayer->GetActorLocation();
+	AdjustedPlayerLocation.Y = FirstHitEnemy->GetActorLocation().Y;
+	// Sum Player's and Enemy's capsule HalfHeights and adding a little bit 
+	AdjustedPlayerLocation.Z = FirstHitEnemy->GetActorLocation().Z + 
+							  (FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() +
+							  + SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
+							  * 1.05; // Multiply so Player's and Enemy's capsules do not cross each other tangentially
+	
+	SSIMPlayer->SetActorLocation(AdjustedPlayerLocation);
+	
+	SSIMPlayer->LaunchCharacter(ReboundDirection * ReboundVelocityZ, true, true);
+}
+
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
-}
-
-
-//DEBUG
-void USSIMPlayerCombatComponent::SwitchAttackCollision_DEBUG() const
-{
-	if (!IsValid(CurrentAttackCollision))
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("No current attack collision"));
-		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Magenta, 
-										TEXT("No current attack collision"), false, FVector2D(1.2f, 1.2f));
-		return;
-	}
-	
-	if (CurrentAttackCollision->GetCollisionEnabled() == ECollisionEnabled::QueryOnly)
-	{
-		CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		CurrentAttackCollision->SetHiddenInGame(true);
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Current attack collision: NoCollision"));
-		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Red, 
-										TEXT("Current attack collision: NoCollision"), false, FVector2D(1.2f, 1.2f));
-	}
-	else if (CurrentAttackCollision->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
-	{
-		CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		CurrentAttackCollision->SetHiddenInGame(false);
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Current attack collision: QueryOnly"));
-		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Emerald, 
-										TEXT("Current attack collision: QueryOnly"), false, FVector2D(1.2f, 1.2f));
-	}
 }
