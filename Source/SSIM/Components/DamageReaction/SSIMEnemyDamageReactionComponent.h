@@ -7,19 +7,23 @@
 
 #include "SSIMEnemyDamageReactionComponent.generated.h"
 
-class ASSIMBaseEnemy;
-DECLARE_MULTICAST_DELEGATE(FEndStaggerSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartStaggerSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndStaggerSignature);
 
+class ASSIMBaseEnemy;
 class USSIMEnemyStatsComponent;
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMEnemyDamageReactionComponent : public USSIMBaseDamageReactionComponent
 {
 	GENERATED_BODY()
 	
 // Variables
 	// Delegates
-	FEndStaggerSignature EndStaggerDelegate;
+public:
+	FOnStartStaggerSignature OnStartStaggerDelegate;
+	FOnEndStaggerSignature OnEndStaggerDelegate;
 	
 protected:
 	UPROPERTY()
@@ -27,11 +31,14 @@ protected:
 	UPROPERTY()
 	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations", meta = (DisplayPriority = 2))
+	TObjectPtr<UAnimMontage> BackStaggeredMontage;
+	
 #pragma region Stagger
 	
-protected:
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger")
-	float StaggerDuration;
+	float StaggerDuration = 0.5f;
 	
 private:
 	FTimerHandle StaggerTimerHandle;
@@ -67,9 +74,11 @@ protected:
 	
 private:
 	void StartStagger();
-	void EndStagger();
+	void EndStagger() const;
 	
 	void ReboundOnHit();
+	
+	UAnimMontage* SelectStaggerMontage() const;
 	
 	// Debug
 protected:

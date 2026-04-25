@@ -3,11 +3,10 @@
 
 #include "SSIMAIController.h"
 
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
-#include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
+#include "SSIM/Components/DamageReaction/SSIMEnemyDamageReactionComponent.h"
 
 
 ASSIMAIController::ASSIMAIController()
@@ -19,9 +18,8 @@ ASSIMAIController::ASSIMAIController()
 void ASSIMAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReferences();
 	
-	EnemyStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMAIController::OnDamageReceivedHandler);
+	SetBlackboardStaggeredDuration();
 }
 
 void ASSIMAIController::OnPossess(APawn* InPawn)
@@ -37,38 +35,64 @@ void ASSIMAIController::OnPossess(APawn* InPawn)
 		return;
 	}
 	RunBehaviorTree(BaseBehaviorTree);
+	
+	SetReferences();
+	
+	UE_LOG(LogTemp, Warning, TEXT("Binding to component: %s"), *GetNameSafe(EnemyDamageReactionComponent));
+	
+	EnemyDamageReactionComponent->OnStartStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnStartStaggerHandler);
+	EnemyDamageReactionComponent->OnEndStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnEndStaggerHandler);
+	DebugComponents();
 }
 
 
 void ASSIMAIController::SetReferences()
 {
 	BaseEnemy = Cast<ASSIMBaseEnemy>(GetPawn());
-	EnemyStatsComponent = BaseEnemy->GetEnemyStatsComponent();
+	EnemyDamageReactionComponent = BaseEnemy->EnemyDamageReactionComponent;
 }
 
-void ASSIMAIController::OnDamageReceivedHandler(const FDamageData& InDamageData)
+void ASSIMAIController::OnStartStaggerHandler()
 {
 	SetBlackboardEnemyState(EEnemyState::EES_Staggered);
 }
 
-void ASSIMAIController::SetBlackboardEnemyState(EEnemyState InNewState)
+void ASSIMAIController::OnEndStaggerHandler()
+{
+	SetBlackboardEnemyState(EEnemyState::EES_Combat);
+}
+
+void ASSIMAIController::SetBlackboardEnemyState(EEnemyState InNewState) const
 {
 	uint8 NewState = static_cast<uint8>(InNewState);
 	USSIMBlackboardHelper::SetEnumSafe(Blackboard, TEXT("EEnemyState"), NewState);
-	
-	/*if (!IsValid(GetBlackboardComponent()))
+}
+
+void ASSIMAIController::SetBlackboardStaggeredDuration() const
+{
+	USSIMBlackboardHelper::SetFloatSafe(Blackboard, TEXT("StaggerDuration"), EnemyDamageReactionComponent->StaggerDuration);
+}
+
+void ASSIMAIController::DebugComponents()
+{
+	if (!BaseEnemy)
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | BlackboardComponent is not valid"), TEXT(__FUNCTION__));
+		UE_LOG(LogTemp, Error, TEXT("BaseEnemy is NULL"));
 		return;
 	}
-	UBlackboardData* BBAsset = Blackboard->GetBlackboardAsset();
-	if (!BBAsset || BBAsset->GetKeyID(TEXT("EEnemyState")) == FBlackboard::InvalidKey)
+
+	TArray<UActorComponent*> Components;
+	BaseEnemy->GetComponents(Components);
+
+	UE_LOG(LogSSIMEnemyInitialization, Warning, TEXT("=== COMPONENT LIST FOR %s ==="), *BaseEnemy->GetName());
+
+	for (UActorComponent* Comp : Components)
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | There is no EEnemyState key in Blackboard"), TEXT(__FUNCTION__));
-		return;
+		UE_LOG(LogSSIMEnemyInitialization, Warning, TEXT("Component: %s | %s | Outer: %s"),
+			*Comp->GetName(),
+			*Comp->GetClass()->GetName(),
+			*GetNameSafe(Comp->GetOuter()));
 	}
-	Blackboard->SetValueAsEnum(TEXT("EEnemyState"), static_cast<uint8>(InNewState));*/
-	
 }
 
 

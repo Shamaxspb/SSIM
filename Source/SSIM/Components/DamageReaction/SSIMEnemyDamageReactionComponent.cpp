@@ -34,7 +34,6 @@ void USSIMEnemyDamageReactionComponent::OnDamageReceivedHandler(const FDamageDat
 	
 	StartStagger();
 	ReboundOnHit();
-	
 }
 
 void USSIMEnemyDamageReactionComponent::StartStagger()
@@ -48,12 +47,33 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 		StaggerDuration,
 		false
 		);
+	
+	if (!IsValid(FrontStaggeredMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
+	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
+	
+	UE_LOG(LogTemp, Warning, TEXT("Broadcast from component: %s"), *GetNameSafe(this));
+	OnStartStaggerDelegate.Broadcast();
 }
 
-void USSIMEnemyDamageReactionComponent::EndStagger()
+void USSIMEnemyDamageReactionComponent::EndStagger() const
 {
 	EnemyStatsComponent->EnemyState = EEnemyState::EES_Combat; // Since enemy can be staggered only in combat (not sure about this)
-	EndStaggerDelegate.Broadcast();
+	
+	SSIMEnemy->StopAnimMontage();
+	
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
+	// or 
+	// StartStagger { OnCharacterLanded.AddDynamic; } 
+	// OnCharacterLandedHandler { EndStagger; OnCharacterLanded.RemoveDynamic; }
+	
+	UE_LOG(LogTemp, Warning, TEXT("Broadcast from component: %s"), *GetNameSafe(this));
+	OnEndStaggerDelegate.Broadcast();
 }
 
 void USSIMEnemyDamageReactionComponent::ReboundOnHit()
@@ -91,6 +111,23 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 #endif !UE_BUILD_SHIPPING
 	
 	SSIMEnemy->LaunchCharacter(ReboundVelocity, false, false);
+}
+
+UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
+{
+	TObjectPtr<UAnimMontage> StaggeredMontage;
+	FVector InstigatorDirection = DamageData.Instigator->GetActorForwardVector();
+	FVector EnemyDirection = SSIMEnemy->GetActorForwardVector();
+	
+	if (FVector::DotProduct(InstigatorDirection, EnemyDirection) > 0.f)
+	{
+		StaggeredMontage = BackStaggeredMontage;
+	}
+	else
+	{
+		StaggeredMontage = FrontStaggeredMontage;
+	}
+	return StaggeredMontage;
 }
 
 void USSIMEnemyDamageReactionComponent::ReboundDrawDebug()

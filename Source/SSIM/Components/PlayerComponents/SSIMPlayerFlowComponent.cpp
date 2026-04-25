@@ -53,17 +53,17 @@ void USSIMPlayerFlowComponent::StartDash()
 	
 	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
-	if (!IsValid(PlayerDashAnimation))
+	if (!IsValid(PlayerDashMontage))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerDashAnimation is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	AnimInstance->Montage_Play(PlayerDashAnimation);
+	AnimInstance->Montage_Play(PlayerDashMontage);
 	
 	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DashInProcessTimerHandle, this, &USSIMPlayerFlowComponent::EndDash, PlayerDashAnimation->GetPlayLength(), false);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashAnimation->GetPlayLength());
+	GetWorld()->GetTimerManager().SetTimer(DashInProcessTimerHandle, this, &USSIMPlayerFlowComponent::EndDash, PlayerDashMontage->GetPlayLength(), false);
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashMontage->GetPlayLength());
 	
 	if (SSIMOwnerCharacter->GetCharacterMovement()->IsFalling())
 	{

@@ -22,6 +22,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<USSIMBaseStatsComponent> BaseStatsComponent;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations", meta = (DisplayPriority = 1))
+	TObjectPtr<UAnimMontage> FrontStaggeredMontage;
 
 #pragma region Rebound Debug
 	

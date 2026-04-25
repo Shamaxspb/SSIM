@@ -11,7 +11,10 @@ void USSIMBaseCombatComponent::StartAttack()
 {
 	if (bAttacking)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is still in process"), TEXT(__FUNCTION__));
+		if (bShowLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is still in process"), TEXT(__FUNCTION__));
+		}
 		return;
 	}
 	
@@ -25,13 +28,21 @@ void USSIMBaseCombatComponent::StartAttack()
 	bAttacking = true; // set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
 	
 	AnimInstance->Montage_Play(AttackMontage);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
+	}
 }
 
 void USSIMBaseCombatComponent::EndAttack()
 {
 	bAttacking = false;
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
+	
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
+	}
+	
 	HitEnemies.Empty();
 }
 
@@ -51,9 +62,10 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 	CurrentAttackCollision->SetHiddenInGame(false);
 	#endif
 	
-	
-	//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Activated Attack Collision: %s"), TEXT(__FUNCTION__), *CurrentAttackCollision->GetName());
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
+	}
 }
 
 void USSIMBaseCombatComponent::EndAttackTrace()
@@ -73,11 +85,15 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 
 	HitEnemies.Empty();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
+	}
 }
 
 UAnimMontage* USSIMBaseCombatComponent::GetAttackMontage()
 {
+	
 	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | GetAttackMontage() is not overriden"), *GetOwner()->GetName());
 	return nullptr;
 }

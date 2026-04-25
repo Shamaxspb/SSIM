@@ -43,9 +43,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
 	TObjectPtr<UAnimMontage> StaggeredFirstFrame;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
-	TObjectPtr<UAnimMontage> StaggeredAnimation;
-	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float StopFrameDuration = 0.2f;
 	
@@ -60,20 +57,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityZ = 2000.f;
-	
-	// DEBUG
-	/*UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
-	bool bReboundShowDebug;
-	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
-	bool bDrawReboundDirectionArrow;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
-	float DrawDuration = 3.f;
-	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
-	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
-	*/
+
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
 	

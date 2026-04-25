@@ -26,8 +26,10 @@ void USSIMPlayerCombatComponent::BeginPlay()
 void USSIMPlayerCombatComponent::StartAttack()
 {
 	Super::StartAttack();
-	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
+	if (bShowLogs)
+    {
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirection));
+    }
 }
 
 void USSIMPlayerCombatComponent::StartAttackTrace()
@@ -171,7 +173,10 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	const FHitResult& SweepResult)
 {
 	HitEnemies.Add(OtherActor);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Enemy : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Enemy : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+	}
 	
 	DealDamageToEnemy();
 }
@@ -180,7 +185,10 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 {
 	if (HitEnemies.IsEmpty())
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+		if (bShowLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+		}
 		return;
 	}
 	

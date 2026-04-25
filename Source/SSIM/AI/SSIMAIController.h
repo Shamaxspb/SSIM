@@ -11,6 +11,7 @@ struct FDamageData;
 enum class EEnemyState : uint8;
 class ASSIMBaseEnemy;
 class USSIMEnemyStatsComponent;
+class USSIMEnemyDamageReactionComponent;
 class UBehaviorTree;
 
 
@@ -27,7 +28,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMBaseEnemy> BaseEnemy;
 	UPROPERTY()
-	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
 
 // Overriden Functions
 public:
@@ -44,9 +45,13 @@ private:
 	void SetReferences();
 	
 	UFUNCTION()
-	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	void OnStartStaggerHandler();
+	UFUNCTION()
+	void OnEndStaggerHandler();
 	
-	void SetBlackboardEnemyState(EEnemyState InNewState);
+	void SetBlackboardEnemyState(EEnemyState InNewState) const;
+	void SetBlackboardStaggeredDuration() const;
 	
-	
+	// DEBUG
+	void DebugComponents();
 };

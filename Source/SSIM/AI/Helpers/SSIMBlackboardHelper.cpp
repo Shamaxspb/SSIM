@@ -11,16 +11,32 @@ class UBlackboardData;
 
 void USSIMBlackboardHelper::SetEnumSafe(UBlackboardComponent* BB, FName KeyName, uint8 Value)
 {
+	if (IsBlackboardAndKeyValid(BB, KeyName))
+	{
+		BB->SetValueAsEnum(KeyName, Value);
+	}
+}
+
+void USSIMBlackboardHelper::SetFloatSafe(UBlackboardComponent* BB, FName KeyName, float Value)
+{
+	if (IsBlackboardAndKeyValid(BB, KeyName))
+	{
+		BB->SetValueAsFloat(KeyName, Value);
+	}
+}
+
+bool USSIMBlackboardHelper::IsBlackboardAndKeyValid(const UBlackboardComponent* BB, FName KeyName)
+{
 	if (!BB)
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | BlackboardComponent is not valid"), TEXT(__FUNCTION__));
-		return;
+		return false;
 	}
 	UBlackboardData* BBAsset = BB->GetBlackboardAsset();
-	if (!BBAsset || BBAsset->GetKeyID(TEXT("EEnemyState")) == FBlackboard::InvalidKey)
+	if (!BBAsset || BBAsset->GetKeyID(KeyName) == FBlackboard::InvalidKey)
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | There is no EEnemyState key in Blackboard"), TEXT(__FUNCTION__));
-		return;
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | There is no %s key in Blackboard"), TEXT(__FUNCTION__), *KeyName.ToString());
+		return false;
 	}
-	BB->SetValueAsEnum(TEXT("EEnemyState"), static_cast<uint8>(Value));
+	return true;
 }

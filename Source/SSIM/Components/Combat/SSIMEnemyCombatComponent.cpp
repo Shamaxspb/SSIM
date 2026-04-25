@@ -82,7 +82,10 @@ void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveC
 {
 	if (OtherActor == PlayerPawn)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
+		if (bShowLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
+		}
 		StartContinuousContactDamage();
 	}
 }
@@ -124,15 +127,16 @@ void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollis
 		return;
 	}
 	
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | %s : Try Deal Damage"), TEXT(__FUNCTION__), *DamageCollision->GetName());
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | %s : Try Deal Damage"), TEXT(__FUNCTION__), *DamageCollision->GetName());
+	}
 	
 	if (DamageCollision->IsOverlappingActor(PlayerPawn))
 	{
 		DamageData.Instigator = SSIMOwnerCharacter;
 		DamageData.Value = RegularAttackDamage;
 		
-		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Character is %s"), TEXT(__FUNCTION__), *PlayerPawn->GetName());
-
 		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(PlayerPawn, DamageData);
 	}
 }

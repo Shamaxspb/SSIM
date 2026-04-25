@@ -124,18 +124,18 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 	
 	SSIMOwnerCharacter->GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
 	
-	if (!IsValid(StaggeredAnimation))
+	if (!IsValid(FrontStaggeredMontage))
     {
     	UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
     	return;
     }
-    SSIMOwnerCharacter->PlayAnimMontage(StaggeredAnimation, 1.f);
+    SSIMOwnerCharacter->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 }
 
 void USSIMPlayerDamageReactionComponent::EndStagger() const
 {
 	BaseStatsComponent->bStaggered = false;
-	SSIMOwnerCharacter->StopAnimMontage(StaggeredAnimation);
+	SSIMOwnerCharacter->StopAnimMontage(FrontStaggeredMontage);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
 }
 

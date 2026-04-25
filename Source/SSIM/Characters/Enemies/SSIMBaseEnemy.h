@@ -22,7 +22,9 @@ class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMCombatInt
 	
 // Variables
 #pragma region Components
-
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMEnemyCombatComponent> EnemyCombatComponent;
@@ -30,8 +32,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
 	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
-	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;*/
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollision")
 	TObjectPtr<UBoxComponent> AttackBoxCollision;
@@ -59,7 +61,7 @@ public:
 		return EnemyStatsComponent;
 	}
 	
-	FORCEINLINE USSIMEnemyDamageReactionComponent* Get() const
+	FORCEINLINE USSIMEnemyDamageReactionComponent* GetEnemyDamageReactionComponent() const
 	{
 		return EnemyDamageReactionComponent;
 	}
