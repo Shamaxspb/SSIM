@@ -4,8 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Runtime/AIModule/Classes/AIController.h"
+
 #include "SSIMAIController.generated.h"
 
+struct FDamageData;
+enum class EEnemyState : uint8;
+class ASSIMBaseEnemy;
+class USSIMEnemyStatsComponent;
+class USSIMEnemyDamageReactionComponent;
 class UBehaviorTree;
 
 
@@ -18,6 +24,11 @@ class SSIM_API ASSIMAIController : public AAIController
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|AI")
 	TObjectPtr<UBehaviorTree> BaseBehaviorTree;
+	
+	UPROPERTY()
+	TObjectPtr<ASSIMBaseEnemy> BaseEnemy;
+	UPROPERTY()
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
 
 // Overriden Functions
 public:
@@ -28,7 +39,19 @@ protected:
 	
 	virtual void OnPossess(APawn* InPawn) override;
 
-public:
-	virtual void Tick(float DeltaTime) override;
 	
+// My Functions
+private:
+	void SetReferences();
+	
+	UFUNCTION()
+	void OnStartStaggerHandler();
+	UFUNCTION()
+	void OnEndStaggerHandler();
+	
+	void SetBlackboardEnemyState(EEnemyState InNewState) const;
+	void SetBlackboardStaggeredDuration() const;
+	
+	// DEBUG
+	void DebugComponents();
 };

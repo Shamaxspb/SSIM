@@ -35,6 +35,16 @@ protected:
 		
 #pragma endregion Metadata
 
+#pragma region Debug
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug")
+	bool bShowDebug;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug", meta = (EditCondition = "bShowDebug", EditConditionHides))
+	bool bShowLogs;
+
+#pragma endregion Debug
 		
 // My Functions
 public:

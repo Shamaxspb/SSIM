@@ -10,7 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDamageReactionComponent.h"
+#include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
@@ -208,10 +208,5 @@ void ASSIMPlayer::EndDashInterface_Implementation() const
 
 void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {
-	if (SSIMPlayerStatsComponent->bInvulnerable)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
-		return;
-	}
 	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }

@@ -36,7 +36,7 @@ protected:
 // My Functions
 protected:	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnDamageReceived(const FDamageData InDamageData);
+	void OnDamageReceived(const FDamageData& InDamageData);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHealReceived(int32 InHealValue);

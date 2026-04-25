@@ -7,10 +7,11 @@
 
 UAnimMontage* USSIMKhaimeraCombatComponent::GetAttackMontage()
 {
-	if (!IsValid(AttackMontage))
+	/*if (!IsValid(AttackMontage))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Attack Montage is not valid"), TEXT(__FUNCTION__));
 		return nullptr;
 	}
-	return AttackMontage;
+	return AttackMontage;*/
+	return nullptr;
 }

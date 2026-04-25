@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "SSIM/Components/Combat/SSIMEnemyCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
+#include "SSIM/Components/DamageReaction/SSIMEnemyDamageReactionComponent.h"
 
 // Overriden Functions
 ASSIMBaseEnemy::ASSIMBaseEnemy()
@@ -14,8 +15,9 @@ ASSIMBaseEnemy::ASSIMBaseEnemy()
 	GetCapsuleComponent()->SetCollisionProfileName("Enemy", true);
 	GetMesh()->SetCollisionProfileName("Enemy", true);
 	
-	EnemyCombatComponent = CreateDefaultSubobject<USSIMEnemyCombatComponent>(TEXT("CombatComponent"));
-	EnemyStatsComponent  = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
+	EnemyCombatComponent		  = CreateDefaultSubobject<USSIMEnemyCombatComponent>(TEXT("CombatComponent"));
+	EnemyStatsComponent			  = CreateDefaultSubobject<USSIMEnemyStatsComponent>(TEXT("StatsComponent"));
+	EnemyDamageReactionComponent  = CreateDefaultSubobject<USSIMEnemyDamageReactionComponent>(TEXT("DamageReactionComponent"));
 	
 	SetupAttackCollision();
 }

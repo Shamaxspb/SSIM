@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SSIMBaseCombatComponent.h"
+
 #include "SSIMEnemyCombatComponent.generated.h"
 
 class ASSIMBaseEnemy;
@@ -15,7 +16,6 @@ class SSIM_API USSIMEnemyCombatComponent : public USSIMBaseCombatComponent
 {
 	GENERATED_BODY()
 	
-	
 // Variables
 #pragma region Stats
 	
@@ -25,6 +25,10 @@ public:
 	int32 RegularAttackDamage = 1;
 	
 #pragma endregion Stats	
+	
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat")
+	EEnemyState EnemyState;
 	
 protected:
 	UPROPERTY()
@@ -51,6 +55,8 @@ public:
 	
 protected:
 	virtual void SetReferences() override;
+	
+	virtual UAnimMontage* GetAttackMontage() override;
 	
 #pragma region Attack Damage
 	

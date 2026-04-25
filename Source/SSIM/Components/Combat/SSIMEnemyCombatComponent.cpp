@@ -7,17 +7,19 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
-#include "SSIM/Characters/Player/SSIMPlayer.h"
 
 
 // Overriden Functions
 void USSIMEnemyCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	SetReferences();
+	
 	SSIMEnemy->GetContactDamageCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap);
 	SSIMEnemy->GetContactDamageCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionEndOverlap);
+	
+	//SSIMEnemy->GetHitRegistrationCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap);
+	//SSIMEnemy->GetHitRegistrationCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap);
 }
 
 void USSIMEnemyCombatComponent::SetReferences()
@@ -29,6 +31,17 @@ void USSIMEnemyCombatComponent::SetReferences()
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
+UAnimMontage* USSIMEnemyCombatComponent::GetAttackMontage()
+{
+	if (!IsValid(AttackMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Attack Montage is not valid"), TEXT(__FUNCTION__));
+		return nullptr;
+	}
+	return AttackMontage;
+}
+
+#pragma region AttackDamage 
 void USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
                                                               AActor* OtherActor, 
                                                               UPrimitiveComponent* OtherComp, 
@@ -67,7 +80,9 @@ void USSIMEnemyCombatComponent::EndAttack()
 	
 	EndContinuousAttackDamage();
 }
+#pragma endregion AttackDamage 
 
+#pragma region ContactDamage 
 void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 																	 AActor* OtherActor, 
 																	 UPrimitiveComponent* OtherComp, 
@@ -77,7 +92,10 @@ void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveC
 {
 	if (OtherActor == PlayerPawn)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
+		if (bShowLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
+		}
 		StartContinuousContactDamage();
 	}
 }
@@ -109,6 +127,7 @@ void USSIMEnemyCombatComponent::EndContinuousContactDamage()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ContinuousContactDamageTimerHandle);
 }
+#pragma endregion ContactDamage 
 
 void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollision)
 {
@@ -118,15 +137,16 @@ void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollis
 		return;
 	}
 	
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | %s : Try Deal Damage"), TEXT(__FUNCTION__), *DamageCollision->GetName());
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | %s : Try Deal Damage"), TEXT(__FUNCTION__), *DamageCollision->GetName());
+	}
 	
 	if (DamageCollision->IsOverlappingActor(PlayerPawn))
 	{
 		DamageData.Instigator = SSIMOwnerCharacter;
 		DamageData.Value = RegularAttackDamage;
 		
-		//UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Character is %s"), TEXT(__FUNCTION__), *PlayerPawn->GetName());
-
 		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(PlayerPawn, DamageData);
 	}
 }

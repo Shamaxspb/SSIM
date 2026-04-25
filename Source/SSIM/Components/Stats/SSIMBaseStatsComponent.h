@@ -9,7 +9,7 @@
 #include "SSIMBaseStatsComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReceivedSignature, FDamageData, DamageData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReceivedSignature, const FDamageData&, InDamageData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealReceivedSignature, int32, HealValue);
 
 

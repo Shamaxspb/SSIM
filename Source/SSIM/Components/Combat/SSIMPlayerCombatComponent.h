@@ -63,31 +63,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
 	
-#pragma region Rebound
-	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
-	float ReboundAngle = 45.f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack|Rebound")
-	float ReboundVelocityCoef = 700.f;
-	
-	FRotator ReboundRotator = FRotator(ReboundAngle, 0.f, 0.f);
-	
-	// Debug
-	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG")
-	bool bReboundShowDebug;
-	
-	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
-	bool bDrawReboundDirectionArrow;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
-	float DrawDuration = 3.f;
-	
-	UPROPERTY(EditAnywhere, Category = "SSIM|Combat|Attack|Rebound|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
-	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.287f, 0.017f, 1.f);
-	
-#pragma endregion Rebound
 
 // Overriden Functions
 protected:
@@ -111,11 +86,9 @@ protected:
 	
 private:
 	void DealDamageToEnemy();
-	void LaunchTargetOnHit(AActor* InActor) const; 
-	FVector CalculateOnHitLaunchVelocity(const AActor* InActor) const;
 	
 	UFUNCTION()
-	void OnDamageReceivedHandler(const FDamageData InDamageData);
+	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
 // DEBUG
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")

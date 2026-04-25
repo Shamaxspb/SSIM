@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "SSIM/Components/SSIMBaseComponent.h"
+#include "SSIMBaseDamageReactionComponent.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+
 #include "SSIMPlayerDamageReactionComponent.generated.h"
 
 
@@ -23,7 +23,7 @@ struct FStaggerSequenceStep
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseComponent
+class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseDamageReactionComponent
 {
 	GENERATED_BODY()
 
@@ -35,13 +35,13 @@ public:
 	
 protected:
 	// Damage processing
-	FDamageData DamageData;
 	
+	
+#pragma region Stagger
+	
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
 	TObjectPtr<UAnimMontage> StaggeredFirstFrame;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
-	TObjectPtr<UAnimMontage> StaggeredAnimation;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float StopFrameDuration = 0.2f;
@@ -57,20 +57,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityZ = 2000.f;
-	
-	// DEBUG
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
-	bool bReboundShowDebug;
-	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
-	bool bDrawReboundDirectionArrow;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
-	float DrawDuration = 3.f;
-	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
-	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
-	
+
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
 	
@@ -78,34 +65,36 @@ private:
 	int32 CurrentStaggerSequenceStep = 0;
 	FTimerHandle StaggerSequenceHandle;
 	
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
+#pragma endregion Stagger
+	
+#pragma region Metadata
+
+	FVector ReboundLaunchVelocity = FVector::ZeroVector;
+	
+#pragma endregion Metadata
 	
 // Overriden Functions
-public:
-	USSIMPlayerDamageReactionComponent();
-
 protected:
 	virtual void BeginPlay() override;
 
 // My Functions
 protected:
-	virtual void SetReferences() override;
-	
+	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
+
 private:
 	// Damage processing
 	UFUNCTION()
-	void InitStagger(const FDamageData DamageData);
+	void InitStagger();
 	void StartStaggerSequence();
 	void ExecuteNextStaggerSequenceStep();
 	void StartStopFrame() const;
 	void EndStopFrame() const;
-	void StartStagger() const;
+	void StartStagger();
 	void EndStagger() const;
 	void EndInvulnerability() const;
 	
-	// DEBUG
+	// Debug
 protected:
-	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
-	void ManualStagger_DEBUG();
+	virtual void ReboundDrawDebug() override;
+	
 };

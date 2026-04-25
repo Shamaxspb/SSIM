@@ -3,16 +3,14 @@
 
 #include "SSIMBaseStatsComponent.h"
 
-#include "SSIM/SSIM.h"
-
 
 // My Functions
 void USSIMBaseStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
-	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | ReduceHealth() is not overriden"), *GetOwner()->GetName());
+	OnDamageReceivedDelegate.Broadcast(InDamageData);
 }
 
 void USSIMBaseStatsComponent::IncreaseHealth(int32 InHealValue)
 {
-	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | IncreaseHealth() is not overriden"), *GetOwner()->GetName());
+	OnHealReceivedDelegate.Broadcast(InHealValue);
 }

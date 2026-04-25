@@ -36,7 +36,7 @@ protected:
 	float DashVelocityCoef = 15.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
-	TObjectPtr<UAnimMontage> PlayerDashAnimation;
+	TObjectPtr<UAnimMontage> PlayerDashMontage;
 
 #pragma region Metadata
 
@@ -73,6 +73,6 @@ private:
 	void ResetDashFromAir(const FHitResult& Hit);
 	
 	UFUNCTION()
-	void OnDamageReceivedHandler(const FDamageData DamageData);
+	void OnDamageReceivedHandler(const FDamageData& DamageData);
 	
 };

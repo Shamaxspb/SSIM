@@ -9,6 +9,7 @@
 
 #include "SSIMBaseEnemy.generated.h"
 
+class USSIMEnemyDamageReactionComponent;
 class USSIMEnemyCombatComponent;
 class USSIMEnemyStatsComponent;
 class UBoxComponent;
@@ -21,13 +22,18 @@ class SSIM_API ASSIMBaseEnemy : public ASSIMBaseCharacter, public ISSIMCombatInt
 	
 // Variables
 #pragma region Components
-
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMEnemyCombatComponent> EnemyCombatComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
 	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
+	
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	TObjectPtr<USSIMEnemyDamageReactionComponent> EnemyDamageReactionComponent;*/
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollision")
 	TObjectPtr<UBoxComponent> AttackBoxCollision;
@@ -43,6 +49,21 @@ public:
 	FORCEINLINE UBoxComponent* GetAttackCollision() const
 	{
 		return AttackBoxCollision;
+	}
+	
+	FORCEINLINE USSIMEnemyCombatComponent* GetEnemyCombatComponent() const
+	{
+		return EnemyCombatComponent;
+	}
+	
+	FORCEINLINE USSIMEnemyStatsComponent* GetEnemyStatsComponent() const
+	{
+		return EnemyStatsComponent;
+	}
+	
+	FORCEINLINE USSIMEnemyDamageReactionComponent* GetEnemyDamageReactionComponent() const
+	{
+		return EnemyDamageReactionComponent;
 	}
 	
 // My Functions

@@ -6,40 +6,33 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Components/Stats/SSIMBaseStatsComponent.h"
 
 
 // Overriden functions
-USSIMPlayerDamageReactionComponent::USSIMPlayerDamageReactionComponent()
-{
-}
-
 void USSIMPlayerDamageReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetReferences();
 	StaggeredFirstFrame->BlendIn = StaggeredFirstFrameBlendInTime;
 	
-	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerDamageReactionComponent::InitStagger);
 }
 
 // My Functions
-void USSIMPlayerDamageReactionComponent::SetReferences()
+
+
+void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
-	Super::SetReferences();
+	Super::OnDamageReceivedHandler(InDamageData);
 	
-	PlayerStatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
+	InitStagger();
 }
 
 #pragma region Stagger processing
-void USSIMPlayerDamageReactionComponent::InitStagger(const FDamageData InDamageData)
+
+void USSIMPlayerDamageReactionComponent::InitStagger()
 {
-	DamageData.Instigator = InDamageData.Instigator;
-	DamageData.Value = InDamageData.Value;
-	
 	SSIMOwnerCharacter->GetCharacterMovement()->StopMovementImmediately();
 	SSIMOwnerCharacter->GetCharacterMovement()->GravityScale = 0.0f;
 	
@@ -50,8 +43,8 @@ void USSIMPlayerDamageReactionComponent::InitStagger(const FDamageData InDamageD
 	}
 	SSIMOwnerCharacter->PlayAnimMontage(StaggeredFirstFrame, 0.f);
 		
-	PlayerStatsComponent->bStaggered = true;
-	PlayerStatsComponent->bInvulnerable = true;
+	BaseStatsComponent->bStaggered = true;
+	BaseStatsComponent->bInvulnerable = true;
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED"), TEXT(__FUNCTION__));
@@ -106,7 +99,7 @@ void USSIMPlayerDamageReactionComponent::EndStopFrame() const
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 }
 
-void USSIMPlayerDamageReactionComponent::StartStagger() const
+void USSIMPlayerDamageReactionComponent::StartStagger()
 {
 	EndStopFrame();
 	
@@ -115,55 +108,54 @@ void USSIMPlayerDamageReactionComponent::StartStagger() const
 	SSIMOwnerCharacter->SetActorRotation(PlayerRotation);
 	
 	bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMOwnerCharacter->GetActorLocation().Y;
-	FVector ReboundLaunchVelocity = FVector(
+	ReboundLaunchVelocity = FVector(
 							0.0f, 
 							ReboundVelocityY * (bEnemyIsToTheRight ? -1.f : 1.f), 
 							ReboundVelocityZ);
 	
 	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
-	#if !UE_BUILD_SHIPPING
-	if (bReboundShowDebug)
+#if !UE_BUILD_SHIPPING
+	if (bDrawReboundDirectionArrow)
 	{
-		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
-									SSIMOwnerCharacter->GetActorLocation(), 
-									 SSIMOwnerCharacter->GetActorLocation() + ReboundLaunchVelocity.GetSafeNormal() * 400.f, 
-								   25.f, 
-											 ReboundDirectionArrowColor, 
-											 DrawDuration, 
-								   5.f);
+		ReboundDrawDebug();
 	}
-	#endif !UE_BUILD_SHIPPING
+#endif !UE_BUILD_SHIPPING
 	
 	SSIMOwnerCharacter->GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
 	
-	if (!IsValid(StaggeredAnimation))
+	if (!IsValid(FrontStaggeredMontage))
     {
     	UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
     	return;
     }
-    SSIMOwnerCharacter->PlayAnimMontage(StaggeredAnimation, 1.f);
+    SSIMOwnerCharacter->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 }
 
 void USSIMPlayerDamageReactionComponent::EndStagger() const
 {
-	PlayerStatsComponent->bStaggered = false;
-	SSIMOwnerCharacter->StopAnimMontage(StaggeredAnimation);
+	BaseStatsComponent->bStaggered = false;
+	SSIMOwnerCharacter->StopAnimMontage(FrontStaggeredMontage);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
 }
 
 void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
 {
-	PlayerStatsComponent->bInvulnerable = false;
+	BaseStatsComponent->bInvulnerable = false;
 	OnEndInvulnerabilityDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED"), TEXT(__FUNCTION__));
 }
 
-#pragma endregion Stagger processing
-
-// DEBUG 
-void USSIMPlayerDamageReactionComponent::ManualStagger_DEBUG()
+void USSIMPlayerDamageReactionComponent::ReboundDrawDebug()
 {
-	InitStagger(FDamageData(SSIMOwnerCharacter, 1));
+	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+								SSIMOwnerCharacter->GetActorLocation(), 
+								 SSIMOwnerCharacter->GetActorLocation() + ReboundLaunchVelocity.GetSafeNormal() * 400.f, 
+							   25.f, 
+										 ReboundDirectionArrowColor, 
+										 DrawDuration, 
+							   5.f);
 }
+
+#pragma endregion Stagger processing
