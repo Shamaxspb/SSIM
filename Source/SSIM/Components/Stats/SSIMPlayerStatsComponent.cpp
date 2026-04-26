@@ -14,7 +14,8 @@ void USSIMPlayerStatsComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	SetReferences();
-	PlayerDamageReactionComponent->OnInvulnerabilityChangedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityChangedHandler);
+	PlayerDamageReactionComponent->OnInvulnerabilityStartedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityStartedHandler);
+	PlayerDamageReactionComponent->OnInvulnerabilityEndedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityEndedHandler);
 }
 
 void USSIMPlayerStatsComponent::SetReferences()
@@ -53,9 +54,13 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 	
 }
 
-void USSIMPlayerStatsComponent::OnInvulnerabilityChangedHandler(bool InInvulnerable)
+void USSIMPlayerStatsComponent::OnInvulnerabilityStartedHandler()
 {
-	bInvulnerable = InInvulnerable;
+	bInvulnerable = true;
+}
+void USSIMPlayerStatsComponent::OnInvulnerabilityEndedHandler()
+{
+	bInvulnerable = false;
 }
 
 

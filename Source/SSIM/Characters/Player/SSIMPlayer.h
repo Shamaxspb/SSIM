@@ -176,17 +176,27 @@ private:
 	
 private:
 	UFUNCTION()
-	void OnAttackingStateChangedHandler(bool InAttackingState);
+	void OnAttackStartedHandler();
 	UFUNCTION()
-	void OnPogoStateChangedHandler(bool InPogoState);
-
+	void OnAttackEndedHandler();
+	
 	UFUNCTION()
-	void OnDashStateChangedHandler(bool InDashState);
+	void OnPogoStartedHandler();
 	UFUNCTION()
-	void OnCanDashStateChangedHandler(bool InCanDashState);
-
+	void OnPogoEndedHandler();
+	
 	UFUNCTION()
-	void OnStaggeredStateChangedHandler(bool InStaggeredState);
+	void OnDashStartedHandler();
+	UFUNCTION()
+	void OnDashEndedHandler();
+	
+	UFUNCTION()
+	void OnCanDashStateChangedHandler(bool InCanDash);
+	
+	UFUNCTION()
+	void OnStaggerStartedHandler();
+	UFUNCTION()
+	void OnStaggerEndedHandler();
 	
 #pragma endregion State Handlers
 	

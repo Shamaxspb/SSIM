@@ -38,6 +38,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetReferences() override;
 	
+	
 // My Functions
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
@@ -48,7 +49,10 @@ public:
 
 private:
 	UFUNCTION()
-	void OnInvulnerabilityChangedHandler(bool InInvulnerable);
+	void OnInvulnerabilityStartedHandler();
+	UFUNCTION()
+	void OnInvulnerabilityEndedHandler();
+	
 	
 // DEBUG
 public:

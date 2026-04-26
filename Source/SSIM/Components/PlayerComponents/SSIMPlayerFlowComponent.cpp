@@ -62,7 +62,7 @@ void USSIMPlayerFlowComponent::StartDash()
 			false);
 	}
 	
-	OnDashingStateChangedDelegate.Broadcast(true);
+	OnDashStartedDelegate.Broadcast();
 	OnCanDashChangedDelegate.Broadcast(false);
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
@@ -98,7 +98,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 
 void USSIMPlayerFlowComponent::EndDash()
 {
-	OnDashingStateChangedDelegate.Broadcast(false);
+	OnDashEndedDelegate.Broadcast();
 }
 
 void USSIMPlayerFlowComponent::ResetDash()

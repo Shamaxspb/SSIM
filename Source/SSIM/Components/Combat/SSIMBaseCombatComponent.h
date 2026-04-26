@@ -8,7 +8,8 @@
 
 #include "SSIMBaseCombatComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackingStateChangedSignature, bool, bAttackingState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackEndedSignature);
 
 class UBoxComponent;
 
@@ -21,7 +22,8 @@ class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 	
 // Variables
 public:
-	FOnAttackingStateChangedSignature OnAttackingStateChangedDelegate;
+	FOnAttackStartedSignature OnAttackStartedDelegate;
+	FOnAttackEndedSignature OnAttackEndedDelegate;
 	
 #pragma region Metadata
 

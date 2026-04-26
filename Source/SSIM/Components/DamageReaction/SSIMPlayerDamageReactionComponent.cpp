@@ -43,8 +43,8 @@ void USSIMPlayerDamageReactionComponent::InitStagger()
 	}
 	SSIMOwnerCharacter->PlayAnimMontage(StaggeredFirstFrame, 0.f);
 		
-	OnStaggeredStateChangedDelegate.Broadcast(true);
-	OnInvulnerabilityChangedDelegate.Broadcast(true);
+	OnStaggerStartedDelegate.Broadcast();
+	OnInvulnerabilityStartedDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED"), TEXT(__FUNCTION__));
@@ -134,14 +134,14 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 
 void USSIMPlayerDamageReactionComponent::EndStagger() const
 {
-	OnStaggeredStateChangedDelegate.Broadcast(false);
+	OnStaggerEndedDelegate.Broadcast();
 	SSIMOwnerCharacter->StopAnimMontage(FrontStaggeredMontage);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
 }
 
 void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
 {
-	OnInvulnerabilityChangedDelegate.Broadcast(false);
+	OnInvulnerabilityEndedDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED"), TEXT(__FUNCTION__));
 }

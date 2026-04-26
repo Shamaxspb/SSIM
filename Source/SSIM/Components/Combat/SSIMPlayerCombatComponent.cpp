@@ -20,7 +20,7 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	SetReferences();
 	
 	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
-	PlayerFlowComponent->OnDashingStateChangedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashingStateChangedHandler);
+	PlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 }
 
 // My Functions
@@ -286,7 +286,7 @@ void USSIMPlayerCombatComponent::PogoStart()
 	
 	SSIMPlayer->LaunchCharacter(ReboundDirection * PogoVelocity, true, true);
 	
-	OnPogoStateChangedDelegate.Broadcast(true);
+	OnPogoStartedDelegate.Broadcast();
 	
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("ReboundDirection: %s"), *ReboundDirection.ToString());
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Launch Velocity: %s"), *FVector(ReboundDirection * PogoVelocity).ToString());
@@ -302,7 +302,7 @@ void USSIMPlayerCombatComponent::PogoStart()
 void USSIMPlayerCombatComponent::EndPogo() const
 {
 	SSIMPlayer->GetCharacterMovement()->GravityScale = SSIM_DEFAULT_PLAYER_GRAVITY_SCALE;
-	OnPogoStateChangedDelegate.Broadcast(false);
+	OnPogoEndedDelegate.Broadcast();
 }
 
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
@@ -310,10 +310,7 @@ void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDa
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
 }
 
-void USSIMPlayerCombatComponent::OnDashingStateChangedHandler(bool InDashing)
+void USSIMPlayerCombatComponent::OnDashStartedHandler()
 {
-	if (InDashing)
-	{
-		EndAttack(); // interrupt attack so to avoid stuck in attack if dash interrupts attack 
-	}
+	EndAttack(); // interrupt attack so to avoid stuck in attack if dash interrupts attack
 }

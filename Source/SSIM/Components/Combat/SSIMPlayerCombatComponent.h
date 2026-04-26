@@ -9,8 +9,9 @@
 #include "SSIMPlayerCombatComponent.generated.h"
 
 class USSIMPlayerFlowComponent;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPogoStateChangedSignature, bool, InPogoState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndPogoSignature);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
 
 class ASSIMPlayer;
 class UBoxComponent;
@@ -24,7 +25,8 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 // Variables
 public:
 	// Delegates
-	FOnPogoStateChangedSignature OnPogoStateChangedDelegate;
+	FOnPogoStartedSignature OnPogoStartedDelegate;
+	FOnPogoEndedSignature OnPogoEndedDelegate;
 	
 #pragma region Stats
 	
@@ -127,7 +129,8 @@ private:
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
+
 	UFUNCTION()
-	void OnDashingStateChangedHandler(bool InDashing);
-	
+	void OnDashStartedHandler();
+
 };

@@ -114,13 +114,19 @@ void ASSIMPlayer::SetupAttackCollision()
 
 void ASSIMPlayer::BindToStateChangesInComponents() const
 {
-	SSIMPlayerCombatComponent->OnAttackingStateChangedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackingStateChangedHandler);
-	SSIMPlayerCombatComponent->OnPogoStateChangedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoStateChangedHandler);
+	SSIMPlayerCombatComponent->OnAttackStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackStartedHandler);
+	SSIMPlayerCombatComponent->OnAttackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackEndedHandler);
 	
-	SSIMPlayerFlowComponent->OnDashingStateChangedDelegate.AddDynamic(this,&ASSIMPlayer::OnDashStateChangedHandler);
+	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoStartedHandler);
+	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoEndedHandler);
+	
+	SSIMPlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashStartedHandler);
+	SSIMPlayerFlowComponent->OnDashEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashEndedHandler);
+	
 	SSIMPlayerFlowComponent->OnCanDashChangedDelegate.AddDynamic(this,&ASSIMPlayer::OnCanDashStateChangedHandler);
 	
-	SSIMPlayerDamageReactionComponent->OnStaggeredStateChangedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggeredStateChangedHandler);
+	SSIMPlayerDamageReactionComponent->OnStaggerStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggerStartedHandler);
+	SSIMPlayerDamageReactionComponent->OnStaggerEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggerEndedHandler);
 	
 }
 
@@ -193,29 +199,35 @@ void ASSIMPlayer::HandleDash()
 }
 
 #pragma region State Handlers
-void ASSIMPlayer::OnAttackingStateChangedHandler(bool InAttackingState)
+void ASSIMPlayer::OnAttackStartedHandler()
 {
-	bAttacking = InAttackingState;
+	bAttacking = true;
+}
+void ASSIMPlayer::OnAttackEndedHandler()
+{
+	bAttacking = false;
 }
 
-void ASSIMPlayer::OnPogoStateChangedHandler(bool InPogoState)
+void ASSIMPlayer::OnPogoStartedHandler()
 {
-	bPogoActive = InPogoState;
+	bPogoActive = true;
+}
+void ASSIMPlayer::OnPogoEndedHandler()
+{
+	bPogoActive = false;
 }
 
-void ASSIMPlayer::OnDashStateChangedHandler(bool InDashing)
+void ASSIMPlayer::OnDashStartedHandler()
 {
-	bDashing = InDashing;
-	if (bDashing)
-	{
-		GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
-		GetContactDamageCollision()->SetCapsuleRadius(GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),true);
-	}
-	else
-	{
-		GetCharacterMovement()->BrakingDecelerationWalking = SSIM_DEFAULT_PLAYER_BRAKING_DECELERATION_WALKING;
-		ContactDamageCollision->SetCapsuleRadius(SSIM_DEFAULT_CONTACT_DAMAGE_COLLISION_DEFAULT_RADIUS);
-	}
+	bDashing = true;
+	GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
+	GetContactDamageCollision()->SetCapsuleRadius(GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),true);
+}
+void ASSIMPlayer::OnDashEndedHandler()
+{
+	bDashing = false;
+	GetCharacterMovement()->BrakingDecelerationWalking = SSIM_DEFAULT_PLAYER_BRAKING_DECELERATION_WALKING;
+	ContactDamageCollision->SetCapsuleRadius(SSIM_DEFAULT_CONTACT_DAMAGE_COLLISION_DEFAULT_RADIUS);
 }
 
 void ASSIMPlayer::OnCanDashStateChangedHandler(bool InCanDash)
@@ -223,9 +235,14 @@ void ASSIMPlayer::OnCanDashStateChangedHandler(bool InCanDash)
 	bCanDash = InCanDash;
 }
 
-void ASSIMPlayer::OnStaggeredStateChangedHandler(bool InStaggeredState)
+void ASSIMPlayer::OnStaggerStartedHandler()
 {
-	bStaggered = InStaggeredState;
+	bStaggered = true;
+}
+
+void ASSIMPlayer::OnStaggerEndedHandler()
+{
+	bStaggered = false;
 }
 #pragma endregion State Handlers
 

@@ -7,8 +7,11 @@
 
 #include "SSIMPlayerFlowComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDashingStateChangedSignature, bool, InDashingState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCanDashChangedSignature, bool, InCanDashState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashEndedSignature);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCanDashChangedSignature, bool, InCanDash);
+
 
 class UCapsuleComponent;
 class USSIMPlayerStatsComponent;
@@ -25,7 +28,9 @@ class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent
 // Variables
 public:
 	// Delegates
-	FOnDashingStateChangedSignature OnDashingStateChangedDelegate;
+	FOnDashStartedSignature OnDashStartedDelegate;
+	FOnDashEndedSignature OnDashEndedDelegate;
+	
 	FOnCanDashChangedSignature OnCanDashChangedDelegate;
 	
 protected:
