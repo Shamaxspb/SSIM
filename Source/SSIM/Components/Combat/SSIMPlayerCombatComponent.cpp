@@ -8,10 +8,8 @@
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -162,7 +160,7 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	HitEnemies.Add(OtherActor);
+	HitEnemies.AddUnique(OtherActor);
 	if (bShowLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Enemy : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
@@ -187,7 +185,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	
 	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
 	{
-		ReboundOnDownwardAttack();
+		PogoInit();
 	}
 	
 	for (auto Element : HitEnemies)
@@ -202,28 +200,105 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	}
 }
 
-void USSIMPlayerCombatComponent::ReboundOnDownwardAttack()
+void USSIMPlayerCombatComponent::PogoInit()
 {
-	if (FVector::DotProduct(SSIMPlayer->GetActorForwardVector(), FVector::RightVector) < 0.f)
+	const ACharacter* FirstHitEnemy = Cast<ACharacter>(HitEnemies[0]);
+	
+	PogoAdjustLocationDelegate.BindUObject(this, &USSIMPlayerCombatComponent::PogoAdjustLocation, FirstHitEnemy);
+	
+	if (SSIMPlayer->GetActorLocation().Z < FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
 	{
-		ReboundAngle *= -1.f;
+		GetWorld()->GetTimerManager().SetTimer(
+			PogoAdjustLocationHandle,
+			PogoAdjustLocationDelegate,
+			0.01f,
+			true
+		);
 	}
-	FVector ReboundDirection = SSIMPlayer->GetActorForwardVector().RotateAngleAxis(ReboundAngle,FVector::ForwardVector);
-	
-	ACharacter* FirstHitEnemy = Cast<ACharacter>(HitEnemies[0]);
-	
-	// Adjust rebound start location
+	else
+	{
+		PogoStart();
+	}
+}
+
+void USSIMPlayerCombatComponent::PogoAdjustLocation(const ACharacter* InFirstHitEnemy)
+{
 	FVector AdjustedPlayerLocation = SSIMPlayer->GetActorLocation();
-	AdjustedPlayerLocation.Y = FirstHitEnemy->GetActorLocation().Y;
+	
+	AdjustedPlayerLocation.Y = InFirstHitEnemy->GetActorLocation().Y;
+	
 	// Sum Player's and Enemy's capsule HalfHeights and adding a little bit 
-	AdjustedPlayerLocation.Z = FirstHitEnemy->GetActorLocation().Z + 
-							  (FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() +
+	AdjustedPlayerLocation.Z = InFirstHitEnemy->GetActorLocation().Z + 
+							  (InFirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() +
 							  + SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
-							  * 1.05; // Multiply so Player's and Enemy's capsules do not cross each other tangentially
+							  * 1.05;
 	
-	SSIMPlayer->SetActorLocation(AdjustedPlayerLocation);
+	constexpr float StepTime = 0.05f;
 	
-	SSIMPlayer->LaunchCharacter(ReboundDirection * ReboundVelocityZ, true, true);
+	SSIMPlayer->SetActorLocation(
+		FMath::VInterpConstantTo(
+			SSIMPlayer->GetActorLocation(), 
+			AdjustedPlayerLocation, 
+			StepTime,
+			interpSpeed)
+		);
+	
+	if (SSIMPlayer->GetActorLocation().Equals(AdjustedPlayerLocation, 0.1f))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(PogoAdjustLocationHandle);
+		PogoStart();
+	}
+}
+
+void USSIMPlayerCombatComponent::PogoStart()
+{	
+	SSIMPlayer->GetCharacterMovement()->GravityScale = PogoTemporaryGravityScale;
+	
+	FTimerHandle GravityResetTimerHandle;
+	FTimerDelegate GravityResetTimerDelegate; 
+	GravityResetTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		GravityResetTimerHandle,
+		GravityResetTimerDelegate,
+		PogoTemporaryGravityDuration,
+		false
+		);
+	
+	FVector CachedPlayerForwardVector = SSIMPlayer->GetActorForwardVector();
+	float ModifiedPogoAngle = PogoAngle;
+	
+	if (FMath::IsNearlyEqual(CachedPlayerForwardVector.Y, -FVector::RightVector.Y, 0.5))
+	{
+		ModifiedPogoAngle *= -1.f;
+	}
+	
+	FVector ReboundDirection = CachedPlayerForwardVector.RotateAngleAxis(ModifiedPogoAngle, FVector::XAxisVector);
+	
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Player Forward Vector: %s"), *SSIMPlayer->GetActorForwardVector().ToString());
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Cached Player Forward Vector: %s"), *CachedPlayerForwardVector.ToString());
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Pogo Angle: %f"), PogoAngle);
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Modified PogoAngle: %f"), ModifiedPogoAngle);
+	
+	SSIMPlayer->LaunchCharacter(ReboundDirection * PogoVelocity, true, true);
+	
+	OnPogoStateChangedDelegate.Broadcast(true);
+	
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("ReboundDirection: %s"), *ReboundDirection.ToString());
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Launch Velocity: %s"), *FVector(ReboundDirection * PogoVelocity).ToString());
+	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+								SSIMPlayer->GetActorLocation(), 
+								 SSIMPlayer->GetActorLocation() + (ReboundDirection * 250.f), 
+							   25.f, 
+										 FLinearColor::Yellow, 
+										 5.f, 
+							   5.f);
+}
+
+void USSIMPlayerCombatComponent::EndPogo() const
+{
+	SSIMPlayer->GetCharacterMovement()->GravityScale = SSIM_DEFAULT_PLAYER_GRAVITY_SCALE;
+	OnPogoStateChangedDelegate.Broadcast(false);
 }
 
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)

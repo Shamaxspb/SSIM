@@ -2,8 +2,8 @@
 
 
 #include "SSIMAttackEndNotify.h"
+
 #include "SSIM/SSIM.h"
-#include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 
 
@@ -29,9 +29,6 @@ void USSIMAttackEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 		}
 		return;
 	}
-	
-	ASSIMBaseCharacter* BaseCharacter = Cast<ASSIMBaseCharacter>(MeshComp->GetOwner());
-	BaseCharacter->OnAttackFinishedDelegate.Broadcast();
 	
 	ISSIMCombatInterface::Execute_EndAttackInterface(MeshComp->GetOwner());
 }

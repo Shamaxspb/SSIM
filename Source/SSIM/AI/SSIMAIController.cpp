@@ -3,7 +3,7 @@
 
 #include "SSIMAIController.h"
 
-#include "Helpers/SSIMBlackboardHelper.h"
+#include "SSIM/Core/Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 #include "SSIM/Components/DamageReaction/SSIMEnemyDamageReactionComponent.h"

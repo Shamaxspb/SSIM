@@ -17,9 +17,7 @@ void USSIMEnemyCombatComponent::BeginPlay()
 	
 	SSIMEnemy->GetContactDamageCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap);
 	SSIMEnemy->GetContactDamageCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionEndOverlap);
-	
-	//SSIMEnemy->GetHitRegistrationCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap);
-	//SSIMEnemy->GetHitRegistrationCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnAttackCollisionBeginOverlap);
+
 }
 
 void USSIMEnemyCombatComponent::SetReferences()

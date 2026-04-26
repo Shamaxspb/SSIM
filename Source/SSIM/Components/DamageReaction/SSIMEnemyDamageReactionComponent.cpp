@@ -72,7 +72,6 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 	// StartStagger { OnCharacterLanded.AddDynamic; } 
 	// OnCharacterLandedHandler { EndStagger; OnCharacterLanded.RemoveDynamic; }
 	
-	UE_LOG(LogTemp, Warning, TEXT("Broadcast from component: %s"), *GetNameSafe(this));
 	OnEndStaggerDelegate.Broadcast();
 }
 

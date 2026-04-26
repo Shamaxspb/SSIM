@@ -8,7 +8,10 @@
 
 #include "SSIMBaseCombatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackingStateChangedSignature, bool, bAttackingState);
+
 class UBoxComponent;
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
@@ -17,11 +20,12 @@ class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
 	
 	
 // Variables
+public:
+	FOnAttackingStateChangedSignature OnAttackingStateChangedDelegate;
+	
 #pragma region Metadata
 
 protected:
-	bool bAttacking = false;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	

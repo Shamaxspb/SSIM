@@ -8,6 +8,9 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPogoStateChangedSignature, bool, InPogoState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndPogoSignature);
+
 class ASSIMPlayer;
 class UBoxComponent;
 class USSIMPlayerStatsComponent;
@@ -18,6 +21,10 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 	GENERATED_BODY()
 
 // Variables
+public:
+	// Delegates
+	FOnPogoStateChangedSignature OnPogoStateChangedDelegate;
+	
 #pragma region Stats
 	
 public:
@@ -50,7 +57,7 @@ protected:
 	
 public:
 	EPlayerAttackDirectionType PlayerAttackDirectionType;
-	
+
 #pragma endregion Metadata
 	
 private:
@@ -60,11 +67,30 @@ private:
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Rebound On Downward Attack")
-	float ReboundAngle = 50.f;
+#pragma region Pogo
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Rebound On Downward Attack")
-	float ReboundVelocityZ = 400.f;
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Pogo", meta = (AllowPrivateAccess = true))
+	float PogoAngle = 50.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
+	float PogoVelocity = 400.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
+	float PogoTemporaryGravityScale = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
+	float PogoTemporaryGravityDuration = 0.5f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo|Debug")
+	float interpSpeed = 10.f;
+	
+private:
+	FTimerHandle PogoAdjustLocationHandle;
+	FTimerDelegate PogoAdjustLocationDelegate;
+	
+#pragma endregion Pogo
+
 
 // Overriden Functions
 protected:
@@ -89,7 +115,10 @@ protected:
 private:
 	void DealDamageToEnemy();
 	
-	void ReboundOnDownwardAttack();
+	void PogoInit();
+	void PogoAdjustLocation(const ACharacter* InFirstHitEnemy);
+	void PogoStart();
+	void EndPogo() const;
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);

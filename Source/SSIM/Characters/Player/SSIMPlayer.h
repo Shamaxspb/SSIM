@@ -87,10 +87,21 @@ protected:
 protected:
 	/*UPROPERTY()
 	EPlayerState CurrentPlayerState;*/
-
-private:
-	float ContactDamageCollisionDefaultRadius = 22.f;
 	
+#pragma region States
+	
+//private:
+public:
+	bool bAttacking  = false;
+	bool bPogoActive = false;
+	
+	bool bDashing	 = false;
+	bool bCanDash    = true;
+	
+	bool bStaggered  = false;
+	
+	
+#pragma endregion States
 	
 // Overriden Functions
 public:
@@ -146,6 +157,7 @@ private:
 	void MoveLeft();
 	
 	void SetupAttackCollision();
+	void BindToStateChangesInComponents() const;
 	
 #pragma region Handler Functions
 	
@@ -160,14 +172,27 @@ private:
 	
 #pragma endregion Handler Functions
 	
+#pragma region State Handlers
+	
 private:
 	UFUNCTION()
-	void OnEndEndInvulnerabilityCollisionUpdate();
+	void OnAttackingStateChangedHandler(bool InAttackingState);
+	UFUNCTION()
+	void OnPogoStateChangedHandler(bool InPogoState);
+
+	UFUNCTION()
+	void OnDashStateChangedHandler(bool InDashState);
+	UFUNCTION()
+	void OnCanDashStateChangedHandler(bool InCanDashState);
+
+	UFUNCTION()
+	void OnStaggeredStateChangedHandler(bool InStaggeredState);
 	
-	UFUNCTION()
-	void StartDashHandler();
-	UFUNCTION()
-	void EndDashHandler();
+#pragma endregion State Handlers
+	
+private:
+	bool CanAttack() const;
+	bool CanMove() const;
 	
 // Interfaces
 public:

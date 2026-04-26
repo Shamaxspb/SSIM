@@ -9,15 +9,6 @@
 
 void USSIMBaseCombatComponent::StartAttack()
 {
-	if (bAttacking)
-	{
-		if (bShowLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is still in process"), TEXT(__FUNCTION__));
-		}
-		return;
-	}
-	
 	if (!IsValid(GetAttackMontage()))
 	{
 		// Logging inside GetAttackMontage()
@@ -25,7 +16,8 @@ void USSIMBaseCombatComponent::StartAttack()
 	}
 	AttackMontage = GetAttackMontage();
 	
-	bAttacking = true; // set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
+	// set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
+	OnAttackingStateChangedDelegate.Broadcast(true); 
 	
 	AnimInstance->Montage_Play(AttackMontage);
 	if (bShowLogs)
@@ -36,14 +28,12 @@ void USSIMBaseCombatComponent::StartAttack()
 
 void USSIMBaseCombatComponent::EndAttack()
 {
-	bAttacking = false;
+	OnAttackingStateChangedDelegate.Broadcast(false);
 	
 	if (bShowLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
 	}
-	
-	HitEnemies.Empty();
 }
 
 void USSIMBaseCombatComponent::StartAttackTrace()

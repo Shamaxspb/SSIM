@@ -43,8 +43,8 @@ void USSIMPlayerDamageReactionComponent::InitStagger()
 	}
 	SSIMOwnerCharacter->PlayAnimMontage(StaggeredFirstFrame, 0.f);
 		
-	BaseStatsComponent->bStaggered = true;
-	BaseStatsComponent->bInvulnerable = true;
+	OnStaggeredStateChangedDelegate.Broadcast(true);
+	OnInvulnerabilityChangedDelegate.Broadcast(true);
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED"), TEXT(__FUNCTION__));
@@ -122,7 +122,7 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 	}
 #endif !UE_BUILD_SHIPPING
 	
-	SSIMOwnerCharacter->GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
+	SSIMOwnerCharacter->GetCharacterMovement()->GravityScale = SSIM_DEFAULT_PLAYER_GRAVITY_SCALE;
 	
 	if (!IsValid(FrontStaggeredMontage))
     {
@@ -134,15 +134,14 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 
 void USSIMPlayerDamageReactionComponent::EndStagger() const
 {
-	BaseStatsComponent->bStaggered = false;
+	OnStaggeredStateChangedDelegate.Broadcast(false);
 	SSIMOwnerCharacter->StopAnimMontage(FrontStaggeredMontage);
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
 }
 
 void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
 {
-	BaseStatsComponent->bInvulnerable = false;
-	OnEndInvulnerabilityDelegate.Broadcast();
+	OnInvulnerabilityChangedDelegate.Broadcast(false);
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED"), TEXT(__FUNCTION__));
 }

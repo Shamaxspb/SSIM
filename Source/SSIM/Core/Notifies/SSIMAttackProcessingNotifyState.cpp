@@ -17,7 +17,6 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 		return;
 	}
 	Owner = MeshComp->GetOwner();
-	
 									
 	if (!Owner->Implements<USSIMCombatInterface>())  
 	{
@@ -32,7 +31,6 @@ void USSIMAttackProcessingNotifyState::NotifyBegin(USkeletalMeshComponent* MeshC
 	}
 	
 	ISSIMCombatInterface::Execute_StartAttackTraceInterface(Owner);
-	
 }
 
 void USSIMAttackProcessingNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,

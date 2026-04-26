@@ -7,6 +7,8 @@
 
 #include "SSIMPlayerStatsComponent.generated.h"
 
+class USSIMPlayerDamageReactionComponent;
+class ASSIMPlayer;
 struct FStaggerSequenceStep;
 struct FDamageData;
 
@@ -18,17 +20,23 @@ class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
 
 // Variables
 public:
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 MaxHealth = 5;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 Health = MaxHealth;
-		
+	
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger")	
+	bool bInvulnerable;
+	
+private:
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerDamageReactionComponent> PlayerDamageReactionComponent;
 	
 // Overriden Functions
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetReferences() override;
 	
 // My Functions
 public:
@@ -38,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void IncreaseHealth(int32 InHealValue) override;
 
+private:
+	UFUNCTION()
+	void OnInvulnerabilityChangedHandler(bool InInvulnerable);
 	
 // DEBUG
 public:

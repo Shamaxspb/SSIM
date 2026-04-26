@@ -10,6 +10,8 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndInvulnerabilitySignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStaggeredStateChangedSignature, bool, InStaggered);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInvulnerabilityChangedSignature, bool, InInvulnerable);
 
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
@@ -31,7 +33,8 @@ class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseDamageReacti
 public:
 	// Delegates
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|DamageProcessing")
-	FOnEndInvulnerabilitySignature OnEndInvulnerabilityDelegate;
+	FOnStaggeredStateChangedSignature OnStaggeredStateChangedDelegate;
+	FOnInvulnerabilityChangedSignature OnInvulnerabilityChangedDelegate;
 	
 protected:
 	// Damage processing
