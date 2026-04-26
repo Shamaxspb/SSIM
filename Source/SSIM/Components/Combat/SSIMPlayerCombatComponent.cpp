@@ -11,14 +11,16 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
 
 void USSIMPlayerCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetReferences();
 	
-	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
-	StatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
+	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
+	PlayerFlowComponent->OnDashingStateChangedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashingStateChangedHandler);
 }
 
 // My Functions
@@ -68,6 +70,8 @@ void USSIMPlayerCombatComponent::SetReferences()
 	Super::SetReferences();
 	
 	SSIMPlayer = CastChecked<ASSIMPlayer>(GetOwner());
+	PlayerStatsComponent = SSIMPlayer->GetPlayerStatsComponent();
+	PlayerFlowComponent  = SSIMPlayer->GetPlayerFlowComponent();
 }
 
 UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
@@ -304,4 +308,12 @@ void USSIMPlayerCombatComponent::EndPogo() const
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
+}
+
+void USSIMPlayerCombatComponent::OnDashingStateChangedHandler(bool InDashing)
+{
+	if (InDashing)
+	{
+		EndAttack(); // interrupt attack so to avoid stuck in attack if dash interrupts attack 
+	}
 }

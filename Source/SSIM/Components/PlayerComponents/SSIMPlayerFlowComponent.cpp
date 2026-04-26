@@ -30,7 +30,6 @@ void USSIMPlayerFlowComponent::BeginPlay()
 // My Functions
 void USSIMPlayerFlowComponent::StartDash()
 {	
-	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 
 	if (!IsValid(PlayerDashMontage))
 	{
@@ -38,6 +37,10 @@ void USSIMPlayerFlowComponent::StartDash()
 		return;
 	}
 	AnimInstance->Montage_Play(PlayerDashMontage);
+	
+	
+	
+	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 	
 	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;

@@ -8,6 +8,7 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
+class USSIMPlayerFlowComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPogoStateChangedSignature, bool, InPogoState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndPogoSignature);
 
@@ -65,7 +66,10 @@ private:
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
 	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
+	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
+	
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerFlowComponent> PlayerFlowComponent;
 	
 #pragma region Pogo
 	
@@ -122,5 +126,8 @@ private:
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	
+	UFUNCTION()
+	void OnDashingStateChangedHandler(bool InDashing);
 	
 };
