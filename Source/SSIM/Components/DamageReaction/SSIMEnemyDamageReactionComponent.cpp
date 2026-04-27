@@ -3,11 +3,14 @@
 
 #include "SSIMEnemyDamageReactionComponent.h"
 
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
+#include "SSIM/Core/Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 //
@@ -64,6 +67,13 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 void USSIMEnemyDamageReactionComponent::EndStagger() const
 {
 	EnemyStatsComponent->EnemyState = EEnemyState::EES_Combat; // Since enemy can be staggered only in combat (not sure about this)
+	
+	/*uint8 NewState = static_cast<uint8>(EEnemyState::EES_Combat);
+	AAIController* EnemyController =  Cast<AAIController>(SSIMEnemy->GetController());
+	UBlackboardComponent* BB = EnemyController->GetBlackboardComponent();
+	BB->SetValueAsEnum(TEXT("EEnemyState"), static_cast<uint8>(EnemyStatsComponent->EnemyState));*/
+	
+	//USSIMBlackboardHelper::SetEnumSafe(EnemyController->GetBlackboardComponent(), TEXT("EEnemyState"), NewState);
 	
 	SSIMEnemy->StopAnimMontage();
 	

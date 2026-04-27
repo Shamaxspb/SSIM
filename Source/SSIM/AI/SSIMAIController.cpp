@@ -3,10 +3,12 @@
 
 #include "SSIMAIController.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
 #include "SSIM/Core/Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 #include "SSIM/Components/DamageReaction/SSIMEnemyDamageReactionComponent.h"
+#include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
 
 
 ASSIMAIController::ASSIMAIController()
@@ -91,7 +93,15 @@ void ASSIMAIController::DebugComponents()
 			*Comp->GetName(),
 			*Comp->GetClass()->GetName(),
 			*GetNameSafe(Comp->GetOuter()));
-	}
+	}	
+}
+
+void ASSIMAIController::PrintEnemyStateValue() const
+{
+	USSIMEnemyStatsComponent* EnemyStatsComponent = BaseEnemy->FindComponentByClass<USSIMEnemyStatsComponent>();
+	EEnemyState BBEnumValue = static_cast<EEnemyState>(Blackboard->GetValueAsEnum(TEXT("EEnemyState")));
+	UE_LOG(LogSSIMEnemyInitialization, Warning, TEXT("Blackboard     EEnemyState : %s"), *UEnum::GetValueAsString(BBEnumValue));
+	UE_LOG(LogSSIMEnemyInitialization, Warning, TEXT("StatsComponent EEnemyState : %s"), *UEnum::GetValueAsString(EnemyStatsComponent->EnemyState));
 }
 
 

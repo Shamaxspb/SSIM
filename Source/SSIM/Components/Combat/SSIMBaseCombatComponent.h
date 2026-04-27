@@ -15,7 +15,7 @@ class UBoxComponent;
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
+class SSIM_API   USSIMBaseCombatComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
 	
@@ -44,10 +44,7 @@ protected:
 #pragma region Debug
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug", meta = (DisplayPriority = 1))
-	bool bShowDebug;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug|Attack", meta = (EditCondition = "bShowDebug", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug|Attack")
 	bool bShowAttackLogs;
 
 #pragma endregion Debug

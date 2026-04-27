@@ -222,7 +222,7 @@ void USSIMPlayerCombatComponent::PogoInit()
 		<	// Bottom of Player capsule below top of Enemy capsule
 		FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
 	{
-		
+		//SetMeshTransformForPogo(true);
 		
 		FVector AdjustedPlayerLocation  = SSIMPlayer->GetActorLocation();
 		float AdjustedPlayerHeight = FirstHitEnemy->GetActorLocation().Z
@@ -243,6 +243,7 @@ void USSIMPlayerCombatComponent::PogoInit()
 		SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		
 #if !UE_BUILD_SHIPPING
+		
 		if (bDrawPogoDebug)
 		{
 			UKismetSystemLibrary::DrawDebugPoint(GetWorld(),
@@ -352,7 +353,25 @@ void USSIMPlayerCombatComponent::PogoStart()
 void USSIMPlayerCombatComponent::EndPogo() const
 {
 	SSIMPlayer->GetCharacterMovement()->GravityScale = SSIM_DEFAULT_PLAYER_GRAVITY_SCALE;
+	
+	//SetMeshTransformForPogo(false);
+	
 	OnPogoEndedDelegate.Broadcast();
+}
+
+void USSIMPlayerCombatComponent::SetMeshTransformForPogo(bool bPogoStart) const
+{
+	FRotator PogoMeshRotation = SSIMPlayer->GetMesh()->GetRelativeRotation();
+	if (bPogoStart)
+	{
+		PogoMeshRotation.Roll += 90.f;
+		SSIMPlayer->GetMesh()->SetRelativeRotation(PogoMeshRotation);
+	}
+	else
+	{
+		PogoMeshRotation.Roll -= 90.f;
+		SSIMPlayer->GetMesh()->SetRelativeRotation(PogoMeshRotation);
+	}
 }
 
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
