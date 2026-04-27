@@ -27,7 +27,7 @@ void USSIMPlayerCombatComponent::BeginPlay()
 void USSIMPlayerCombatComponent::StartAttack()
 {
 	Super::StartAttack();
-	if (bShowLogs)
+	if (bShowAttackLogs)
     {
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
     }
@@ -165,9 +165,11 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	const FHitResult& SweepResult)
 {
 	HitEnemies.AddUnique(OtherActor);
-	if (bShowLogs)
+	
+	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Hit Enemy : %s"), TEXT(__FUNCTION__), *OtherActor->GetName());
+		PogoInit();
+		return;
 	}
 	
 	DealDamageToEnemy();
@@ -177,7 +179,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 {
 	if (HitEnemies.IsEmpty())
 	{
-		if (bShowLogs)
+		if (bShowAttackLogs)
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
 		}
@@ -187,17 +189,17 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
 	
-	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
-	{
-		PogoInit();
-	}
-	
 	for (auto Element : HitEnemies)
 	{
 		if (!Element->Implements<USSIMDamageableInterface>())
 		{
 			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
 			return;
+		}
+		
+		if (bShowAttackLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s"), TEXT(__FUNCTION__), *Element->GetName());
 		}
 		
 		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
@@ -208,14 +210,67 @@ void USSIMPlayerCombatComponent::PogoInit()
 {
 	const ACharacter* FirstHitEnemy = Cast<ACharacter>(HitEnemies[0]);
 	
-	PogoAdjustLocationDelegate.BindUObject(this, &USSIMPlayerCombatComponent::PogoAdjustLocation, FirstHitEnemy);
-	
-	if (SSIMPlayer->GetActorLocation().Z < FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
+	if (bShowPogoLogs)
 	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Check Player = %f"), SSIMPlayer->GetActorLocation().Z - SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Check Enemy  = %f"), FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	}
+	
+	OnPogoStartedDelegate.Broadcast();
+	
+	if (SSIMPlayer->GetActorLocation().Z - SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() 
+		<	// Bottom of Player capsule below top of Enemy capsule
+		FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
+	{
+		
+		
+		FVector AdjustedPlayerLocation  = SSIMPlayer->GetActorLocation();
+		float AdjustedPlayerHeight = FirstHitEnemy->GetActorLocation().Z
+								   + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight()
+								   + SSIMPlayer->   GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		AdjustedPlayerLocation.Z = AdjustedPlayerHeight;
+		
+		if (bShowPogoLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Should Adjust Start Pogo Location"));
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Adjusted Player Height  = %f"), AdjustedPlayerHeight);
+		}
+		
+		PogoAdjustHeightDelegate.BindUObject(this, &USSIMPlayerCombatComponent::AdjustPogoStartLocation, AdjustedPlayerLocation);
+		
+		SSIMPlayer->GetCharacterMovement()->GravityScale = 0.0f;
+		SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
+		SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+#if !UE_BUILD_SHIPPING
+		if (bDrawPogoDebug)
+		{
+			UKismetSystemLibrary::DrawDebugPoint(GetWorld(),
+											 	SSIMPlayer->GetActorLocation(),
+											 	32.f,
+											 	PogoAdjustmentStartPointColor,
+											 	bDrawPogoDebugDuration);
+			
+			UKismetSystemLibrary::DrawDebugPoint(GetWorld(),
+												 AdjustedPlayerLocation,
+												 25.f,
+												 PogoAdjustmentEndPointColor,
+												 bDrawPogoDebugDuration);
+			
+			UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+										SSIMPlayer->GetActorLocation(), 
+										 AdjustedPlayerLocation, 
+									   10.f, 
+												 PogoAdjustmentDirectionArrowColor, 
+												 bDrawPogoDebugDuration, 
+									   5.f);
+		}
+#endif
+		
 		GetWorld()->GetTimerManager().SetTimer(
-			PogoAdjustLocationHandle,
-			PogoAdjustLocationDelegate,
-			0.01f,
+			PogoAdjustHeightHandle,
+			PogoAdjustHeightDelegate,
+			PogoInterpolationStepTime,
 			true
 		);
 	}
@@ -225,47 +280,43 @@ void USSIMPlayerCombatComponent::PogoInit()
 	}
 }
 
-void USSIMPlayerCombatComponent::PogoAdjustLocation(const ACharacter* InFirstHitEnemy)
+void USSIMPlayerCombatComponent::AdjustPogoStartLocation(FVector AdjustedPlayerLocation)
 {
-	FVector AdjustedPlayerLocation = SSIMPlayer->GetActorLocation();
-	
-	AdjustedPlayerLocation.Y = InFirstHitEnemy->GetActorLocation().Y;
-	
-	// Sum Player's and Enemy's capsule HalfHeights and adding a little bit 
-	AdjustedPlayerLocation.Z = InFirstHitEnemy->GetActorLocation().Z + 
-							  (InFirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() +
-							  + SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
-							  * 1.05;
-	
-	constexpr float StepTime = 0.05f;
-	
 	SSIMPlayer->SetActorLocation(
-		FMath::VInterpConstantTo(
-			SSIMPlayer->GetActorLocation(), 
-			AdjustedPlayerLocation, 
-			StepTime,
-			interpSpeed)
-		);
+					FMath::VInterpConstantTo(
+						SSIMPlayer->GetActorLocation(),
+						AdjustedPlayerLocation,
+						PogoInterpolationStepTime,
+						PogoAdjustmentInterpSpeed));
 	
-	if (SSIMPlayer->GetActorLocation().Equals(AdjustedPlayerLocation, 0.1f))
+	if (bShowPogoLogs)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(PogoAdjustLocationHandle);
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Adjustment: Current Location - %s"), *SSIMPlayer->GetActorLocation().ToString());
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Adjustment: Target Location  - %s"), *AdjustedPlayerLocation.ToString());
+	}
+	
+	
+	if (SSIMPlayer->GetActorLocation().Equals(AdjustedPlayerLocation, 0.5f))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(PogoAdjustHeightHandle);
 		PogoStart();
 	}
 }
 
 void USSIMPlayerCombatComponent::PogoStart()
 {	
+	DealDamageToEnemy();
+	
 	SSIMPlayer->GetCharacterMovement()->GravityScale = PogoTemporaryGravityScale;
 	
-	FTimerHandle GravityResetTimerHandle;
-	FTimerDelegate GravityResetTimerDelegate; 
-	GravityResetTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
+	FTimerHandle EndPogoTimerHandle;
+	FTimerDelegate EndPogoTimerDelegate; 
+	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 	
 	GetWorld()->GetTimerManager().SetTimer(
-		GravityResetTimerHandle,
-		GravityResetTimerDelegate,
-		PogoTemporaryGravityDuration,
+		EndPogoTimerHandle,
+		EndPogoTimerDelegate,
+		PogoStateDuration,
 		false
 		);
 	
@@ -279,24 +330,23 @@ void USSIMPlayerCombatComponent::PogoStart()
 	
 	FVector ReboundDirection = CachedPlayerForwardVector.RotateAngleAxis(ModifiedPogoAngle, FVector::XAxisVector);
 	
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Player Forward Vector: %s"), *SSIMPlayer->GetActorForwardVector().ToString());
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Cached Player Forward Vector: %s"), *CachedPlayerForwardVector.ToString());
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Pogo Angle: %f"), PogoAngle);
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Modified PogoAngle: %f"), ModifiedPogoAngle);
-	
 	SSIMPlayer->LaunchCharacter(ReboundDirection * PogoVelocity, true, true);
 	
-	OnPogoStartedDelegate.Broadcast();
+	SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("ReboundDirection: %s"), *ReboundDirection.ToString());
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Launch Velocity: %s"), *FVector(ReboundDirection * PogoVelocity).ToString());
-	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+#if !UE_BUILD_SHIPPING
+	if (bDrawPogoDebug)
+	{
+		UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
 								SSIMPlayer->GetActorLocation(), 
 								 SSIMPlayer->GetActorLocation() + (ReboundDirection * 250.f), 
 							   25.f, 
-										 FLinearColor::Yellow, 
-										 5.f, 
+										 PogoReboundDirectionArrowColor, 
+										 bDrawPogoDebugDuration, 
 							   5.f);
+	}
+	
+#endif
 }
 
 void USSIMPlayerCombatComponent::EndPogo() const

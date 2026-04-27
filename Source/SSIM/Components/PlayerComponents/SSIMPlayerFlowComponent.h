@@ -47,9 +47,6 @@ protected:
 
 public:
 	FTimerHandle DashCooldownTimerHandle;
-	
-private:	
-	bool bCanDash = true;
 
 #pragma endregion Metadata
 	

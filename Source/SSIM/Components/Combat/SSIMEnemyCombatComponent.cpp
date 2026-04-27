@@ -90,7 +90,7 @@ void USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap(UPrimitiveC
 {
 	if (OtherActor == PlayerPawn)
 	{
-		if (bShowLogs)
+		if (bShowAttackLogs)
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | %s collided with : %s"), TEXT(__FUNCTION__), *SSIMOwnerCharacter->GetName(), *OtherActor->GetName());
 		}
@@ -135,7 +135,7 @@ void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollis
 		return;
 	}
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | %s : Try Deal Damage"), TEXT(__FUNCTION__), *DamageCollision->GetName());
 	}

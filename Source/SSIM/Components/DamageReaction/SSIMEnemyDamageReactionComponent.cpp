@@ -56,7 +56,7 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 	}
 	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
 	ReboundOnHit();
 	OnStartStaggerDelegate.Broadcast();
 }
@@ -67,7 +67,7 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 	
 	SSIMEnemy->StopAnimMontage();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
 	// or 
 	// StartStagger { OnCharacterLanded.AddDynamic; } 
 	// OnCharacterLandedHandler { EndStagger; OnCharacterLanded.RemoveDynamic; }
@@ -122,7 +122,7 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 
 #endif !UE_BUILD_SHIPPING
 	
-	SSIMEnemy->LaunchCharacter(ReboundVelocity, false, false);
+	SSIMEnemy->LaunchCharacter(ReboundVelocity, true, true);
 }
 
 UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const

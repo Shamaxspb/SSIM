@@ -20,7 +20,7 @@ void USSIMBaseCombatComponent::StartAttack()
 	OnAttackStartedDelegate.Broadcast();
 	
 	AnimInstance->Montage_Play(AttackMontage);
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
 	}
@@ -30,7 +30,7 @@ void USSIMBaseCombatComponent::EndAttack()
 {
 	OnAttackEndedDelegate.Broadcast();
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
 	}
@@ -52,9 +52,9 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 	CurrentAttackCollision->SetHiddenInGame(false);
 	#endif
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 
@@ -75,9 +75,9 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 
 	HitEnemies.Empty();
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 

@@ -6,8 +6,6 @@
 #include "GameFramework/Character.h"
 #include "SSIMBaseCharacter.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnAttackFinishedSignature)
-
 class UBoxComponent;
 
 
@@ -17,9 +15,6 @@ class SSIM_API ASSIMBaseCharacter : public ACharacter
 	GENERATED_BODY()
 
 // Variables
-public:
-	FOnAttackFinishedSignature OnAttackFinishedDelegate;
-	
 #pragma region Components
 
 protected:

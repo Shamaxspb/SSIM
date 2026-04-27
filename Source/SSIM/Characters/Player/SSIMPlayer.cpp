@@ -118,7 +118,7 @@ void ASSIMPlayer::BindToStateChangesInComponents() const
 	SSIMPlayerCombatComponent->OnAttackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackEndedHandler);
 	
 	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoStartedHandler);
-	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoEndedHandler);
+	SSIMPlayerCombatComponent->OnPogoEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoEndedHandler);
 	
 	SSIMPlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashStartedHandler);
 	SSIMPlayerFlowComponent->OnDashEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashEndedHandler);
@@ -180,6 +180,11 @@ void ASSIMPlayer::HandleDash()
 {
 	if (bPogoActive || bDashing || !bCanDash || bStaggered)
 	{
+		if (bPogoActive)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
+			return;
+		}
 		if (bDashing)
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));

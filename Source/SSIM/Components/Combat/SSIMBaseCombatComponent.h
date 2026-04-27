@@ -44,11 +44,11 @@ protected:
 #pragma region Debug
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug", meta = (DisplayPriority = 1))
 	bool bShowDebug;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug", meta = (EditCondition = "bShowDebug", EditConditionHides))
-	bool bShowLogs;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug|Attack", meta = (EditCondition = "bShowDebug", EditConditionHides))
+	bool bShowAttackLogs;
 
 #pragma endregion Debug
 		

@@ -6,6 +6,7 @@
 #include "SSIMBTTaskBase.h"
 #include "SSIMEnemyAttackBTT.generated.h"
 
+class ASSIMBaseEnemy;
 /**
  * 
  */
@@ -17,9 +18,13 @@ class SSIM_API USSIMEnemyAttackBTT : public USSIMBTTaskBase
 private:
 	TWeakObjectPtr<UBehaviorTreeComponent> CachedOwnerComp; 
 	
+	UPROPERTY()
+	TObjectPtr<ASSIMBaseEnemy> BaseEnemy; 
+	
 public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:
-	void OnEndAttack() const;
+	UFUNCTION()
+	void OnAttackEndedHandler();
 };
