@@ -41,9 +41,11 @@ public:
 	
 	
 protected:
+	
+	UPROPERTY()
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	
 	// Damage processing
-	
-	
 #pragma region Stagger
 	
 protected:
@@ -86,6 +88,8 @@ protected:
 
 // My Functions
 protected:
+	virtual void SetReferences() override;
+	
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
 
 private:

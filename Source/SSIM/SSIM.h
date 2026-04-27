@@ -18,8 +18,3 @@ constexpr ECollisionChannel ECC_MeleeAttack		= ECC_GameTraceChannel3;
 constexpr ECollisionChannel ECC_Projectile		= ECC_GameTraceChannel4;
 constexpr ECollisionChannel ECC_HitRegistration	= ECC_GameTraceChannel5;
 constexpr ECollisionChannel ECC_ContactDamage	= ECC_GameTraceChannel6;
-
-// Globals
-/*const*/ inline float SSIM_DEFAULT_PLAYER_GRAVITY_SCALE = 7.f;
-/*const*/ inline float SSIM_DEFAULT_PLAYER_BRAKING_DECELERATION_WALKING = 10000.f;
-/*const*/ inline float SSIM_DEFAULT_CONTACT_DAMAGE_COLLISION_DEFAULT_RADIUS = 22.f;

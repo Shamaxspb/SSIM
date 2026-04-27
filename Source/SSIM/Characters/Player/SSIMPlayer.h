@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
@@ -103,6 +105,14 @@ public:
 	
 #pragma endregion States
 	
+#pragma region Player Defaults
+	
+private:
+	float DefaultPlayerGravityScale = 7.f;
+	float DefaultPlayerBrakingDecelerationWalking = 10000.f;
+	float DefaultContactDamageCollisionRadius = 70.f;
+	
+#pragma endregion  Player Defaults
 // Overriden Functions
 public:
 	ASSIMPlayer();
@@ -121,13 +131,11 @@ public:
 	{
 		return SSIMPlayerCombatComponent;
 	}
-	
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerFlowComponent* GetPlayerFlowComponent() const
 	{
 		return SSIMPlayerFlowComponent;
 	}
-	
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
 	{
@@ -151,6 +159,23 @@ public:
 	}
 	
 #pragma endregion Inline Getters
+	
+#pragma region Inline Setters
+	
+	FORCEINLINE void SetPlayerGravityScaleToDefault() const
+	{
+		GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
+	}
+	FORCEINLINE void SetPlayerBrakingDecelerationWalkingToDefault() const
+	{
+		GetCharacterMovement()->BrakingDecelerationWalking = DefaultPlayerBrakingDecelerationWalking;
+	}
+	FORCEINLINE void SetContactDamageCollisionRadiusToDefault() const
+	{
+		ContactDamageCollision->SetCapsuleRadius(DefaultContactDamageCollisionRadius);
+	}
+
+#pragma endregion Inline Setters
 	
 private:
 	void MoveRight();

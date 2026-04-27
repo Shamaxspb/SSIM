@@ -352,7 +352,7 @@ void USSIMPlayerCombatComponent::PogoStart()
 
 void USSIMPlayerCombatComponent::EndPogo() const
 {
-	SSIMPlayer->GetCharacterMovement()->GravityScale = SSIM_DEFAULT_PLAYER_GRAVITY_SCALE;
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
 	//SetMeshTransformForPogo(false);
 	

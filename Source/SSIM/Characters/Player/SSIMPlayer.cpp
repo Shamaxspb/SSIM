@@ -29,15 +29,16 @@ ASSIMPlayer::ASSIMPlayer()
 
 	SetupAttackCollision();
 	
-	ContactDamageCollision->SetCapsuleRadius(SSIM_DEFAULT_CONTACT_DAMAGE_COLLISION_DEFAULT_RADIUS);
-	
+	SetPlayerGravityScaleToDefault();
+	SetPlayerBrakingDecelerationWalkingToDefault();
+	SetContactDamageCollisionRadiusToDefault();
 }
 
 void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetCharacterMovement()->GravityScale = SSIM_DEFAULT_PLAYER_GRAVITY_SCALE;
+	GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
 	
 	BindToStateChangesInComponents();
 }
@@ -231,8 +232,8 @@ void ASSIMPlayer::OnDashStartedHandler()
 void ASSIMPlayer::OnDashEndedHandler()
 {
 	bDashing = false;
-	GetCharacterMovement()->BrakingDecelerationWalking = SSIM_DEFAULT_PLAYER_BRAKING_DECELERATION_WALKING;
-	ContactDamageCollision->SetCapsuleRadius(SSIM_DEFAULT_CONTACT_DAMAGE_COLLISION_DEFAULT_RADIUS);
+	SetPlayerBrakingDecelerationWalkingToDefault();
+	SetContactDamageCollisionRadiusToDefault();
 }
 
 void ASSIMPlayer::OnCanDashStateChangedHandler(bool InCanDash)
