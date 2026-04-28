@@ -7,6 +7,7 @@
 
 #include "SSIMPlayerFlowComponent.generated.h"
 
+class USSIMPlayerCombatComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashEndedSignature);
 
@@ -40,6 +41,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashVelocityCoef = 15.f;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	float DashGravityScale = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	float DashBrakingDecelerationWalking = 1000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	float DashBrakingDecelerationFalling = 1000.f;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
 	TObjectPtr<UAnimMontage> PlayerDashMontage;
 
@@ -52,7 +62,12 @@ public:
 	
 private:
 	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerCombatComponent> PlayerCombatComponent;
 	
 	
 // Overriden Functions
@@ -61,6 +76,9 @@ protected:
 	
 	
 // My Functions
+protected:
+	virtual void SetReferences() override;
+	
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Dash")
 	void StartDash();
@@ -74,6 +92,12 @@ private:
 	void ResetDashFromAir(const FHitResult& Hit);
 	
 	UFUNCTION()
+	void ResetBrakingDecelerationFalling(const FHitResult& Hit);
+	
+	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& DamageData);
+	
+	UFUNCTION()
+	void OnAttackStartedHandler();
 	
 };

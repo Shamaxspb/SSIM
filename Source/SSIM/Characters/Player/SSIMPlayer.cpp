@@ -31,7 +31,7 @@ ASSIMPlayer::ASSIMPlayer()
 	
 	SetPlayerGravityScaleToDefault();
 	SetPlayerBrakingDecelerationWalkingToDefault();
-	SetContactDamageCollisionRadiusToDefault();
+	SetContactDamageCollisionShapeDefault();
 }
 
 void ASSIMPlayer::BeginPlay()
@@ -226,14 +226,10 @@ void ASSIMPlayer::OnPogoEndedHandler()
 void ASSIMPlayer::OnDashStartedHandler()
 {
 	bDashing = true;
-	GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
-	GetContactDamageCollision()->SetCapsuleRadius(GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),true);
 }
 void ASSIMPlayer::OnDashEndedHandler()
 {
 	bDashing = false;
-	SetPlayerBrakingDecelerationWalkingToDefault();
-	SetContactDamageCollisionRadiusToDefault();
 }
 
 void ASSIMPlayer::OnCanDashStateChangedHandler(bool InCanDash)
@@ -279,7 +275,7 @@ bool ASSIMPlayer::CanMove() const
 }
 
 
-// Interfaces
+#pragma region Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const
 {
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Shouldn't call player's Start Attack from outside player related classes"), TEXT(__FUNCTION__));
@@ -311,3 +307,4 @@ void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDam
 {
 	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }
+#pragma endregion Interfaces

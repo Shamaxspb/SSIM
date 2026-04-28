@@ -216,6 +216,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 	}
 }
 
+#pragma region Pogo
 void USSIMPlayerCombatComponent::PogoInit()
 {
 	const ACharacter* FirstHitEnemy = Cast<ACharacter>(HitEnemies[0]);
@@ -232,7 +233,6 @@ void USSIMPlayerCombatComponent::PogoInit()
 		<	// Bottom of Player capsule below top of Enemy capsule
 		FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight())
 	{
-		//SetMeshTransformForPogo(true);
 		
 		FVector AdjustedPlayerLocation  = SSIMPlayer->GetActorLocation();
 		float AdjustedPlayerHeight = FirstHitEnemy->GetActorLocation().Z
@@ -364,26 +364,12 @@ void USSIMPlayerCombatComponent::EndPogo() const
 {
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
-	//SetMeshTransformForPogo(false);
 	
 	OnPogoEndedDelegate.Broadcast();
 }
+#pragma endregion Pogo
 
-void USSIMPlayerCombatComponent::SetMeshTransformForPogo(bool bPogoStart) const
-{
-	FRotator PogoMeshRotation = SSIMPlayer->GetMesh()->GetRelativeRotation();
-	if (bPogoStart)
-	{
-		PogoMeshRotation.Roll += 90.f;
-		SSIMPlayer->GetMesh()->SetRelativeRotation(PogoMeshRotation);
-	}
-	else
-	{
-		PogoMeshRotation.Roll -= 90.f;
-		SSIMPlayer->GetMesh()->SetRelativeRotation(PogoMeshRotation);
-	}
-}
-
+#pragma region Handlers
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
@@ -398,3 +384,4 @@ void USSIMPlayerCombatComponent::PogoAnimationCallback(UAnimMontage* PogoMontage
 {
 	OnPogoAnimationEndedDelegate.Broadcast();
 }
+#pragma endregion Handlers

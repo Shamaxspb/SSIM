@@ -8,6 +8,7 @@
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
+#include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 
@@ -15,22 +16,29 @@
 void USSIMPlayerFlowComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetReferences();
 	
-	StatsComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerStatsComponent>();
-	
-	if (!IsValid(StatsComponent))
+	if (!IsValid(PlayerStatsComponent))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stats component is not valid"), TEXT(__FUNCTION__));
 	}
-	StatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedHandler);
+	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedHandler);
+	PlayerCombatComponent->OnAttackStartedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnAttackStartedHandler);
+}
+
+void USSIMPlayerFlowComponent::SetReferences()
+{
+	Super::SetReferences();
 	
+	SSIMPlayer = CastChecked<ASSIMPlayer>(SSIMOwnerCharacter);
+	PlayerStatsComponent  = SSIMPlayer->GetPlayerStatsComponent();
+	PlayerCombatComponent = SSIMPlayer->GetPlayerCombatComponent();
 }
 
 
 // My Functions
 void USSIMPlayerFlowComponent::StartDash()
 {	
-
 	if (!IsValid(PlayerDashMontage))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerDashAnimation is not valid"), TEXT(__FUNCTION__));
@@ -38,18 +46,28 @@ void USSIMPlayerFlowComponent::StartDash()
 	}
 	AnimInstance->Montage_Play(PlayerDashMontage);
 	
-	
-	
-	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
+	SSIMPlayer->StopJumping();
+	SSIMPlayer->LaunchCharacter(GetDashLaunchVelocity() ,true, true);
 	
 	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(DashInProcessTimerHandle, this, &USSIMPlayerFlowComponent::EndDash, PlayerDashMontage->GetPlayLength(), false);
+	GetWorld()->GetTimerManager().SetTimer(
+									DashInProcessTimerHandle, 
+									this, 
+									&USSIMPlayerFlowComponent::EndDash, 
+									PlayerDashMontage->GetPlayLength(), 
+									false);
+	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashMontage->GetPlayLength());
 	
-	if (SSIMOwnerCharacter->GetCharacterMovement()->IsFalling())
+	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationWalking = DashBrakingDecelerationWalking;
+	SSIMPlayer->SetContactDamageCollisionShapeDash();
+	SSIMPlayer->GetCharacterMovement()->GravityScale = DashGravityScale;
+	
+	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = DashBrakingDecelerationFalling;
+	
+	if (SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{
-		ASSIMPlayer* SSIMPlayer = Cast<ASSIMPlayer>(SSIMOwnerCharacter);
 		SSIMPlayer->LandedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
 	}
 	else
@@ -72,7 +90,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 {
 	// Calculate Player direction
 	FVector DashDirectionVector;
-	float DirectionDotProduct = FVector::DotProduct(SSIMOwnerCharacter->GetActorForwardVector(), FVector::RightVector);
+	float DirectionDotProduct = FVector::DotProduct(SSIMPlayer->GetActorForwardVector(), FVector::RightVector);
 		
 	if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
 	{
@@ -89,7 +107,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 	}
 	
 	FVector OutLaunchVelocity =  DashDirectionVector *
-								 SSIMOwnerCharacter->GetCharacterMovement()->GetMaxSpeed() *
+								 SSIMPlayer->GetCharacterMovement()->GetMaxSpeed() *
 								 DashVelocityCoef;
 		
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
@@ -99,6 +117,17 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 void USSIMPlayerFlowComponent::EndDash()
 {
 	OnDashEndedDelegate.Broadcast();
+	SSIMPlayer->SetPlayerBrakingDecelerationWalkingToDefault();
+	SSIMPlayer->SetContactDamageCollisionShapeDefault();
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
+	
+	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = 0.f;
+	
+	/*if (SSIMPlayer->GetCharacterMovement()->IsFalling())
+	{
+		SSIMPlayer->LandedDelegate.AddUniqueDynamic(this, &USSIMPlayerFlowComponent::ResetBrakingDecelerationFalling);
+		SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = DashBrakingDecelerationFalling;
+	}*/
 }
 
 void USSIMPlayerFlowComponent::ResetDash()
@@ -108,13 +137,23 @@ void USSIMPlayerFlowComponent::ResetDash()
 
 void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
 {
-	ASSIMPlayer* SSIMPlayer = Cast<ASSIMPlayer>(SSIMOwnerCharacter);
 	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
 	
 	OnCanDashChangedDelegate.Broadcast(true);
 }
 
+void USSIMPlayerFlowComponent::ResetBrakingDecelerationFalling(const FHitResult& Hit)
+{
+	/*SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = 0.f;
+	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::ResetBrakingDecelerationFalling);*/
+}
+
 void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData& DamageData)
 {
 	EndDash();
+}
+
+void USSIMPlayerFlowComponent::OnAttackStartedHandler()
+{
+	
 }

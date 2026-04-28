@@ -107,10 +107,15 @@ public:
 	
 #pragma region Player Defaults
 	
-private:
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
 	float DefaultPlayerGravityScale = 7.f;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
 	float DefaultPlayerBrakingDecelerationWalking = 10000.f;
-	float DefaultContactDamageCollisionRadius = 70.f;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
+	float DefaultContactDamageCollisionHalfHeight = 75.f;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
+	float DefaultContactDamageCollisionRadius = 35.f;
 	
 #pragma endregion  Player Defaults
 // Overriden Functions
@@ -170,9 +175,17 @@ public:
 	{
 		GetCharacterMovement()->BrakingDecelerationWalking = DefaultPlayerBrakingDecelerationWalking;
 	}
-	FORCEINLINE void SetContactDamageCollisionRadiusToDefault() const
+	FORCEINLINE void SetContactDamageCollisionShapeDefault() const
 	{
 		ContactDamageCollision->SetCapsuleRadius(DefaultContactDamageCollisionRadius);
+		ContactDamageCollision->SetCapsuleHalfHeight(DefaultContactDamageCollisionHalfHeight);
+	}
+	FORCEINLINE void SetContactDamageCollisionShapeDash() const
+	{
+		ContactDamageCollision->SetCapsuleRadius(
+								GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),
+								true);
+		ContactDamageCollision->SetCapsuleHalfHeight(DefaultContactDamageCollisionHalfHeight);
 	}
 
 #pragma endregion Inline Setters

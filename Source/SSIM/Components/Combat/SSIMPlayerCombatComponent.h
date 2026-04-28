@@ -166,8 +166,6 @@ private:
 	void PogoStart();
 	void EndPogo() const;
 	
-	void SetMeshTransformForPogo(bool bPogoStart) const;
-	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 
