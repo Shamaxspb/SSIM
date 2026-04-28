@@ -40,8 +40,6 @@ void ASSIMAIController::OnPossess(APawn* InPawn)
 	
 	SetReferences();
 	
-	UE_LOG(LogTemp, Warning, TEXT("Binding to component: %s"), *GetNameSafe(EnemyDamageReactionComponent));
-	
 	EnemyDamageReactionComponent->OnStartStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnStartStaggerHandler);
 	EnemyDamageReactionComponent->OnEndStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnEndStaggerHandler);
 }

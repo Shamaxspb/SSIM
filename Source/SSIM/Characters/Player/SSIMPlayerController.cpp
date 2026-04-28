@@ -48,8 +48,6 @@ void ASSIMPlayerController::InitBasicInputContext()
 	}
 	
 	EnhancedInputSubsystem->AddMappingContext(BaseInputContext, 1);
-	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s : EnhancedInputSubsystem %s added"), TEXT(__FUNCTION__), *BaseInputContext->GetName());
-	
 }
 
 void ASSIMPlayerController::InitUI()

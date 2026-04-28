@@ -10,11 +10,15 @@
 struct FDamageData;
 class ASSIMPlayer;
 
-struct FPogoBoneRotation
+UENUM(BlueprintType)
+enum class EPogoBonesState : uint8
 {
-	FRotator* CurrentRotation;
-	FRotator ModifiedRotation;
+	EPBS_DefaultRotation	UMETA(DisplayName = "Default Rotation"),
+	EPBS_BlendingIn			UMETA(DisplayName = "Blending In"),
+	EPBS_ModifiedRotation	UMETA(DisplayName = "Modified Rotation"),
+	EPBS_BlendingOut		UMETA(DisplayName = "Blending Out"),
 };
+
 
 UCLASS()
 class SSIM_API USSIMPlayerAnimInstance : public USSIMAnimInstance
@@ -50,37 +54,51 @@ protected:
 	FRotator PogoModifiedAdditionalRotation_Thigh_L = FRotator(0.f, 0.f, 30.f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
 	FRotator PogoModifiedAdditionalRotation_Thigh_R = FRotator(0.f, 0.f, 30.f);
-	
-private:
-	//TArray<FRotator*> PogoBonesRotations;
-	//TMap<FRotator, FRotator> PogoBonesModifiedRotationsMap;
-	
+
 #pragma endregion Pogo Modify Bones
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
-	float PogoBlendInDuration = 0.15f;
+	float DefaultPogoBlendInDuration = 0.15f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
-	float PogoBlendOutDuration = 0.15f;
+	float DefaultPogoBlendOutDuration = 0.15f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
+	float OnLandedPogoBlendInDuration = 0.11f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
+	float OnDamageReceivedPogoBlendOutDuration = 0.11f;
 	
+	// Initially set to default, will change later, depending on context
+	float PogoBlendInDuration = DefaultPogoBlendInDuration; 
+	float PogoBlendOutDuration = DefaultPogoBlendOutDuration;
+
 private:
-	bool bBlendInPogoAttackBones;
-	bool bBlendOutPogoAttackBones;
+	EPogoBonesState PogoBonesState = EPogoBonesState::EPBS_DefaultRotation;
 	float BlendElapsedTime;
 	
+	// Debug
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG|Pogo")
+	bool bShowPogoBlendLogs = false;
 
 // Overriden Functions
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
+	
 // My Functions
 protected:
 	virtual void SetOwnerReference() override;
 	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG|Pogo")
+	EPogoBonesState GetPogoBonesState() const
+	{
+		return PogoBonesState;
+	}
+	
 private:
-	void ModifyBonesForPogo();
-	void ResetBonesAfterPogo();
+	void StartBlendInPogoBones(float InBlendInDuration);
+	void StartBlendOutPogoBones(float InBlendOutDuration);
 	
 	void BlendInPogoBone(float InDeltaSeconds, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
 	void BlendOutPogoBone(float InBlendElapsedTime, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);

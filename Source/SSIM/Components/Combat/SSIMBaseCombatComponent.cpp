@@ -22,7 +22,7 @@ void USSIMBaseCombatComponent::StartAttack()
 	AnimInstance->Montage_Play(AttackMontage);
 	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 
@@ -32,7 +32,7 @@ void USSIMBaseCombatComponent::EndAttack()
 	
 	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 

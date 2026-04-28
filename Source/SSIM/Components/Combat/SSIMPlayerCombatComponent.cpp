@@ -39,7 +39,7 @@ void USSIMPlayerCombatComponent::StartAttack()
 	
 	if (bShowAttackLogs)
     {
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
     }
 }
 

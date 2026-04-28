@@ -28,10 +28,10 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 // Variables
 public:
 	// Delegates
-	FOnPogoStartedSignature OnPogoStartedDelegate;
-	FOnPogoEndedSignature OnPogoEndedDelegate;
+	FOnPogoStartedSignature			 OnPogoStartedDelegate;
+	FOnPogoEndedSignature			 OnPogoEndedDelegate;
 	FOnPogoAnimationStartedSignature OnPogoAnimationStartedDelegate;
-	FOnPogoAnimationEndedSignature OnPogoAnimationEndedDelegate;
+	FOnPogoAnimationEndedSignature	 OnPogoAnimationEndedDelegate;
 	
 #pragma region Stats
 	

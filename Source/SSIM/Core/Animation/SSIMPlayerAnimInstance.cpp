@@ -18,44 +18,20 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoAnimationEndedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler);
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDamageReceivedHandler);
-	SSIMPlayer->LandedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPlayerLanded);
-	
-	// PogoBonesRotations.Add(&PogoCurrentAdditionalRotation_Pelvis);
-	// PogoBonesRotations.Add(&PogoCurrentAdditionalRotation_Spine_01);
-	// PogoBonesRotations.Add(&PogoCurrentAdditionalRotation_Spine_02);
-	// PogoBonesRotations.Add(&PogoCurrentAdditionalRotation_Thigh_L);
-	// PogoBonesRotations.Add(&PogoCurrentAdditionalRotation_Thigh_R);
-	
-	// PogoBonesModifiedRotationsMap.Emplace(PogoCurrentAdditionalRotation_Pelvis,   PogoModifiedAdditionalRotation_Pelvis);
-	// PogoBonesModifiedRotationsMap.Emplace(PogoCurrentAdditionalRotation_Spine_01, PogoModifiedAdditionalRotation_Spine_01);
-	// PogoBonesModifiedRotationsMap.Emplace(PogoCurrentAdditionalRotation_Spine_02, PogoModifiedAdditionalRotation_Spine_02);
-	// PogoBonesModifiedRotationsMap.Emplace(PogoCurrentAdditionalRotation_Thigh_L,  PogoModifiedAdditionalRotation_Thigh_L);
-	// PogoBonesModifiedRotationsMap.Emplace(PogoCurrentAdditionalRotation_Thigh_R,  PogoModifiedAdditionalRotation_Thigh_R);
-	
-	// TArray<FPogoBoneRotation*> PogoBones;
-	// FPogoBoneRotation* Pelvis = {PogoCurrentAdditionalRotation_Pelvis, PogoModifiedAdditionalRotation_Pelvis};
-	// FPogoBoneRotation* Pelvis;
-	// Pelvis->CurrentRotation = &PogoCurrentAdditionalRotation_Pelvis;
-	// Pelvis->ModifiedRotation = PogoModifiedAdditionalRotation_Pelvis;
-	// PogoBones.Add(Pelvis);
 }
 
 void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	
-	if (bBlendInPogoAttackBones)
+	if (PogoBonesState == EPogoBonesState::EPBS_BlendingIn)
 	{
 		BlendElapsedTime += DeltaSeconds;
 		
 		float Alpha			= FMath::Clamp(BlendElapsedTime / PogoBlendInDuration, 0.f, 1.f);
 		float SmoothedAlpha = FMath::InterpEaseInOut(0.f, 1.f, Alpha, 2.f);
 		
-		// for (FRotator& PogoBoneRotation : PogoBonesRotations)
-		// {
-		// 	BlendInPogoBones(SmoothedAlpha, PogoBoneRotation, PogoBonesModifiedRotationsMap[PogoBoneRotation]);
-		// }
-		
+		// This is better be done via foreach, TArray stores values, not rotator references, need to figure it out 
 		BlendInPogoBone(SmoothedAlpha, PogoCurrentAdditionalRotation_Pelvis,   PogoModifiedAdditionalRotation_Pelvis);
 		BlendInPogoBone(SmoothedAlpha, PogoCurrentAdditionalRotation_Spine_01, PogoModifiedAdditionalRotation_Spine_01);
 		BlendInPogoBone(SmoothedAlpha, PogoCurrentAdditionalRotation_Spine_02, PogoModifiedAdditionalRotation_Spine_02);
@@ -64,18 +40,25 @@ void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		
 		if (SmoothedAlpha >= 1.f)
 		{
-			bBlendInPogoAttackBones = false;
+			PogoBonesState = EPogoBonesState::EPBS_ModifiedRotation;
 			BlendElapsedTime = 0.f;
+			PogoBlendInDuration = DefaultPogoBlendInDuration;
+			
+			if (bShowPogoBlendLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("End Blend In, State: %s"), *UEnum::GetValueAsString(PogoBonesState));
+			}
 		}
 	}
 	
-	if (bBlendOutPogoAttackBones)
+	if (PogoBonesState == EPogoBonesState::EPBS_BlendingOut)
 	{
 		BlendElapsedTime += DeltaSeconds;
 		
-		float Alpha			= FMath::Clamp(BlendElapsedTime / PogoBlendInDuration, 0.f, 1.f);
+		float Alpha			= FMath::Clamp(BlendElapsedTime / PogoBlendOutDuration, 0.f, 1.f);
 		float SmoothedAlpha = FMath::InterpEaseInOut(0.f, 1.f, Alpha, 2.f);
 		
+		// This is better be done via foreach, TArray stores values, not rotator references, need to figure it out 
 		BlendOutPogoBone(SmoothedAlpha, PogoCurrentAdditionalRotation_Pelvis,   PogoModifiedAdditionalRotation_Pelvis);
 		BlendOutPogoBone(SmoothedAlpha, PogoCurrentAdditionalRotation_Spine_01, PogoModifiedAdditionalRotation_Spine_01);
 		BlendOutPogoBone(SmoothedAlpha, PogoCurrentAdditionalRotation_Spine_02, PogoModifiedAdditionalRotation_Spine_02);
@@ -84,8 +67,14 @@ void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		
 		if (SmoothedAlpha >= 1.f)
 		{
-			bBlendOutPogoAttackBones = false;
+			PogoBonesState = EPogoBonesState::EPBS_DefaultRotation;
 			BlendElapsedTime = 0.f;
+			PogoBlendOutDuration = DefaultPogoBlendOutDuration;
+			
+			if (bShowPogoBlendLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("End Blend Out, State: %s"), *UEnum::GetValueAsString(PogoBonesState));
+			}
 		}
 	}
 }
@@ -103,92 +92,131 @@ void USSIMPlayerAnimInstance::SetOwnerReference()
 	
 	SSIMPlayer = CastChecked<ASSIMPlayer>(TryGetPawnOwner());
 }
+void USSIMPlayerAnimInstance::StartBlendInPogoBones(float InBlendInDuration)
 
-void USSIMPlayerAnimInstance::ModifyBonesForPogo()
 {
-	BlendElapsedTime = 0.f;
-	bBlendInPogoAttackBones = true;
+	if (PogoBonesState == EPogoBonesState::EPBS_ModifiedRotation || PogoBonesState == EPogoBonesState::EPBS_BlendingIn)
+	{
+		if (bShowPogoBlendLogs)
+		{
+			if (PogoBonesState != EPogoBonesState::EPBS_ModifiedRotation)
+			{
+				UE_LOG(LogSSIMValidations, Warning, TEXT( "%s | Player Pogo Bones are in (%s) state"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PogoBonesState));
+			}
+		}
+		return;
+	}
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Prepare to Start Blend In, State: %s"), *UEnum::GetValueAsString(PogoBonesState));
+	}
 	
-	// Set value instantly
-	/*PogoCurrentAdditionalRotation_Pelvis   = PogoModifiedAdditionalRotation_Pelvis;
-	PogoCurrentAdditionalRotation_Spine_01 = PogoModifiedAdditionalRotation_Spine_01;
-	PogoCurrentAdditionalRotation_Spine_02 = PogoModifiedAdditionalRotation_Spine_02;
-	PogoCurrentAdditionalRotation_Thigh_L  = PogoModifiedAdditionalRotation_Thigh_L;
-	PogoCurrentAdditionalRotation_Thigh_R  = PogoModifiedAdditionalRotation_Thigh_R;*/
+	// Set values to start interpolation on Tick
+	PogoBonesState = EPogoBonesState::EPBS_BlendingIn;
+	PogoBlendInDuration = InBlendInDuration;
+	BlendElapsedTime = 0.f;
+
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Start Blend In, State: %s"), *UEnum::GetValueAsString(PogoBonesState));
+	}
 }
 
-void USSIMPlayerAnimInstance::ResetBonesAfterPogo()
+void USSIMPlayerAnimInstance::StartBlendOutPogoBones(float InBlendOutDuration)
 {
-	BlendElapsedTime = 0.f;
-	bBlendOutPogoAttackBones = true;
+	if (PogoBonesState == EPogoBonesState::EPBS_DefaultRotation || PogoBonesState == EPogoBonesState::EPBS_BlendingOut)
+	{
+		if (bShowPogoBlendLogs)
+		{
+			UE_LOG(LogSSIMValidations, Warning, TEXT( "%s | Player Pogo Bones are in (%s) state"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PogoBonesState));
+		}
+		return;
+	}
 	
-	// Set value instantly
-	/*PogoCurrentAdditionalRotation_Pelvis   = FRotator::ZeroRotator;
-	PogoCurrentAdditionalRotation_Spine_01 = FRotator::ZeroRotator;
-	PogoCurrentAdditionalRotation_Spine_02 = FRotator::ZeroRotator;
-	PogoCurrentAdditionalRotation_Thigh_L  = FRotator::ZeroRotator;
-	PogoCurrentAdditionalRotation_Thigh_R  = FRotator::ZeroRotator;*/
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Prepare to Start Blend Out, State: %s"), *UEnum::GetValueAsString(PogoBonesState));
+	}
+	
+	// Set values to start interpolation on Tick
+	PogoBonesState = EPogoBonesState::EPBS_BlendingOut;
+	PogoBlendOutDuration = InBlendOutDuration;
+	BlendElapsedTime = 0.f;
+	
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Start Blend Out, State: %s"), *UEnum::GetValueAsString(PogoBonesState));
+	}
 }
 
 void USSIMPlayerAnimInstance::BlendInPogoBone(float InSmoothedAlpha, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation)
 {
-	/*float Alpha			= FMath::Clamp(BlendElapsedTime / PogoBlendInDuration, 0.f, 1.f);
-	float SmoothedAlpha = FMath::InterpEaseInOut(0.f, 1.f, Alpha, 2.f);*/
-
 	InPogoBoneRotation = UKismetMathLibrary::RLerp(
-							FRotator::ZeroRotator,
-							InModifiedRotation,
-				   			InSmoothedAlpha,
-	   			true);
+						FRotator::ZeroRotator,
+						InModifiedRotation,
+						   InSmoothedAlpha,
+			   true);
 	
-	/*if (SmoothedAlpha >= 1.f)
-	{
-		PogoBlendInDuration = false;
-		BlendElapsedTime = 0.f;
-	}*/
 }
 
 void USSIMPlayerAnimInstance::BlendOutPogoBone(float InSmoothedAlpha, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation)
 {
-	/*BlendElapsedTime += InBlendElapsedTime;
-	
-	float Alpha			= FMath::Clamp(BlendElapsedTime / PogoBlendInDuration, 0.f, 1.f);
-	float SmoothedAlpha = FMath::InterpEaseInOut(0.f, 1.f, Alpha, 2.f);*/
-	
 	InPogoBoneRotation = UKismetMathLibrary::RLerp(
-							InModifiedRotation,
-							FRotator::ZeroRotator,
-							   InSmoothedAlpha,
-				   true);
+						InModifiedRotation,
+						FRotator::ZeroRotator,
+						   InSmoothedAlpha,
+			   true);
 	
-	/*if (SmoothedAlpha >= 1.f)
-	{
-		PogoBlendInDuration = false;
-		BlendElapsedTime = 0.f;
-	}*/
 }
 
 void USSIMPlayerAnimInstance::OnPogoAnimationStartedHandler()
 {
-	ModifyBonesForPogo();
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	SSIMPlayer->LandedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPlayerLanded);
+	StartBlendInPogoBones(DefaultPogoBlendInDuration);
 }
 
 void USSIMPlayerAnimInstance::OnPogoEndedHandler()
 {
-	ResetBonesAfterPogo();
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	StartBlendOutPogoBones(DefaultPogoBlendOutDuration);
 }
 
 void USSIMPlayerAnimInstance::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
-	ResetBonesAfterPogo();
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	StartBlendOutPogoBones(OnDamageReceivedPogoBlendOutDuration);
 }
 
 void USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler()
 {
-	ResetBonesAfterPogo();
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	StartBlendOutPogoBones(DefaultPogoBlendOutDuration);
 }
 
 void USSIMPlayerAnimInstance::OnPlayerLanded(const FHitResult& Hit)
 {
-	ResetBonesAfterPogo();
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	StartBlendOutPogoBones(OnLandedPogoBlendInDuration);
+	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerAnimInstance::OnPlayerLanded);
 }
