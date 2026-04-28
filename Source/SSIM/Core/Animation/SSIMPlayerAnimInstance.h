@@ -10,6 +10,11 @@
 struct FDamageData;
 class ASSIMPlayer;
 
+struct FPogoBoneRotation
+{
+	FRotator* CurrentRotation;
+	FRotator ModifiedRotation;
+};
 
 UCLASS()
 class SSIM_API USSIMPlayerAnimInstance : public USSIMAnimInstance
@@ -24,37 +29,50 @@ protected:
 #pragma region Pogo Modify Bones
 	
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalRotation_Pelvis   = FRotator::ZeroRotator;
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalRotation_Spine_01 = FRotator::ZeroRotator;
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalRotation_Spine_02 = FRotator::ZeroRotator;
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalRotation_Thigh_L  = FRotator::ZeroRotator;
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalRotation_Thigh_R  = FRotator::ZeroRotator;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo|CurrentRotation")
+	FRotator PogoCurrentAdditionalRotation_Pelvis   = FRotator::ZeroRotator;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo|CurrentRotation")
+	FRotator PogoCurrentAdditionalRotation_Spine_01 = FRotator::ZeroRotator;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo|CurrentRotation")
+	FRotator PogoCurrentAdditionalRotation_Spine_02 = FRotator::ZeroRotator;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo|CurrentRotation")
+	FRotator PogoCurrentAdditionalRotation_Thigh_L  = FRotator::ZeroRotator;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo|CurrentRotation")
+	FRotator PogoCurrentAdditionalRotation_Thigh_R  = FRotator::ZeroRotator;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalDeltaRotation_Pelvis = FRotator(0.f, 0.f, 50.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
+	FRotator PogoModifiedAdditionalRotation_Pelvis = FRotator(0.f, 0.f, 50.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
+	FRotator PogoModifiedAdditionalRotation_Spine_01 = FRotator(0.f, 0.f, 15.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
+	FRotator PogoModifiedAdditionalRotation_Spine_02 = FRotator(0.f, 0.f, -15.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
+	FRotator PogoModifiedAdditionalRotation_Thigh_L = FRotator(0.f, 0.f, 30.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
+	FRotator PogoModifiedAdditionalRotation_Thigh_R = FRotator(0.f, 0.f, 30.f);
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalDeltaRotation_Spine_01 = FRotator(0.f, 0.f, 15.f);
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalDeltaRotation_Spine_02 = FRotator(0.f, 0.f, -15.f);
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalDeltaRotation_Thigh_L = FRotator(0.f, 0.f, 30.f);
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo")
-	FRotator PogoAdditionalDeltaRotation_Thigh_R = FRotator(0.f, 0.f, 30.f);
+private:
+	//TArray<FRotator*> PogoBonesRotations;
+	//TMap<FRotator, FRotator> PogoBonesModifiedRotationsMap;
 	
 #pragma endregion Pogo Modify Bones
 
-// My Functions
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
+	float PogoBlendInDuration = 0.15f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
+	float PogoBlendOutDuration = 0.15f;
+	
+private:
+	bool bBlendInPogoAttackBones;
+	bool bBlendOutPogoAttackBones;
+	float BlendElapsedTime;
+	
+
+// Overriden Functions
 public:
 	virtual void NativeBeginPlay() override;
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 // My Functions
 protected:
@@ -63,6 +81,11 @@ protected:
 private:
 	void ModifyBonesForPogo();
 	void ResetBonesAfterPogo();
+	
+	void BlendInPogoBone(float InDeltaSeconds, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
+	void BlendOutPogoBone(float InBlendElapsedTime, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
+	
+#pragma region Reset Pogo Handlers
 	
 	UFUNCTION()
 	void OnPogoAnimationStartedHandler();
@@ -75,4 +98,5 @@ private:
 	UFUNCTION()
 	void OnPlayerLanded(const FHitResult& Hit);
 	
+#pragma endregion Reset Pogo Handlers
 };
