@@ -29,29 +29,7 @@ void USSIMPlayerFlowComponent::BeginPlay()
 
 // My Functions
 void USSIMPlayerFlowComponent::StartDash()
-{
-	if (bDashing || !bCanDash || StatsComponent->bStaggered)
-	{
-		if (bDashing)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
-		}
-		if (!bCanDash)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(DashCooldownTimerHandle));
-			return;	
-		}
-		if (StatsComponent->bStaggered)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
-			return;	
-		}
-	}
-	
-	bDashing = true;
-	bCanDash = false;	
-	
-	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
+{	
 
 	if (!IsValid(PlayerDashMontage))
 	{
@@ -59,6 +37,10 @@ void USSIMPlayerFlowComponent::StartDash()
 		return;
 	}
 	AnimInstance->Montage_Play(PlayerDashMontage);
+	
+	
+	
+	SSIMOwnerCharacter->LaunchCharacter(GetDashLaunchVelocity() ,true, false);
 	
 	// Should implement OnCompleted/OnBlendOut/AnimNotify bDashing reset
 	FTimerHandle DashInProcessTimerHandle;
@@ -80,8 +62,8 @@ void USSIMPlayerFlowComponent::StartDash()
 			false);
 	}
 	
-	
-	OnStartDashDelegate.Broadcast();
+	OnDashStartedDelegate.Broadcast();
+	OnCanDashChangedDelegate.Broadcast(false);
 	
 	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
 }
@@ -116,14 +98,12 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 
 void USSIMPlayerFlowComponent::EndDash()
 {
-	bDashing = false;
-	
-	OnEndDashDelegate.Broadcast();
+	OnDashEndedDelegate.Broadcast();
 }
 
 void USSIMPlayerFlowComponent::ResetDash()
 {
-	bCanDash = true;
+	OnCanDashChangedDelegate.Broadcast(true);
 }
 
 void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
@@ -131,7 +111,7 @@ void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
 	ASSIMPlayer* SSIMPlayer = Cast<ASSIMPlayer>(SSIMOwnerCharacter);
 	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
 	
-	bCanDash = true;
+	OnCanDashChangedDelegate.Broadcast(true);
 }
 
 void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData& DamageData)

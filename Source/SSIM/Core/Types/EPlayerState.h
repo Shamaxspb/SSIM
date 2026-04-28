@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "EPlayerState.generated.h"
+//#include "EPlayerState.generated.h"
 
 
 
-UENUM(BlueprintType)
+/*UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
 	EPS_Movement	UMETA(DisplayName = "Movement"),
@@ -25,3 +25,4 @@ enum class EPlayerDirection : uint8
 	EPD_Right		UMETA(DisplayName = "Right"),
 	EPD_Left		UMETA(DisplayName = "Left")
 };
+*/

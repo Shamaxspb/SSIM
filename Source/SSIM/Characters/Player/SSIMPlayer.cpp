@@ -29,20 +29,18 @@ ASSIMPlayer::ASSIMPlayer()
 
 	SetupAttackCollision();
 	
-	ContactDamageCollision->SetCapsuleRadius(ContactDamageCollisionDefaultRadius);
-	
+	SetPlayerGravityScaleToDefault();
+	SetPlayerBrakingDecelerationWalkingToDefault();
+	SetContactDamageCollisionRadiusToDefault();
 }
 
 void ASSIMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetCharacterMovement()->GravityScale = DEFAULT_GRAVITY_SCALE;
+	GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
 	
-	SSIMPlayerDamageReactionComponent->OnEndInvulnerabilityDelegate.AddDynamic(this, &ASSIMPlayer::OnEndEndInvulnerabilityCollisionUpdate);
-	
-	SSIMPlayerFlowComponent->OnStartDashDelegate.AddDynamic(this, &ASSIMPlayer::StartDashHandler);
-	SSIMPlayerFlowComponent->OnEndDashDelegate.AddDynamic(this, &ASSIMPlayer::EndDashHandler);
+	BindToStateChangesInComponents();
 }
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -75,24 +73,21 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // My Functions
 void ASSIMPlayer::MoveRight()
 {
-	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerStatsComponent->bStaggered)
+	if (CanMove())
 	{
-		return;
+		AddMovementInput(FVector::RightVector, 1.f, false);
+		SetActorRotation(FRotator(0, 90, 0));
 	}
-	
-	AddMovementInput(FVector::RightVector, 1.f, false);
-	SetActorRotation(FRotator(0, 90, 0));
 }
 
 void ASSIMPlayer::MoveLeft()
 {
-	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerStatsComponent->bStaggered)
+	if (CanMove())
 	{
-		return;
+		AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
+		SetActorRotation(FRotator(0, -90, 0));
 	}
 	
-	AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
-	SetActorRotation(FRotator(0, -90, 0));
 }
 
 void ASSIMPlayer::SetupAttackCollision()
@@ -118,30 +113,57 @@ void ASSIMPlayer::SetupAttackCollision()
 	
 }
 
+void ASSIMPlayer::BindToStateChangesInComponents() const
+{
+	SSIMPlayerCombatComponent->OnAttackStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackStartedHandler);
+	SSIMPlayerCombatComponent->OnAttackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackEndedHandler);
+	
+	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoStartedHandler);
+	SSIMPlayerCombatComponent->OnPogoEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoEndedHandler);
+	
+	SSIMPlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashStartedHandler);
+	SSIMPlayerFlowComponent->OnDashEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashEndedHandler);
+	
+	SSIMPlayerFlowComponent->OnCanDashChangedDelegate.AddDynamic(this,&ASSIMPlayer::OnCanDashStateChangedHandler);
+	
+	SSIMPlayerDamageReactionComponent->OnStaggerStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggerStartedHandler);
+	SSIMPlayerDamageReactionComponent->OnStaggerEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggerEndedHandler);
+	
+}
+
 void ASSIMPlayer::HandleAttackFrontal()
 {
-	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
-	SSIMPlayerCombatComponent->StartAttack();
+	if (CanAttack())
+	{
+		SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Frontal;
+        SSIMPlayerCombatComponent->StartAttack();
+	}
 }
 
 void ASSIMPlayer::HandleAttackUpward()
 {
-	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Upward;
-	SSIMPlayerCombatComponent->StartAttack();
+	if (CanAttack())
+	{
+		SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Upward;
+		SSIMPlayerCombatComponent->StartAttack();
+	}
 }
 
 void ASSIMPlayer::HandleAttackDownward()
 {
-	if (!GetCharacterMovement()->IsFalling())
+	if (CanAttack())
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
+		if (!GetCharacterMovement()->IsFalling())
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
 		
-		SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Frontal;
+			SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Frontal;
+			SSIMPlayerCombatComponent->StartAttack();
+			return;
+		}
+		SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Downward;
 		SSIMPlayerCombatComponent->StartAttack();
-		return;
 	}
-	SSIMPlayerCombatComponent->PlayerAttackDirection = EPlayerAttackDirection::EPAD_Downward;
-	SSIMPlayerCombatComponent->StartAttack();
 }
 
 void ASSIMPlayer::HandleStartAttackTrace()
@@ -157,26 +179,105 @@ void ASSIMPlayer::HandleEndAttackTrace()
 
 void ASSIMPlayer::HandleDash()
 {
+	if (bPogoActive || bDashing || !bCanDash || bStaggered)
+	{
+		if (bPogoActive)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
+			return;
+		}
+		if (bDashing)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
+		}
+		if (!bCanDash)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
+			return;	
+		}
+		if (bStaggered)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
+			return;	
+		}
+	}
 	SSIMPlayerFlowComponent->StartDash();
 }
 
-void ASSIMPlayer::OnEndEndInvulnerabilityCollisionUpdate()
+#pragma region State Handlers
+void ASSIMPlayer::OnAttackStartedHandler()
 {
-	HitRegistrationCollision->UpdateOverlaps();
-	ContactDamageCollision->UpdateOverlaps();
+	bAttacking = true;
+}
+void ASSIMPlayer::OnAttackEndedHandler()
+{
+	bAttacking = false;
 }
 
-void ASSIMPlayer::StartDashHandler()
+void ASSIMPlayer::OnPogoStartedHandler()
 {
+	bPogoActive = true;
+}
+void ASSIMPlayer::OnPogoEndedHandler()
+{
+	bPogoActive = false;
+}
+
+void ASSIMPlayer::OnDashStartedHandler()
+{
+	bDashing = true;
 	GetCharacterMovement()->BrakingDecelerationWalking = 1000.f;
 	GetContactDamageCollision()->SetCapsuleRadius(GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),true);
 }
-
-void ASSIMPlayer::EndDashHandler()
+void ASSIMPlayer::OnDashEndedHandler()
 {
-	GetCharacterMovement()->BrakingDecelerationWalking = DEFAULT_BRAKING_DECELERATION_WALKING;
-	ContactDamageCollision->SetCapsuleRadius(ContactDamageCollisionDefaultRadius);
+	bDashing = false;
+	SetPlayerBrakingDecelerationWalkingToDefault();
+	SetContactDamageCollisionRadiusToDefault();
 }
+
+void ASSIMPlayer::OnCanDashStateChangedHandler(bool InCanDash)
+{
+	bCanDash = InCanDash;
+}
+
+void ASSIMPlayer::OnStaggerStartedHandler()
+{
+	bStaggered = true;
+}
+
+void ASSIMPlayer::OnStaggerEndedHandler()
+{
+	bStaggered = false;
+}
+#pragma endregion State Handlers
+
+bool ASSIMPlayer::CanAttack() const
+{
+	if (bAttacking || bDashing)
+	{
+		if (bAttacking)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
+		}
+		if (bDashing)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+		}
+		return false;
+	}
+	return true;
+}
+
+bool ASSIMPlayer::CanMove() const
+{
+	if (bPogoActive || bDashing || bStaggered)
+	{
+		return false;
+	}
+	return true;
+}
+
 
 // Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const

@@ -3,10 +3,12 @@
 
 #include "SSIMAIController.h"
 
-#include "Helpers/SSIMBlackboardHelper.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "SSIM/Core/Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 #include "SSIM/Components/DamageReaction/SSIMEnemyDamageReactionComponent.h"
+#include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
 
 
 ASSIMAIController::ASSIMAIController()
@@ -38,18 +40,15 @@ void ASSIMAIController::OnPossess(APawn* InPawn)
 	
 	SetReferences();
 	
-	UE_LOG(LogTemp, Warning, TEXT("Binding to component: %s"), *GetNameSafe(EnemyDamageReactionComponent));
-	
 	EnemyDamageReactionComponent->OnStartStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnStartStaggerHandler);
 	EnemyDamageReactionComponent->OnEndStaggerDelegate.AddDynamic(this, &ASSIMAIController::OnEndStaggerHandler);
-	DebugComponents();
 }
 
 
 void ASSIMAIController::SetReferences()
 {
 	BaseEnemy = Cast<ASSIMBaseEnemy>(GetPawn());
-	EnemyDamageReactionComponent = BaseEnemy->EnemyDamageReactionComponent;
+	EnemyDamageReactionComponent = BaseEnemy->GetEnemyDamageReactionComponent();
 }
 
 void ASSIMAIController::OnStartStaggerHandler()
@@ -92,7 +91,15 @@ void ASSIMAIController::DebugComponents()
 			*Comp->GetName(),
 			*Comp->GetClass()->GetName(),
 			*GetNameSafe(Comp->GetOuter()));
-	}
+	}	
+}
+
+void ASSIMAIController::PrintEnemyStateValue() const
+{
+	USSIMEnemyStatsComponent* EnemyStatsComponent = BaseEnemy->FindComponentByClass<USSIMEnemyStatsComponent>();
+	EEnemyState BBEnumValue = static_cast<EEnemyState>(Blackboard->GetValueAsEnum(TEXT("EEnemyState")));
+	UE_LOG(LogSSIMEnemyInitialization, Warning, TEXT("Blackboard     EEnemyState : %s"), *UEnum::GetValueAsString(BBEnumValue));
+	UE_LOG(LogSSIMEnemyInitialization, Warning, TEXT("StatsComponent EEnemyState : %s"), *UEnum::GetValueAsString(EnemyStatsComponent->EnemyState));
 }
 
 

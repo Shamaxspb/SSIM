@@ -16,7 +16,7 @@ class SSIM_API USSIMEnemyStatsComponent : public USSIMBaseStatsComponent
 
 // Variables
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Combat")
 	EEnemyState EnemyState;
 
 protected:

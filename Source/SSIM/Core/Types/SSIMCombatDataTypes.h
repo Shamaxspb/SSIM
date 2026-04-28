@@ -6,12 +6,12 @@
 #include "SSIMCombatDataTypes.generated.h"
 
 UENUM(BlueprintType)
-enum class EPlayerAttackDirection : uint8
+enum class EPlayerAttackDirectionType : uint8
 {
-	EPAD_Default	UMETA(Hidden),
-	EPAD_Frontal	UMETA(DisplayName = "Frontal"),
-	EPAD_Upward 	UMETA(DisplayName = "Upward"),
-	EPAD_Downward	UMETA(DisplayName = "Downward")
+	EPADT_Default	UMETA(Hidden),
+	EPADT_Frontal	UMETA(DisplayName = "Frontal"),
+	EPADT_Upward 	UMETA(DisplayName = "Upward"),
+	EPADT_Downward	UMETA(DisplayName = "Downward")
 };
 
 USTRUCT(Blueprintable)

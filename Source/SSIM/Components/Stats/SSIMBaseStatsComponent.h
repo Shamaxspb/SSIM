@@ -27,12 +27,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|UI")
 	FOnHealReceivedSignature OnHealReceivedDelegate;
 	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger")	
-	bool bStaggered;
-	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger")	
-	bool bInvulnerable;
-	
 	
 // My Functions
 public:

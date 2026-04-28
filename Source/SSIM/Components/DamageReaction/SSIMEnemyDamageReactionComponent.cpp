@@ -3,11 +3,14 @@
 
 #include "SSIMEnemyDamageReactionComponent.h"
 
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
+#include "SSIM/Core/Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 //
@@ -33,7 +36,6 @@ void USSIMEnemyDamageReactionComponent::OnDamageReceivedHandler(const FDamageDat
 	Super::OnDamageReceivedHandler(InDamageData);
 	
 	StartStagger();
-	ReboundOnHit();
 }
 
 void USSIMEnemyDamageReactionComponent::StartStagger()
@@ -48,16 +50,17 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 		false
 		);
 	
-	if (!IsValid(FrontStaggeredMontage))
+	if (!IsValid(SelectStaggerMontage()))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | %s montage is not valid"), 
+											    TEXT(__FUNCTION__), 
+													 *GetNameSafe(SelectStaggerMontage()));
 		return;
 	}
 	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED"), TEXT(__FUNCTION__));
-	
-	UE_LOG(LogTemp, Warning, TEXT("Broadcast from component: %s"), *GetNameSafe(this));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
+	ReboundOnHit();
 	OnStartStaggerDelegate.Broadcast();
 }
 
@@ -65,14 +68,20 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 {
 	EnemyStatsComponent->EnemyState = EEnemyState::EES_Combat; // Since enemy can be staggered only in combat (not sure about this)
 	
+	/*uint8 NewState = static_cast<uint8>(EEnemyState::EES_Combat);
+	AAIController* EnemyController =  Cast<AAIController>(SSIMEnemy->GetController());
+	UBlackboardComponent* BB = EnemyController->GetBlackboardComponent();
+	BB->SetValueAsEnum(TEXT("EEnemyState"), static_cast<uint8>(EnemyStatsComponent->EnemyState));*/
+	
+	//USSIMBlackboardHelper::SetEnumSafe(EnemyController->GetBlackboardComponent(), TEXT("EEnemyState"), NewState);
+	
 	SSIMEnemy->StopAnimMontage();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
 	// or 
 	// StartStagger { OnCharacterLanded.AddDynamic; } 
 	// OnCharacterLandedHandler { EndStagger; OnCharacterLanded.RemoveDynamic; }
 	
-	UE_LOG(LogTemp, Warning, TEXT("Broadcast from component: %s"), *GetNameSafe(this));
 	OnEndStaggerDelegate.Broadcast();
 }
 
@@ -80,29 +89,42 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 {
 	FVector EnemyLocation = SSIMEnemy->GetActorLocation();
 	FVector PlayerLocation = DamageData.Instigator->GetActorLocation();
+	FVector ReboundVelocity;
+	FVector ReboundDirection;
 	
-	// Determine if Player is to the right or to the left
-	bool bPlayerToTheRight = PlayerLocation.Y > EnemyLocation.Y;
+	switch (PlayerAttackDirectionType)
+	{
+	case EPlayerAttackDirectionType::EPADT_Downward:
+		{
+			// Just vector down from Enemy location
+			ReboundDirection = EnemyLocation + FVector::DownVector;
+			ReboundVelocity = ReboundDirection * -ReboundVelocityZ;
+			break;
+		}
+	default:
+		{
+			// Determine if Player is to the right or to the left
+			bool bPlayerToTheRight = PlayerLocation.Y > EnemyLocation.Y;
 	
-	// Get unit vector from Player to Enemy and Negate that vector
-	FVector ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
+			// Get unit vector from Player to Enemy and Negate that vector
+			ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
 	
-	// Add rotation to that vector (around X axis)
-	RotatedDirection = ReboundDirection.RotateAngleAxis(bPlayerToTheRight ? -ReboundAngle : ReboundAngle, FVector::ForwardVector);
+			// Add rotation to that vector (around X axis)
+			RotatedDirection = ReboundDirection.RotateAngleAxis(bPlayerToTheRight ? -ReboundAngle : ReboundAngle, FVector::ForwardVector);
 
-	// Multiply by coef for launch
-	FVector ReboundVelocity = RotatedDirection * ReboundVelocityCoef;
+			// Multiply by coef for launch
+			ReboundVelocity = RotatedDirection * ReboundVelocityCoef;
+			break;
+		}
+	}
 	
 #if !UE_BUILD_SHIPPING
 	
 	if (bReboundShowLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Player Is to the: %s"), (bPlayerToTheRight ? TEXT("Right") : TEXT("Left")));
-		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Direction: %s"), *ReboundDirection.ToString());
-		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rotated Direction: %s"), *RotatedDirection.ToString());
-		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("Rebound Velocity: %s"),  *ReboundVelocity.ToString());
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player Attack Direction Type: %s"), TEXT(__FUNCTION__),  *UEnum::GetValueAsString(PlayerAttackDirectionType));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Rebound Velocity: %s"), TEXT(__FUNCTION__), *ReboundVelocity.ToString());
 	}
-	
 	if (bDrawReboundDirectionArrow)
 	{
 		ReboundDrawDebug();
@@ -110,7 +132,7 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 
 #endif !UE_BUILD_SHIPPING
 	
-	SSIMEnemy->LaunchCharacter(ReboundVelocity, false, false);
+	SSIMEnemy->LaunchCharacter(ReboundVelocity, true, true);
 }
 
 UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
@@ -128,6 +150,12 @@ UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
 		StaggeredMontage = FrontStaggeredMontage;
 	}
 	return StaggeredMontage;
+}
+
+void USSIMEnemyDamageReactionComponent::ReceivePlayerAttackDirectionType(
+	EPlayerAttackDirectionType InPlayerAttackDirectionType) // This value initialized by interface, not OnDamageReceived
+{
+	PlayerAttackDirectionType = InPlayerAttackDirectionType;
 }
 
 void USSIMEnemyDamageReactionComponent::ReboundDrawDebug()

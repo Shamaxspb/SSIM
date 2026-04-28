@@ -20,7 +20,13 @@ void USSIMDashEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	
 	if (!MeshComp->GetOwner()->Implements<UPlayerDataInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner does not implement UPlayerDataInterface"), TEXT(__FUNCTION__));
+		if (IsValid(GetWorld()))
+		{
+			if (GetWorld()->IsGameWorld())
+			{
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner does not implement UPlayerDataInterface"), TEXT(__FUNCTION__));
+			}
+		}
 		return;
 	}
 	

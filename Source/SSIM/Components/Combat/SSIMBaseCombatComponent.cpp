@@ -9,15 +9,6 @@
 
 void USSIMBaseCombatComponent::StartAttack()
 {
-	if (bAttacking)
-	{
-		if (bShowLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is still in process"), TEXT(__FUNCTION__));
-		}
-		return;
-	}
-	
 	if (!IsValid(GetAttackMontage()))
 	{
 		// Logging inside GetAttackMontage()
@@ -25,25 +16,24 @@ void USSIMBaseCombatComponent::StartAttack()
 	}
 	AttackMontage = GetAttackMontage();
 	
-	bAttacking = true; // set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
+	// set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
+	OnAttackStartedDelegate.Broadcast();
 	
 	AnimInstance->Montage_Play(AttackMontage);
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack started"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 
 void USSIMBaseCombatComponent::EndAttack()
 {
-	bAttacking = false;
+	OnAttackEndedDelegate.Broadcast();
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ended"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
-	
-	HitEnemies.Empty();
 }
 
 void USSIMBaseCombatComponent::StartAttackTrace()
@@ -62,9 +52,9 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 	CurrentAttackCollision->SetHiddenInGame(false);
 	#endif
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 
@@ -85,16 +75,16 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 
 	HitEnemies.Empty();
 	
-	if (bShowLogs)
+	if (bShowAttackLogs)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
 
 UAnimMontage* USSIMBaseCombatComponent::GetAttackMontage()
 {
 	
-	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | GetAttackMontage() is not overriden"), *GetOwner()->GetName());
+	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | GetAttackMontage() is not overriden"), *GetOwner()->GetName());
 	return nullptr;
 }
 
@@ -105,6 +95,6 @@ void USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent
 															 bool bFromSweep,
 															 const FHitResult& SweepResult)
 {
-	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | OnAttackCollisionBeginOverlap() is not overriden"), *GetOwner()->GetName());
+	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | OnAttackCollisionBeginOverlap() is not overriden"), *GetOwner()->GetName());
 	return;
 }

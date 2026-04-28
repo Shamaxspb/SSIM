@@ -3,7 +3,9 @@
 
 #include "SSIMPlayerStatsComponent.h"
 
+#include "GameFramework/Character.h"
 #include "SSIM/SSIM.h"
+#include "SSIM/Components/DamageReaction/SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 
@@ -11,14 +13,20 @@ void USSIMPlayerStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	SetReferences();
+	PlayerDamageReactionComponent->OnInvulnerabilityStartedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityStartedHandler);
+	PlayerDamageReactionComponent->OnInvulnerabilityEndedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityEndedHandler);
+}
+
+void USSIMPlayerStatsComponent::SetReferences()
+{
+	Super::SetReferences();
+	PlayerDamageReactionComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerDamageReactionComponent>();
 }
 
 // My Functions
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
-	
-	
 	if (bInvulnerable)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
@@ -44,6 +52,15 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 													Health, 
 													MaxHealth);
 	
+}
+
+void USSIMPlayerStatsComponent::OnInvulnerabilityStartedHandler()
+{
+	bInvulnerable = true;
+}
+void USSIMPlayerStatsComponent::OnInvulnerabilityEndedHandler()
+{
+	bInvulnerable = false;
 }
 
 

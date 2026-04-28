@@ -21,6 +21,8 @@ class SSIM_API ISSIMDamageableInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Stats")
-	void ReceiveDamageInterface(const FDamageData& DamageData) const;
+	void ReceiveDamageInterface(const FDamageData& InDamageData) const;
 	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SSIM|Stats")
+	void ReceivePlayerAttackDirectionType(EPlayerAttackDirectionType InPlayerAttackDirectionType) const;
 };

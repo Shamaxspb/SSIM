@@ -54,4 +54,7 @@ private:
 	
 	// DEBUG
 	void DebugComponents();
+	
+	UFUNCTION(BlueprintCallable)
+	void PrintEnemyStateValue() const;
 };

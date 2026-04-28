@@ -2,8 +2,8 @@
 
 
 #include "SSIMAttackEndNotify.h"
+
 #include "SSIM/SSIM.h"
-#include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 
 
@@ -20,12 +20,15 @@ void USSIMAttackEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 	
 	if (!MeshComp->GetOwner()->Implements<USSIMCombatInterface>())  
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Owner does not implement USSIMCombatInterface"), TEXT(__FUNCTION__));
+		if (IsValid(GetWorld()))
+		{
+			if (GetWorld()->IsGameWorld())
+			{
+				UE_LOG(LogSSIMValidations, Error, TEXT("%s | %s does not implement USSIMCombatInterface"), TEXT(__FUNCTION__), *MeshComp->GetOwner()->GetName());
+			}
+		}
 		return;
 	}
-	
-	ASSIMBaseCharacter* BaseCharacter = Cast<ASSIMBaseCharacter>(MeshComp->GetOwner());
-	BaseCharacter->OnAttackFinishedDelegate.Broadcast();
 	
 	ISSIMCombatInterface::Execute_EndAttackInterface(MeshComp->GetOwner());
 }

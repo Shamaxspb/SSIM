@@ -8,8 +8,11 @@
 
 #include "SSIMPlayerDamageReactionComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStaggerStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStaggerEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityEndedSignature);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndInvulnerabilitySignature);
 
 class USSIMPlayerStatsComponent;
 class ASSIMPlayer;
@@ -31,12 +34,18 @@ class SSIM_API USSIMPlayerDamageReactionComponent : public USSIMBaseDamageReacti
 public:
 	// Delegates
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|DamageProcessing")
-	FOnEndInvulnerabilitySignature OnEndInvulnerabilityDelegate;
+	FOnStaggerStartedSignature OnStaggerStartedDelegate;
+	FOnStaggerEndedSignature OnStaggerEndedDelegate;
+	FOnInvulnerabilityStartedSignature OnInvulnerabilityStartedDelegate;
+	FOnInvulnerabilityEndedSignature OnInvulnerabilityEndedDelegate;
+	
 	
 protected:
+	
+	UPROPERTY()
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	
 	// Damage processing
-	
-	
 #pragma region Stagger
 	
 protected:
@@ -79,6 +88,8 @@ protected:
 
 // My Functions
 protected:
+	virtual void SetReferences() override;
+	
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
 
 private:

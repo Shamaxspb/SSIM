@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
@@ -85,13 +87,32 @@ protected:
 #pragma endregion Input	
 	
 protected:
-	UPROPERTY()
-	EPlayerState CurrentPlayerState;
-
+	/*UPROPERTY()
+	EPlayerState CurrentPlayerState;*/
+	
+#pragma region States
+	
+//private:
+public:
+	bool bAttacking  = false;
+	bool bPogoActive = false;
+	
+	bool bDashing	 = false;
+	bool bCanDash    = true;
+	
+	bool bStaggered  = false;
+	
+	
+#pragma endregion States
+	
+#pragma region Player Defaults
+	
 private:
-	float ContactDamageCollisionDefaultRadius = 22.f;
+	float DefaultPlayerGravityScale = 7.f;
+	float DefaultPlayerBrakingDecelerationWalking = 10000.f;
+	float DefaultContactDamageCollisionRadius = 70.f;
 	
-	
+#pragma endregion  Player Defaults
 // Overriden Functions
 public:
 	ASSIMPlayer();
@@ -110,13 +131,11 @@ public:
 	{
 		return SSIMPlayerCombatComponent;
 	}
-	
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerFlowComponent* GetPlayerFlowComponent() const
 	{
 		return SSIMPlayerFlowComponent;
 	}
-	
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
 	{
@@ -141,11 +160,29 @@ public:
 	
 #pragma endregion Inline Getters
 	
+#pragma region Inline Setters
+	
+	FORCEINLINE void SetPlayerGravityScaleToDefault() const
+	{
+		GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
+	}
+	FORCEINLINE void SetPlayerBrakingDecelerationWalkingToDefault() const
+	{
+		GetCharacterMovement()->BrakingDecelerationWalking = DefaultPlayerBrakingDecelerationWalking;
+	}
+	FORCEINLINE void SetContactDamageCollisionRadiusToDefault() const
+	{
+		ContactDamageCollision->SetCapsuleRadius(DefaultContactDamageCollisionRadius);
+	}
+
+#pragma endregion Inline Setters
+	
 private:
 	void MoveRight();
 	void MoveLeft();
 	
 	void SetupAttackCollision();
+	void BindToStateChangesInComponents() const;
 	
 #pragma region Handler Functions
 	
@@ -160,14 +197,37 @@ private:
 	
 #pragma endregion Handler Functions
 	
+#pragma region State Handlers
+	
 private:
 	UFUNCTION()
-	void OnEndEndInvulnerabilityCollisionUpdate();
+	void OnAttackStartedHandler();
+	UFUNCTION()
+	void OnAttackEndedHandler();
 	
 	UFUNCTION()
-	void StartDashHandler();
+	void OnPogoStartedHandler();
 	UFUNCTION()
-	void EndDashHandler();
+	void OnPogoEndedHandler();
+	
+	UFUNCTION()
+	void OnDashStartedHandler();
+	UFUNCTION()
+	void OnDashEndedHandler();
+	
+	UFUNCTION()
+	void OnCanDashStateChangedHandler(bool InCanDash);
+	
+	UFUNCTION()
+	void OnStaggerStartedHandler();
+	UFUNCTION()
+	void OnStaggerEndedHandler();
+	
+#pragma endregion State Handlers
+	
+private:
+	bool CanAttack() const;
+	bool CanMove() const;
 	
 // Interfaces
 public:

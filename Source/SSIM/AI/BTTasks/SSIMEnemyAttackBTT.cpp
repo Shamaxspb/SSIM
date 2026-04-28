@@ -5,7 +5,8 @@
 
 #include "AIController.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Characters/SSIMBaseCharacter.h"
+#include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
+#include "SSIM/Components/Combat/SSIMEnemyCombatComponent.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 
 EBTNodeResult::Type USSIMEnemyAttackBTT::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -17,26 +18,27 @@ EBTNodeResult::Type USSIMEnemyAttackBTT::ExecuteTask(UBehaviorTreeComponent& Own
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner is not valid"), TEXT(__FUNCTION__));
 		return EBTNodeResult::Failed;
 	}
-	ASSIMBaseCharacter* BaseCharacter = Cast<ASSIMBaseCharacter>(CachedOwnerComp->GetAIOwner()->GetPawn());
+	BaseEnemy = Cast<ASSIMBaseEnemy>(CachedOwnerComp->GetAIOwner()->GetPawn());
 	
-	if (!BaseCharacter->Implements<USSIMCombatInterface>())
+	if (!BaseEnemy->Implements<USSIMCombatInterface>())
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Owner does not implement USSIMCommonCombatInterface"), TEXT(__FUNCTION__));
 		return EBTNodeResult::Failed;
 	}
 	
-	BaseCharacter->OnAttackFinishedDelegate.AddUObject(this, &USSIMEnemyAttackBTT::OnEndAttack);
+	BaseEnemy->GetEnemyCombatComponent()->OnAttackEndedDelegate.AddUniqueDynamic(this, &USSIMEnemyAttackBTT::OnAttackEndedHandler);
 	
-	ISSIMCombatInterface::Execute_StartAttackInterface(BaseCharacter);
+	ISSIMCombatInterface::Execute_StartAttackInterface(BaseEnemy);
 	
 	return EBTNodeResult::InProgress;
 	
 }
 
-void USSIMEnemyAttackBTT::OnEndAttack() const
+void USSIMEnemyAttackBTT::OnAttackEndedHandler()
 {
 	if (CachedOwnerComp.IsValid())
 	{
+		BaseEnemy->GetEnemyCombatComponent()->OnAttackEndedDelegate.RemoveDynamic(this, &USSIMEnemyAttackBTT::OnAttackEndedHandler);
 		FinishLatentTask(*CachedOwnerComp, EBTNodeResult::Succeeded);
 	}
 }

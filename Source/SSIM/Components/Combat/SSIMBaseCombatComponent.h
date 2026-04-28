@@ -8,20 +8,26 @@
 
 #include "SSIMBaseCombatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackEndedSignature);
+
 class UBoxComponent;
 
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class SSIM_API USSIMBaseCombatComponent : public USSIMBaseComponent
+class SSIM_API   USSIMBaseCombatComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
 	
 	
 // Variables
+public:
+	FOnAttackStartedSignature OnAttackStartedDelegate;
+	FOnAttackEndedSignature OnAttackEndedDelegate;
+	
 #pragma region Metadata
 
 protected:
-	bool bAttacking = false;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
@@ -29,7 +35,7 @@ protected:
 	UBoxComponent* CurrentAttackCollision;
 	
 	UPROPERTY()
-	TSet<AActor*> HitEnemies;
+	TArray<AActor*> HitEnemies;
 	
 	FDamageData DamageData;
 		
@@ -38,11 +44,8 @@ protected:
 #pragma region Debug
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug")
-	bool bShowDebug;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug", meta = (EditCondition = "bShowDebug", EditConditionHides))
-	bool bShowLogs;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug|Attack")
+	bool bShowAttackLogs;
 
 #pragma endregion Debug
 		

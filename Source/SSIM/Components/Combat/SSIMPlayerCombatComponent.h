@@ -8,6 +8,14 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
+class USSIMPlayerFlowComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMontageEnded);
+
 class ASSIMPlayer;
 class UBoxComponent;
 class USSIMPlayerStatsComponent;
@@ -18,6 +26,13 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 	GENERATED_BODY()
 
 // Variables
+public:
+	// Delegates
+	FOnPogoStartedSignature			 OnPogoStartedDelegate;
+	FOnPogoEndedSignature			 OnPogoEndedDelegate;
+	FOnPogoAnimationStartedSignature OnPogoAnimationStartedDelegate;
+	FOnPogoAnimationEndedSignature	 OnPogoAnimationEndedDelegate;
+	
 #pragma region Stats
 	
 public:
@@ -42,18 +57,15 @@ protected:
 	TArray<TObjectPtr<UAnimMontage>> PlayerAirUpwardAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<TObjectPtr<UAnimMontage>> PlayerDownwardAttackMontages;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<TObjectPtr<UAnimMontage>> PlayerAirDownwardAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerPogoMontages;
 
 #pragma endregion Montages
 	
 #pragma region Metadata
 	
 public:
-	EPlayerAttackDirection PlayerAttackDirection;
-	
+	EPlayerAttackDirectionType PlayerAttackDirectionType;
+
 #pragma endregion Metadata
 	
 private:
@@ -61,8 +73,70 @@ private:
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
 	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> StatsComponent;
+	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
 	
+	UPROPERTY()
+	TObjectPtr<USSIMPlayerFlowComponent> PlayerFlowComponent;
+
+#pragma region Pogo
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Pogo", meta = (AllowPrivateAccess = true))
+	float PogoAngle = 50.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
+	float PogoVelocity = 400.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
+	float PogoTemporaryGravityScale = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
+	float PogoStateDuration = 0.5f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo|Settings")
+	float PogoAdjustmentInterpSpeed = 1500.f;
+	
+#pragma region Pogo Debug
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo")
+	bool bShowPogoDebug;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug", EditConditionHides,
+																	  DisplayAfter = "bShowPogoDebug"))
+	bool bShowPogoLogs;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug", EditConditionHides,
+																 	  DisplayAfter = "bShowPogoLogs"))
+	bool bDrawPogoDebug;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
+																 	  DisplayAfter = "bDrawPogoDebug"))
+	float bDrawPogoDebugDuration = 5.f;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
+															 	  DisplayAfter = "bDrawPogoDebug"))
+	FLinearColor PogoAdjustmentStartPointColor = FLinearColor::Red;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
+															 	  DisplayAfter = "bDrawPogoDebug"))
+	FLinearColor PogoAdjustmentEndPointColor = FLinearColor::Green;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
+															 	  DisplayAfter = "bDrawPogoDebug"))
+	FLinearColor PogoAdjustmentDirectionArrowColor = FLinearColor::Yellow;
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
+																  DisplayAfter = "bDrawPogoDebug"))
+	FLinearColor PogoReboundDirectionArrowColor = FLinearColor::Blue;
+#pragma endregion Pogo Debug
+	
+	
+private:
+	FTimerHandle PogoAdjustHeightHandle;
+	FTimerDelegate PogoAdjustHeightDelegate;
+	float PogoInterpolationStepTime = 0.002f;
+	
+#pragma endregion Pogo
+
 
 // Overriden Functions
 protected:
@@ -87,10 +161,20 @@ protected:
 private:
 	void DealDamageToEnemy();
 	
+	void PogoInit();
+	void AdjustPogoStartLocation(FVector AdjustedPlayerLocation);
+	void PogoStart();
+	void EndPogo() const;
+	
+	void SetMeshTransformForPogo(bool bPogoStart) const;
+	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+
+	UFUNCTION()
+	void OnDashStartedHandler();
 	
-// DEBUG
-	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
-	void SwitchAttackCollision_DEBUG() const;
+	UFUNCTION()
+	void PogoAnimationCallback(UAnimMontage* PogoMontage, bool Interrupted) const;
+
 };

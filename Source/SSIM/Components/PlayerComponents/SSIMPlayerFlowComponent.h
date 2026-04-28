@@ -7,8 +7,11 @@
 
 #include "SSIMPlayerFlowComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartDashSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndDashSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashEndedSignature);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCanDashChangedSignature, bool, InCanDash);
+
 
 class UCapsuleComponent;
 class USSIMPlayerStatsComponent;
@@ -25,8 +28,10 @@ class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent
 // Variables
 public:
 	// Delegates
-	FOnStartDashSignature OnStartDashDelegate;
-	FOnEndDashSignature OnEndDashDelegate;
+	FOnDashStartedSignature OnDashStartedDelegate;
+	FOnDashEndedSignature OnDashEndedDelegate;
+	
+	FOnCanDashChangedSignature OnCanDashChangedDelegate;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
@@ -41,10 +46,6 @@ protected:
 #pragma region Metadata
 
 public:
-	bool bDashing = false;
-	
-private:	
-	bool bCanDash = true;
 	FTimerHandle DashCooldownTimerHandle;
 
 #pragma endregion Metadata
