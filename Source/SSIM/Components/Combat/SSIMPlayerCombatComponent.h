@@ -12,6 +12,9 @@ class USSIMPlayerFlowComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMontageEnded);
 
 class ASSIMPlayer;
 class UBoxComponent;
@@ -27,6 +30,8 @@ public:
 	// Delegates
 	FOnPogoStartedSignature OnPogoStartedDelegate;
 	FOnPogoEndedSignature OnPogoEndedDelegate;
+	FOnPogoAnimationStartedSignature OnPogoAnimationStartedDelegate;
+	FOnPogoAnimationEndedSignature OnPogoAnimationEndedDelegate;
 	
 #pragma region Stats
 	
@@ -52,7 +57,7 @@ protected:
 	TArray<TObjectPtr<UAnimMontage>> PlayerAirUpwardAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<TObjectPtr<UAnimMontage>> PlayerAirDownwardAttackMontages;
+	TArray<TObjectPtr<UAnimMontage>> PlayerPogoMontages;
 
 #pragma endregion Montages
 	
@@ -165,9 +170,11 @@ private:
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
-	
 
 	UFUNCTION()
 	void OnDashStartedHandler();
+	
+	UFUNCTION()
+	void PogoAnimationCallback(UAnimMontage* PogoMontage, bool Interrupted) const;
 
 };

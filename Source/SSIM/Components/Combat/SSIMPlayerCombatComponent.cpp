@@ -7,11 +7,11 @@
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
 
 void USSIMPlayerCombatComponent::BeginPlay()
@@ -27,6 +27,16 @@ void USSIMPlayerCombatComponent::BeginPlay()
 void USSIMPlayerCombatComponent::StartAttack()
 {
 	Super::StartAttack();
+	
+	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
+	{
+		FOnMontageEnded OnPogoAnimationEnded;
+		OnPogoAnimationEnded.BindUObject(this, &USSIMPlayerCombatComponent::PogoAnimationCallback);
+		
+		OnPogoAnimationStartedDelegate.Broadcast();
+		SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(OnPogoAnimationEnded, AttackMontage);
+	}
+	
 	if (bShowAttackLogs)
     {
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Direction: %s"), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
@@ -105,12 +115,12 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 	
 		case EPlayerAttackDirectionType::EPADT_Downward:
 			{
-				if (PlayerAirDownwardAttackMontages.IsEmpty())
+				if (PlayerPogoMontages.IsEmpty())
 				{
 					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No Air DOWNWARD Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
-				AttackMontage = PlayerAirDownwardAttackMontages[FMath::RandHelper(PlayerAirDownwardAttackMontages.Num())];
+				AttackMontage = PlayerPogoMontages[FMath::RandHelper(PlayerPogoMontages.Num())];
 				break;
 			}
 			
@@ -382,4 +392,9 @@ void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDa
 void USSIMPlayerCombatComponent::OnDashStartedHandler()
 {
 	EndAttack(); // interrupt attack so to avoid stuck in attack if dash interrupts attack
+}
+
+void USSIMPlayerCombatComponent::PogoAnimationCallback(UAnimMontage* PogoMontage, bool Interrupted) const
+{
+	OnPogoAnimationEndedDelegate.Broadcast();
 }

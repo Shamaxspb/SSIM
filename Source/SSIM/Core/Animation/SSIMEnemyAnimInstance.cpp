@@ -15,8 +15,6 @@ void USSIMEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void USSIMEnemyAnimInstance::SetOwnerReference()
 {
-	Super::SetOwnerReference();
-
 	if (TryGetPawnOwner() == nullptr)
 	{
 		if (GetWorld()->IsGameWorld()) // to prevent log spamming in editor

@@ -84,7 +84,7 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 UAnimMontage* USSIMBaseCombatComponent::GetAttackMontage()
 {
 	
-	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | GetAttackMontage() is not overriden"), *GetOwner()->GetName());
+	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | GetAttackMontage() is not overriden"), *GetOwner()->GetName());
 	return nullptr;
 }
 
@@ -95,6 +95,6 @@ void USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveComponent
 															 bool bFromSweep,
 															 const FHitResult& SweepResult)
 {
-	UE_LOG(LogSSIMInheritance, Error, TEXT("%s | OnAttackCollisionBeginOverlap() is not overriden"), *GetOwner()->GetName());
+	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | OnAttackCollisionBeginOverlap() is not overriden"), *GetOwner()->GetName());
 	return;
 }
