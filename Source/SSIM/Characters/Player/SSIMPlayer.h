@@ -92,8 +92,8 @@ protected:
 	
 #pragma region States
 	
-//private:
-public:
+private:
+// public:
 	bool bAttacking  = false;
 	bool bPogoActive = false;
 	
@@ -136,6 +136,7 @@ public:
 #pragma region Inline Getters
 	
 public:
+	// Component getters
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
@@ -168,28 +169,29 @@ public:
 		return BottomAttackCollision;
 	}
 	
+	// State getters
 	UFUNCTION()
-	FORCEINLINE bool GetPlayerAttackingState() const
+	FORCEINLINE bool GetIsPlayerAttacking() const
 	{
 		return bAttacking;
 	}
 	UFUNCTION()
-	FORCEINLINE bool GetPlayerPogoState() const
+	FORCEINLINE bool GetIsPlayerPogoActive() const
 	{
 		return bPogoActive;
 	}
 	UFUNCTION()
-	FORCEINLINE bool GetPlayerDashingState() const
+	FORCEINLINE bool GetIsPlayerDashing() const
 	{
 		return bDashing;
 	}
 	UFUNCTION()
-	FORCEINLINE bool GetPlayerCanDashState() const
+	FORCEINLINE bool GetCanPlayerDash() const
 	{
 		return bCanDash;
 	}
 	UFUNCTION()
-	FORCEINLINE bool GetPlayerStaggeredState() const
+	FORCEINLINE bool GetIsPlayerStaggered() const
 	{
 		return bStaggered;
 	}
@@ -270,8 +272,9 @@ private:
 #pragma endregion State Handlers
 	
 private:
-	bool CanAttack() const;
 	bool CanMove() const;
+	bool CanAttack() const;
+	bool CanDash() const;
 	
 // Interfaces
 public:

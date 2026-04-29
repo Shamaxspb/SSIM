@@ -14,7 +14,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPogoAnimationEndedSignature, bool, bInterrupted);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMontageEnded);
 
 class ASSIMPlayer;
 class UBoxComponent;
