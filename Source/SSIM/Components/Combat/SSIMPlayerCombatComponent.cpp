@@ -216,7 +216,7 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 		
 		if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward
 			&&
-			SSIMPlayer->GetPlayerPogoState())
+			SSIMPlayer->GetIsPlayerPogoActive())
 		{
 			// If Pogo is active and hit another target - restart EndPogo timer
 		GetWorld()->GetTimerManager().SetTimer(
@@ -225,6 +225,13 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 			PogoStateDuration,
 			false
 			);
+		}
+		
+		if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward
+			&&
+			!SSIMPlayer->GetCanPlayerDash())
+		{
+			//SSIMPlayer->GetPlayerFlowComponent()->ResetDash();
 		}
 		
 		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
@@ -315,13 +322,6 @@ void USSIMPlayerCombatComponent::AdjustPogoStartLocation(FVector AdjustedPlayerL
 						PogoInterpolationStepTime,
 						PogoAdjustmentInterpSpeed));
 	
-	if (bShowPogoLogs)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Adjustment: Current Location - %s"), *SSIMPlayer->GetActorLocation().ToString());
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Adjustment: Target Location  - %s"), *AdjustedPlayerLocation.ToString());
-	}
-	
-	
 	if (SSIMPlayer->GetActorLocation().Equals(AdjustedPlayerLocation, 0.5f))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(PogoAdjustHeightHandle);
@@ -334,8 +334,6 @@ void USSIMPlayerCombatComponent::PogoStart()
 	DealDamageToEnemy();
 	
 	SSIMPlayer->GetCharacterMovement()->GravityScale = PogoTemporaryGravityScale;
-	
-	// EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		EndPogoTimerHandle,
@@ -375,16 +373,6 @@ void USSIMPlayerCombatComponent::PogoStart()
 
 void USSIMPlayerCombatComponent::EndPogo() const
 {
-	/*if (SSIMPlayer->GetPlayerAttackingState())
-	{
-		if (bShowPogoLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | EndPogo CANCELED, Player is still attacking/started next attack"), 
-				TEXT(__FUNCTION__), *SSIMPlayer->GetActorLocation().ToString());
-		}
-		return;
-	}*/
-	
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
 	OnPogoEndedDelegate.Broadcast();

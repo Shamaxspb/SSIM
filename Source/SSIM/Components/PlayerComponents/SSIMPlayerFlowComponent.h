@@ -35,11 +35,14 @@ public:
 	FOnCanDashChangedSignature OnCanDashChangedDelegate;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
-	float DashCooldown = 2.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
+	TObjectPtr<UAnimMontage> PlayerDashMontage;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
-	float DashVelocityCoef = 15.f;
+	float DashDuration = 0.5f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	float DashVelocity = 1000.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashGravityScale = 0.f;
@@ -50,8 +53,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
 	float DashBrakingDecelerationFalling = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
-	TObjectPtr<UAnimMontage> PlayerDashMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	float DashCooldown = 2.f;
 
 #pragma region Metadata
 
@@ -91,15 +94,14 @@ public:
 	void StartDash();
 	void EndDash();
 
-private:
-	FVector GetDashLaunchVelocity() const;
-	
 	void ResetDash();
 	UFUNCTION()
 	void ResetDashFromAir(const FHitResult& Hit);
-	
 	UFUNCTION()
-	void ResetBrakingDecelerationFalling(const FHitResult& Hit);
+	void ResetDashOnPogo();
+	
+private:
+	FVector GetDashLaunchVelocity() const;
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& DamageData);

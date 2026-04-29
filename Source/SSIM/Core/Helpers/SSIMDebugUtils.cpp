@@ -17,11 +17,11 @@ void USSIMDebugUtils::PrintPlayerStates(const UObject* WorldContextObject)
 	}
 	USSIMPlayerStatsComponent* PlayerStatsComponent = SSIMPlayer->GetPlayerStatsComponent();
 	
-	bool bAttacking    = SSIMPlayer->GetPlayerAttackingState();
-	bool bPogoActive   = SSIMPlayer->GetPlayerPogoState();
-	bool bDashing	   = SSIMPlayer->GetPlayerDashingState();
-	bool bCanDash	   = SSIMPlayer->GetPlayerCanDashState();
-	bool bStaggered	   = SSIMPlayer->GetPlayerStaggeredState();
+	bool bAttacking    = SSIMPlayer->GetIsPlayerAttacking();
+	bool bPogoActive   = SSIMPlayer->GetIsPlayerPogoActive();
+	bool bDashing	   = SSIMPlayer->GetIsPlayerDashing();
+	bool bCanDash	   = SSIMPlayer->GetCanPlayerDash();
+	bool bStaggered	   = SSIMPlayer->GetIsPlayerStaggered();
 	bool bInvulnerable = PlayerStatsComponent->GetPlayerInvulnerableState();
 	
 	

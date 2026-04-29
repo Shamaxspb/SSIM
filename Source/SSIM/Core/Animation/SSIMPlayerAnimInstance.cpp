@@ -7,6 +7,7 @@
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 void USSIMPlayerAnimInstance::NativeBeginPlay()
@@ -19,6 +20,8 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoAnimationEndedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler);
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDamageReceivedHandler);
+	
+	SSIMPlayer->GetPlayerFlowComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDashStartedHandler);
 }
 
 void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -95,7 +98,6 @@ void USSIMPlayerAnimInstance::SetOwnerReference()
 }
 
 void USSIMPlayerAnimInstance::StartBlendInPogoBones(float InBlendInDuration)
-
 {
 	if (PogoBonesState == EPogoBonesState::EPBS_ModifiedRotation || PogoBonesState == EPogoBonesState::EPBS_BlendingIn)
 	{
@@ -244,4 +246,14 @@ void USSIMPlayerAnimInstance::OnPlayerLanded(const FHitResult& Hit)
 	
 	StartBlendOutPogoBones(OnLandedPogoBlendInDuration);
 	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerAnimInstance::OnPlayerLanded);
+}
+
+void USSIMPlayerAnimInstance::OnDashStartedHandler()
+{
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMAnimation, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	StartBlendOutPogoBones(0.11f);
 }

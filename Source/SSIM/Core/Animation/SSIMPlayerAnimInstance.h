@@ -115,6 +115,8 @@ private:
 	void OnPogoAnimationEndedHandler(bool bInterrupted);
 	UFUNCTION()
 	void OnPlayerLanded(const FHitResult& Hit);
+	UFUNCTION()
+	void OnDashStartedHandler();
 	
 #pragma endregion Reset Pogo Handlers
 };

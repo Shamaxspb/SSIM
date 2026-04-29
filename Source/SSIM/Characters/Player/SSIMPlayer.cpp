@@ -182,41 +182,10 @@ void ASSIMPlayer::HandleEndAttackTrace()
 
 void ASSIMPlayer::HandleDash()
 {
-	if (bPogoActive || bDashing || !bCanDash || bStaggered)
+	if (CanDash())
 	{
-		if (bPogoActive)
-		{
-			if (bShowLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
-			}
-			return;
-		}
-		if (bDashing)
-		{
-			if (bShowLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
-			}
-		}
-		if (!bCanDash)
-		{
-			if (bShowLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
-			}
-			return;	
-		}
-		if (bStaggered)
-		{
-			if (bShowLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
-			}
-			return;	
-		}
+		SSIMPlayerFlowComponent->StartDash();
 	}
-	SSIMPlayerFlowComponent->StartDash();
 }
 
 #pragma region State Handlers
@@ -263,6 +232,15 @@ void ASSIMPlayer::OnStaggerEndedHandler()
 }
 #pragma endregion State Handlers
 
+bool ASSIMPlayer::CanMove() const
+{
+	if (/*bPogoActive || */bDashing || bStaggered)
+	{
+		return false;
+	}
+	return true;
+}
+
 bool ASSIMPlayer::CanAttack() const
 {
 	if (bAttacking || bDashing)
@@ -286,15 +264,44 @@ bool ASSIMPlayer::CanAttack() const
 	return true;
 }
 
-bool ASSIMPlayer::CanMove() const
+bool ASSIMPlayer::CanDash() const
 {
-	if (/*bPogoActive || */bDashing || bStaggered)
+	if (/*bPogoActive || */bDashing || !bCanDash || bStaggered)
 	{
+		/*if (bPogoActive)
+		{
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
+			}
+			return false;
+		}*/
+		if (bDashing)
+		{
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
+			}
+		}
+		if (!bCanDash)
+		{
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
+			}
+		}
+		if (bStaggered)
+		{
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
+			}
+		}
 		return false;
 	}
+	
 	return true;
 }
-
 
 #pragma region Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const
@@ -328,4 +335,4 @@ void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDam
 {
 	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }
-#pragma endregion Interfaces
+#pragma endregion Interfaces                                                                                                       
