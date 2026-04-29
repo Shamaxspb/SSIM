@@ -112,7 +112,7 @@ private:
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	UFUNCTION()
-	void OnPogoAnimationEndedHandler();
+	void OnPogoAnimationEndedHandler(bool bInterrupted);
 	UFUNCTION()
 	void OnPlayerLanded(const FHitResult& Hit);
 	

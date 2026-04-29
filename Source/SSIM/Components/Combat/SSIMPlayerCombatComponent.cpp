@@ -21,6 +21,8 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	
 	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
 	PlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
+	
+	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 }
 
 // My Functions
@@ -212,6 +214,19 @@ void USSIMPlayerCombatComponent::DealDamageToEnemy()
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s"), TEXT(__FUNCTION__), *Element->GetName());
 		}
 		
+		if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward
+			&&
+			SSIMPlayer->GetPlayerPogoState())
+		{
+			// If Pogo is active and hit another target - restart EndPogo timer
+		GetWorld()->GetTimerManager().SetTimer(
+			EndPogoTimerHandle,
+			EndPogoTimerDelegate,
+			PogoStateDuration,
+			false
+			);
+		}
+		
 		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
 	}
 }
@@ -320,9 +335,7 @@ void USSIMPlayerCombatComponent::PogoStart()
 	
 	SSIMPlayer->GetCharacterMovement()->GravityScale = PogoTemporaryGravityScale;
 	
-	FTimerHandle EndPogoTimerHandle;
-	FTimerDelegate EndPogoTimerDelegate; 
-	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
+	// EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		EndPogoTimerHandle,
@@ -362,8 +375,17 @@ void USSIMPlayerCombatComponent::PogoStart()
 
 void USSIMPlayerCombatComponent::EndPogo() const
 {
-	SSIMPlayer->SetPlayerGravityScaleToDefault();
+	/*if (SSIMPlayer->GetPlayerAttackingState())
+	{
+		if (bShowPogoLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | EndPogo CANCELED, Player is still attacking/started next attack"), 
+				TEXT(__FUNCTION__), *SSIMPlayer->GetActorLocation().ToString());
+		}
+		return;
+	}*/
 	
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
 	OnPogoEndedDelegate.Broadcast();
 }
@@ -382,6 +404,6 @@ void USSIMPlayerCombatComponent::OnDashStartedHandler()
 
 void USSIMPlayerCombatComponent::PogoAnimationCallback(UAnimMontage* PogoMontage, bool Interrupted) const
 {
-	OnPogoAnimationEndedDelegate.Broadcast();
+	OnPogoAnimationEndedDelegate.Broadcast(Interrupted);
 }
 #pragma endregion Handlers

@@ -155,7 +155,10 @@ void ASSIMPlayer::HandleAttackDownward()
 	{
 		if (!GetCharacterMovement()->IsFalling())
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
+			}
 		
 			SSIMPlayerCombatComponent->PlayerAttackDirectionType = EPlayerAttackDirectionType::EPADT_Frontal;
 			SSIMPlayerCombatComponent->StartAttack();
@@ -183,21 +186,33 @@ void ASSIMPlayer::HandleDash()
 	{
 		if (bPogoActive)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
+			}
 			return;
 		}
 		if (bDashing)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
+			}
 		}
 		if (!bCanDash)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
+			}
 			return;	
 		}
 		if (bStaggered)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
+			}
 			return;	
 		}
 	}
@@ -254,11 +269,17 @@ bool ASSIMPlayer::CanAttack() const
 	{
 		if (bAttacking)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
+			}
 		}
 		if (bDashing)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+			}
 		}
 		return false;
 	}
@@ -267,7 +288,7 @@ bool ASSIMPlayer::CanAttack() const
 
 bool ASSIMPlayer::CanMove() const
 {
-	if (bPogoActive || bDashing || bStaggered)
+	if (/*bPogoActive || */bDashing || bStaggered)
 	{
 		return false;
 	}

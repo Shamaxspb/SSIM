@@ -29,16 +29,22 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	if (bInvulnerable)
 	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+		if (bShowLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+		}
 		return;
 	}
 	
 	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
-	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
-													Health, 
-													MaxHealth);
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
+														Health, 
+														MaxHealth);
+	}
 	
 	Super::ReduceHealth(InDamageData);
 }
@@ -48,9 +54,12 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 	Health += InHealValue;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
-	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
-													Health, 
-													MaxHealth);
+	if (bShowLogs)
+	{
+		UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
+														Health, 
+														MaxHealth);
+	}
 	
 }
 

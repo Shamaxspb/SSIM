@@ -13,7 +13,7 @@ class USSIMPlayerFlowComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationEndedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPogoAnimationEndedSignature, bool, bInterrupted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMontageEnded);
 
 class ASSIMPlayer;
@@ -131,6 +131,9 @@ protected:
 	
 	
 private:
+	FTimerHandle EndPogoTimerHandle;
+	FTimerDelegate EndPogoTimerDelegate;
+	
 	FTimerHandle PogoAdjustHeightHandle;
 	FTimerDelegate PogoAdjustHeightDelegate;
 	float PogoInterpolationStepTime = 0.002f;

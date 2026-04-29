@@ -118,6 +118,11 @@ protected:
 	float DefaultContactDamageCollisionRadius = 35.f;
 	
 #pragma endregion  Player Defaults
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|PlayerDebug")
+	bool bShowLogs;
+	
 // Overriden Functions
 public:
 	ASSIMPlayer();
@@ -161,6 +166,32 @@ public:
 	FORCEINLINE UBoxComponent* GetBottomAttackCollision() const
 	{
 		return BottomAttackCollision;
+	}
+	
+	UFUNCTION()
+	FORCEINLINE bool GetPlayerAttackingState() const
+	{
+		return bAttacking;
+	}
+	UFUNCTION()
+	FORCEINLINE bool GetPlayerPogoState() const
+	{
+		return bPogoActive;
+	}
+	UFUNCTION()
+	FORCEINLINE bool GetPlayerDashingState() const
+	{
+		return bDashing;
+	}
+	UFUNCTION()
+	FORCEINLINE bool GetPlayerCanDashState() const
+	{
+		return bCanDash;
+	}
+	UFUNCTION()
+	FORCEINLINE bool GetPlayerStaggeredState() const
+	{
+		return bStaggered;
 	}
 	
 #pragma endregion Inline Getters

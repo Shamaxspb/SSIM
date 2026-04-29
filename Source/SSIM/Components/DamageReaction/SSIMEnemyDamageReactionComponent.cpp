@@ -59,7 +59,11 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 	}
 	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
+	if (bStaggerShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
+	}
+	
 	ReboundOnHit();
 	OnStartStaggerDelegate.Broadcast();
 }
@@ -68,19 +72,15 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 {
 	EnemyStatsComponent->EnemyState = EEnemyState::EES_Combat; // Since enemy can be staggered only in combat (not sure about this)
 	
-	/*uint8 NewState = static_cast<uint8>(EEnemyState::EES_Combat);
-	AAIController* EnemyController =  Cast<AAIController>(SSIMEnemy->GetController());
-	UBlackboardComponent* BB = EnemyController->GetBlackboardComponent();
-	BB->SetValueAsEnum(TEXT("EEnemyState"), static_cast<uint8>(EnemyStatsComponent->EnemyState));*/
-	
-	//USSIMBlackboardHelper::SetEnumSafe(EnemyController->GetBlackboardComponent(), TEXT("EEnemyState"), NewState);
-	
 	SSIMEnemy->StopAnimMontage();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
-	// or 
-	// StartStagger { OnCharacterLanded.AddDynamic; } 
-	// OnCharacterLandedHandler { EndStagger; OnCharacterLanded.RemoveDynamic; }
+	if (bStaggerShowLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
+		// or 
+		// StartStagger { OnCharacterLanded.AddDynamic; } 
+		// OnCharacterLandedHandler { EndStagger; OnCharacterLanded.RemoveDynamic(); }
+	}
 	
 	OnEndStaggerDelegate.Broadcast();
 }

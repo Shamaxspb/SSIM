@@ -21,7 +21,7 @@ protected:
 	TObjectPtr<ASSIMBaseEnemy> SSIMBaseEnemy;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Values")
-	float VelocityY;
+	float EnemyVelocityY;
 	
 // Overriden Functions
 public:

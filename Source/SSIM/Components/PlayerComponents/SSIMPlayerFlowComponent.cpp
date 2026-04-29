@@ -58,8 +58,6 @@ void USSIMPlayerFlowComponent::StartDash()
 									PlayerDashMontage->GetPlayLength(), 
 									false);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | PlayerDash animation length: %f"), TEXT(__FUNCTION__), PlayerDashMontage->GetPlayLength());
-	
 	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationWalking = DashBrakingDecelerationWalking;
 	SSIMPlayer->SetContactDamageCollisionShapeDash();
 	SSIMPlayer->GetCharacterMovement()->GravityScale = DashGravityScale;
@@ -83,7 +81,10 @@ void USSIMPlayerFlowComponent::StartDash()
 	OnDashStartedDelegate.Broadcast();
 	OnCanDashChangedDelegate.Broadcast(false);
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash started"), TEXT(__FUNCTION__));
+	if (bShowDashLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash STARTED"), TEXT(__FUNCTION__));
+	}
 }
 
 FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
@@ -109,8 +110,12 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 	FVector OutLaunchVelocity =  DashDirectionVector *
 								 SSIMPlayer->GetCharacterMovement()->GetMaxSpeed() *
 								 DashVelocityCoef;
-		
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
+	
+	if (bShowDashLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Launch Velocity: %s"), TEXT(__FUNCTION__), *OutLaunchVelocity.ToString());
+	}
+	
 	return OutLaunchVelocity;
 }
 
@@ -122,6 +127,11 @@ void USSIMPlayerFlowComponent::EndDash()
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
 	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = 0.f;
+	
+	if (bShowDashLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash ENDED"), TEXT(__FUNCTION__));
+	}
 	
 	/*if (SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{

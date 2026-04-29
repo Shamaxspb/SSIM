@@ -29,22 +29,25 @@ protected:
 #pragma region Rebound Debug
 	
 	// DEBUG
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound")
 	bool bReboundShowDebug;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
 	bool bReboundShowLogs;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bReboundShowDebug", EditConditionHides))
 	bool bDrawReboundDirectionArrow;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
 	float DrawDuration = 3.f;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bReboundShowDebug && bDrawReboundDirectionArrow", EditConditionHides))
 	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
 	
 #pragma endregion Rebound Debug
+	
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Stagger")
+	bool bStaggerShowLogs;
 	
 // Overriden Functions
 protected:

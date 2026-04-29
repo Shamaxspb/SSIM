@@ -26,12 +26,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
 	int32 Health = MaxHealth;
 	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stagger")	
-	bool bInvulnerable;
 	
 private:
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerDamageReactionComponent> PlayerDamageReactionComponent;
+	
+	bool bInvulnerable;
 	
 // Overriden Functions
 protected:
@@ -46,6 +46,13 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void IncreaseHealth(int32 InHealValue) override;
+	
+	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
+	bool GetPlayerInvulnerableState() const
+	{
+		return bInvulnerable;
+	}
 
 private:
 	UFUNCTION()

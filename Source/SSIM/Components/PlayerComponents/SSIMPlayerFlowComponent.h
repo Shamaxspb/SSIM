@@ -57,6 +57,13 @@ protected:
 
 public:
 	FTimerHandle DashCooldownTimerHandle;
+	
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Dash")
+	bool bShowDashDebug;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Dash", meta = (EditCondition = "bShowDashDebug", EditConditionHides))
+	bool bShowDashLogs;
 
 #pragma endregion Metadata
 	
