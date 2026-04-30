@@ -11,6 +11,7 @@
 
 #include "SSIMPlayer.generated.h"
 
+struct FInputActionValue;
 class USSIMPlayerDamageReactionComponent;
 class USSIMPlayerStatsComponent;
 class UBoxComponent;
@@ -30,58 +31,55 @@ class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterf
 #pragma region Components
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "CombatComponent")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "CombatComponent")
 	TObjectPtr<USSIMPlayerCombatComponent> SSIMPlayerCombatComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "StatsComponent")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "StatsComponent")
 	TObjectPtr<USSIMPlayerStatsComponent> SSIMPlayerStatsComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FlowComponent")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "FlowComponent")
 	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "DamageReactionComponent")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "DamageReactionComponent")
 	TObjectPtr<USSIMPlayerDamageReactionComponent> SSIMPlayerDamageReactionComponent;
 	
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "AttackCollisionRoot", 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Player|Player|Components", DisplayName = "AttackCollisionRoot", 
 			  meta = (ToolTip = "This is blank component to group up attack collision components, just for clear hierarchy"))
 	TObjectPtr<USceneComponent> RootAttackCollisionComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "FrontalAttackCollision")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Player|Player|Components", DisplayName = "FrontalAttackCollision")
 	TObjectPtr<UBoxComponent> FrontalAttackCollision;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "UpperAttackCollision")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Player|Player|Components", DisplayName = "UpperAttackCollision")
 	TObjectPtr<UBoxComponent> UpperAttackCollision;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components", DisplayName = "BottomAttackCollision")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Player|Player|Components", DisplayName = "BottomAttackCollision")
 	TObjectPtr<UBoxComponent> BottomAttackCollision;
 	
 #pragma endregion Components
 	
 #pragma region Input
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveRight")
-	UInputAction* MoveRightInputAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input", DisplayName = "IA_Move")
+	UInputAction* MoveInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_MoveLeft")
-	UInputAction* MoveLeftInputAction;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input", DisplayName = "IA_Dash")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input", DisplayName = "IA_Dash")
 	UInputAction* DashInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_Attack")
 	UInputAction* AttackInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackUpward")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_AttackUpward")
 	UInputAction* AttackUpwardInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackUpward_Chord")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_AttackUpward_Chord")
 	UInputAction* UpwardAttackChord;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackDownward")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_AttackDownward")
 	UInputAction* AttackDownwardInputAction;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Input|Attack", DisplayName = "IA_AttackDownward_Chord")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_AttackDownward_Chord")
 	UInputAction* DownwardAttackChord;
 	
 #pragma endregion Input	
@@ -93,7 +91,6 @@ protected:
 #pragma region States
 	
 private:
-// public:
 	bool bAttacking  = false;
 	bool bPogoActive = false;
 	
@@ -108,24 +105,26 @@ private:
 #pragma region Player Defaults
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultPlayerGravityScale = 7.f;
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultPlayerBrakingDecelerationWalking = 10000.f;
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultContactDamageCollisionHalfHeight = 75.f;
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultContactDamageCollisionRadius = 35.f;
 	
 #pragma endregion  Player Defaults
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|PlayerDebug")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|DEBUG")
 	bool bShowLogs;
 	
+private:
+	float CachedPlayerRotationYaw;
+	
 // Overriden Functions
-public:
-	ASSIMPlayer();
+public:ASSIMPlayer();
 	
 	virtual void BeginPlay() override;
 	
@@ -224,8 +223,8 @@ public:
 #pragma endregion Inline Setters
 	
 private:
-	void MoveRight();
-	void MoveLeft();
+	void HandleMove(const FInputActionValue& Value);
+	void HandleMoveCompleted();
 	
 	void SetupAttackCollision();
 	void BindToStateChangesInComponents() const;

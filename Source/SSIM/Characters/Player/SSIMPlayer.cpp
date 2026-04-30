@@ -61,8 +61,8 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		return;
 	}
 		
-	SSIMInputComponent->BindAction(MoveRightInputAction,		ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveRight);
-	SSIMInputComponent->BindAction(MoveLeftInputAction,			ETriggerEvent::Triggered, this, &ASSIMPlayer::MoveLeft);
+	SSIMInputComponent->BindAction(MoveInputAction,				ETriggerEvent::Triggered, this, &ASSIMPlayer::HandleMove);
+	SSIMInputComponent->BindAction(MoveInputAction,				ETriggerEvent::Completed, this, &ASSIMPlayer::HandleMoveCompleted);
 	SSIMInputComponent->BindAction(DashInputAction,				ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
 	SSIMInputComponent->BindAction(AttackInputAction,			ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackFrontal);
 	SSIMInputComponent->BindAction(AttackUpwardInputAction,		ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackUpward);
@@ -71,23 +71,57 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 
 // My Functions
-void ASSIMPlayer::MoveRight()
+void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 {
 	if (CanMove())
 	{
-		AddMovementInput(FVector::RightVector, 1.f, false);
-		SetActorRotation(FRotator(0, 90, 0));
+		float PlayerRotationYaw;
+		float CachedInputValue;
+		
+		// Move Right
+ 		if (Value.Get<float>() > 0.f)
+		{
+			CachedInputValue = FMath::Clamp(Value.Get<float>(),1.f, 1.f);
+			PlayerRotationYaw = 90.f;
+		}
+		
+		// Move Left
+		else if (Value.Get<float>() < 0.f)
+		{
+			CachedInputValue = FMath::Clamp(Value.Get<float>(),-1.f, -1.f);
+			PlayerRotationYaw = -90.f;
+		}
+		
+		// Do not move
+		else
+		{
+			CachedInputValue = 0.f;
+			PlayerRotationYaw = CachedPlayerRotationYaw;
+		}
+		
+		AddMovementInput(FVector::RightVector, CachedInputValue, false);
+		SetActorRotation(FRotator(0, 
+								   PlayerRotationYaw, 
+								   0));
+		
+		CachedPlayerRotationYaw = PlayerRotationYaw;
 	}
 }
 
-void ASSIMPlayer::MoveLeft()
+void ASSIMPlayer::HandleMoveCompleted()
 {
-	if (CanMove())
+	if (bStaggered || bDashing)
 	{
-		AddMovementInput(FVector::RightVector * -1.f, 1.f, false);
-		SetActorRotation(FRotator(0, -90, 0));
+		if (bShowLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Set Velocity Y = 0.f on COMPLETED denied: bStaggered: %s, bDashing: %s"), 
+													  TEXT(__FUNCTION__), 
+													  bStaggered ? TEXT("true") : TEXT("false"),
+													  bDashing ? TEXT("true") : TEXT("false"));
+		}
+		return;
 	}
-	
+	GetCharacterMovement()->Velocity.Y = 0.f;
 }
 
 void ASSIMPlayer::SetupAttackCollision()

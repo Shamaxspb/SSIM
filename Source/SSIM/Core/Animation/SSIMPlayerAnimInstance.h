@@ -108,8 +108,6 @@ private:
 	UFUNCTION()
 	void OnPogoAnimationStartedHandler();
 	UFUNCTION()
-	void OnPogoEndedHandler();
-	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	UFUNCTION()
 	void OnPogoAnimationEndedHandler(bool bInterrupted);

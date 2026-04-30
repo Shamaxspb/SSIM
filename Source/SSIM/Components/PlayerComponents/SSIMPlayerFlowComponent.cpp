@@ -129,7 +129,8 @@ void USSIMPlayerFlowComponent::EndDash()
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
 	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
-	SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_Stop(.09, PlayerDashMontage);
+	// SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_Stop(0.09f, PlayerDashMontage);
+	SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_Stop(PlayerDashMontage->BlendOut.GetBlendTime());
 	
 	if (bShowDashLogs)
 	{
