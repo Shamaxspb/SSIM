@@ -75,6 +75,8 @@ void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 {
 	if (CanMove())
 	{
+		MoveInputValue = Value.Get<float>();
+		
 		float PlayerRotationYaw;
 		float CachedInputValue;
 		
@@ -122,6 +124,7 @@ void ASSIMPlayer::HandleMoveCompleted()
 		return;
 	}
 	GetCharacterMovement()->Velocity.Y = 0.f;
+	MoveInputValue = 0.f;
 }
 
 void ASSIMPlayer::SetupAttackCollision()
@@ -149,8 +152,13 @@ void ASSIMPlayer::SetupAttackCollision()
 
 void ASSIMPlayer::BindToStateChangesInComponents() const
 {
+	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
+	
 	SSIMPlayerCombatComponent->OnAttackStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackStartedHandler);
 	SSIMPlayerCombatComponent->OnAttackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackEndedHandler);
+	
+	SSIMPlayerCombatComponent->OnAttackKnockbackStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackKnockbackStartedHandler);
+	SSIMPlayerCombatComponent->OnAttackKnockbackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackKnockbackEndedHandler);
 	
 	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoStartedHandler);
 	SSIMPlayerCombatComponent->OnPogoEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoEndedHandler);
@@ -222,6 +230,11 @@ void ASSIMPlayer::HandleDash()
 	}
 }
 
+void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
+{
+	MoveInputValue = 0.f;
+}
+
 #pragma region State Handlers
 void ASSIMPlayer::OnAttackStartedHandler()
 {
@@ -230,6 +243,15 @@ void ASSIMPlayer::OnAttackStartedHandler()
 void ASSIMPlayer::OnAttackEndedHandler()
 {
 	bAttacking = false;
+}
+
+void ASSIMPlayer::OnAttackKnockbackStartedHandler()
+{
+	bAttackKnockbackActive = true;
+}
+void ASSIMPlayer::OnAttackKnockbackEndedHandler()
+{
+	bAttackKnockbackActive = false;
 }
 
 void ASSIMPlayer::OnPogoStartedHandler()
@@ -268,7 +290,7 @@ void ASSIMPlayer::OnStaggerEndedHandler()
 
 bool ASSIMPlayer::CanMove() const
 {
-	if (/*bPogoActive || */bDashing || bStaggered)
+	if (bDashing || bStaggered || bAttackKnockbackActive)
 	{
 		return false;
 	}

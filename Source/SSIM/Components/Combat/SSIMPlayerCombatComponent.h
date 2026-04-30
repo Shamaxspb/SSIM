@@ -14,6 +14,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPogoAnimationEndedSignature, bool, bInterrupted);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackKnockbackStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackKnockbackEndedSignature);
 
 class ASSIMPlayer;
 class UBoxComponent;
@@ -27,16 +29,18 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 // Variables
 public:
 	// Delegates
-	FOnPogoStartedSignature			 OnPogoStartedDelegate;
-	FOnPogoEndedSignature			 OnPogoEndedDelegate;
-	FOnPogoAnimationStartedSignature OnPogoAnimationStartedDelegate;
-	FOnPogoAnimationEndedSignature	 OnPogoAnimationEndedDelegate;
+	FOnPogoStartedSignature			   OnPogoStartedDelegate;
+	FOnPogoEndedSignature			   OnPogoEndedDelegate;
+	FOnPogoAnimationStartedSignature   OnPogoAnimationStartedDelegate;
+	FOnPogoAnimationEndedSignature	   OnPogoAnimationEndedDelegate;
+	FOnAttackKnockbackStartedSignature OnAttackKnockbackStartedDelegate;
+	FOnAttackKnockbackEndedSignature   OnAttackKnockbackEndedDelegate;
 	
 #pragma region Stats
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Attack")
-	float RegularAttackDamage;
+	int32 RegularAttackDamage;
 	
 #pragma endregion Stats	
 	
@@ -64,6 +68,7 @@ protected:
 	
 public:
 	EPlayerAttackDirectionType PlayerAttackDirectionType;
+	EAttackKnockbackType AttackKnockbackType;
 
 #pragma endregion Metadata
 	
@@ -80,7 +85,7 @@ private:
 #pragma region Pogo
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Pogo", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Pogo")
 	float PogoAngle = 50.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Pogo")
@@ -139,10 +144,23 @@ private:
 	
 #pragma endregion Pogo
 
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack")
+	float GroundAttackKnockbackVelocity;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack")
+	float AirAttackKnockbackVelocity;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack")
+	float AttackKnockbackDuration = 0.1f;
 
 // Overriden Functions
+public:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 protected:
+	USSIMPlayerCombatComponent();
+	
 	virtual void BeginPlay() override;
+	
 
 // My Functions
 public:
@@ -161,7 +179,10 @@ protected:
 											   const FHitResult& SweepResult) override;
 	
 private:
-	void DealDamageToEnemy();
+	void HitRegistration();
+	
+	void AttackKnockback();
+	void ResetAttackKnockbackState();
 	
 	void PogoInit();
 	void AdjustPogoStartLocation(FVector AdjustedPlayerLocation);

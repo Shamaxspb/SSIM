@@ -43,7 +43,7 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | CurrentAttackCollision is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	CurrentAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap);
+	CurrentAttackCollision->OnComponentBeginOverlap.AddUniqueDynamic(this, &USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap);
 	
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CurrentAttackCollision->UpdateOverlaps();

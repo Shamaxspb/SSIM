@@ -14,6 +14,13 @@ enum class EPlayerAttackDirectionType : uint8
 	EPADT_Downward	UMETA(DisplayName = "Downward")
 };
 
+UENUM(BlueprintType)
+enum class EAttackKnockbackType : uint8
+{
+	EAKT_Ground		UMETA(DisplayName = "Ground Knockback"),
+	EAKT_Air		UMETA(DisplayName = "Air Knockback")	
+};
+
 USTRUCT(Blueprintable)
 struct FDamageData
 {

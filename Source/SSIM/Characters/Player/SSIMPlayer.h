@@ -61,6 +61,7 @@ protected:
 	
 #pragma region Input
 	
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input", DisplayName = "IA_Move")
 	UInputAction* MoveInputAction;
 	
@@ -91,15 +92,15 @@ protected:
 #pragma region States
 	
 private:
-	bool bAttacking  = false;
-	bool bPogoActive = false;
+	bool bAttacking  			= false;
+	bool bPogoActive 			= false;
+	bool bAttackKnockbackActive = false;
 	
-	bool bDashing	 = false;
-	bool bCanDash    = true;
+	bool bDashing	 			= false;
+	bool bCanDash    			= true;
 	
-	bool bStaggered  = false;
-	
-	
+	bool bStaggered  			= false;
+
 #pragma endregion States
 	
 #pragma region Player Defaults
@@ -116,12 +117,14 @@ protected:
 	
 #pragma endregion  Player Defaults
 	
-protected:
+	// Debug
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|DEBUG")
 	bool bShowLogs;
 	
 private:
 	float CachedPlayerRotationYaw;
+	float MoveInputValue;
+	
 	
 // Overriden Functions
 public:ASSIMPlayer();
@@ -168,28 +171,39 @@ public:
 		return BottomAttackCollision;
 	}
 	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|Input")
+	FORCEINLINE float GetPlayerMoveInputValue() const
+	{
+		return MoveInputValue;
+	}
+	
 	// State getters
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerAttacking() const
 	{
 		return bAttacking;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
+	FORCEINLINE bool GetIsPlayerAttackKnockbackActive() const
+	{
+		return bAttackKnockbackActive;
+	}
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerPogoActive() const
 	{
 		return bPogoActive;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerDashing() const
 	{
 		return bDashing;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetCanPlayerDash() const
 	{
 		return bCanDash;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerStaggered() const
 	{
 		return bStaggered;
@@ -246,9 +260,17 @@ private:
 	
 private:
 	UFUNCTION()
+	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	
+	UFUNCTION()
 	void OnAttackStartedHandler();
 	UFUNCTION()
 	void OnAttackEndedHandler();
+	
+	UFUNCTION()
+	void OnAttackKnockbackStartedHandler();
+	UFUNCTION()
+	void OnAttackKnockbackEndedHandler();
 	
 	UFUNCTION()
 	void OnPogoStartedHandler();

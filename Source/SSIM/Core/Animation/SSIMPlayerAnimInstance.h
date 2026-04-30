@@ -30,6 +30,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
+	TObjectPtr<UAnimMontage> CurrentAttackMontage;
+		
+
 #pragma region Pogo Modify Bones
 	
 protected:
