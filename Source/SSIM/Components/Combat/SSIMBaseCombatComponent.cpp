@@ -17,6 +17,7 @@ void USSIMBaseCombatComponent::StartAttack()
 	AttackMontage = GetAttackMontage();
 	
 	// set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
+	bAttacking = true;
 	OnAttackStartedDelegate.Broadcast();
 	
 	AnimInstance->Montage_Play(AttackMontage);
@@ -28,6 +29,7 @@ void USSIMBaseCombatComponent::StartAttack()
 
 void USSIMBaseCombatComponent::EndAttack()
 {
+	bAttacking = false;
 	OnAttackEndedDelegate.Broadcast();
 	
 	if (bShowAttackLogs)
@@ -43,7 +45,7 @@ void USSIMBaseCombatComponent::StartAttackTrace()
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | CurrentAttackCollision is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	CurrentAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap);
+	CurrentAttackCollision->OnComponentBeginOverlap.AddUniqueDynamic(this, &USSIMBaseCombatComponent::OnAttackCollisionBeginOverlap);
 	
 	CurrentAttackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CurrentAttackCollision->UpdateOverlaps();
@@ -73,6 +75,14 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 	CurrentAttackCollision->SetHiddenInGame(true);
 	#endif
 
+	if (HitEnemies.IsEmpty())
+	{
+		if (bShowAttackLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+		}
+	}
+	
 	HitEnemies.Empty();
 	
 	if (bShowAttackLogs)

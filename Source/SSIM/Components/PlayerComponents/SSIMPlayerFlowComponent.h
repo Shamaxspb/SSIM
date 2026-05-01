@@ -34,6 +34,9 @@ public:
 	
 	FOnCanDashChangedSignature OnCanDashChangedDelegate;
 	
+	bool bDashing;
+	bool bCanDash = true;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
 	TObjectPtr<UAnimMontage> PlayerDashMontage;
@@ -63,9 +66,6 @@ public:
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Dash")
-	bool bShowDashDebug;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Dash", meta = (EditCondition = "bShowDashDebug", EditConditionHides))
 	bool bShowDashLogs;
 
 #pragma endregion Metadata
@@ -105,8 +105,5 @@ private:
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& DamageData);
-	
-	UFUNCTION()
-	void OnAttackStartedHandler();
 	
 };

@@ -12,7 +12,7 @@ void USSIMEnemyStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
-	if (bShowLogs)
+	if (bShowStatsLogs)
 	{
 		UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s Health: %d/%d"),TEXT(__FUNCTION__), 
 											 *GetOwner()->GetName(),

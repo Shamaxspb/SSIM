@@ -4,6 +4,10 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Characters/SSIMBaseCharacter.h"
+#include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
+#include "SSIM/Components/DamageReaction/SSIMPlayerDamageReactionComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
@@ -61,6 +65,7 @@ protected:
 	
 #pragma region Input
 	
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input", DisplayName = "IA_Move")
 	UInputAction* MoveInputAction;
 	
@@ -88,20 +93,6 @@ protected:
 	/*UPROPERTY()
 	EPlayerState CurrentPlayerState;*/
 	
-#pragma region States
-	
-private:
-	bool bAttacking  = false;
-	bool bPogoActive = false;
-	
-	bool bDashing	 = false;
-	bool bCanDash    = true;
-	
-	bool bStaggered  = false;
-	
-	
-#pragma endregion States
-	
 #pragma region Player Defaults
 	
 protected:
@@ -116,12 +107,14 @@ protected:
 	
 #pragma endregion  Player Defaults
 	
-protected:
+	// Debug
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|DEBUG")
 	bool bShowLogs;
 	
 private:
 	float CachedPlayerRotationYaw;
+	float MoveInputValue;
+	
 	
 // Overriden Functions
 public:ASSIMPlayer();
@@ -168,31 +161,46 @@ public:
 		return BottomAttackCollision;
 	}
 	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|Input")
+	FORCEINLINE float GetPlayerMoveInputValue() const
+	{
+		return MoveInputValue;
+	}
+	
 	// State getters
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerAttacking() const
 	{
-		return bAttacking;
+		return SSIMPlayerCombatComponent->bAttacking;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
+	FORCEINLINE bool GetIsPlayerAttackKnockbackActive() const
+	{
+		return SSIMPlayerCombatComponent->bAttackKnockbackActive;
+	}
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerPogoActive() const
 	{
-		return bPogoActive;
+		return SSIMPlayerCombatComponent->bPogoActive;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerDashing() const
 	{
-		return bDashing;
+		return SSIMPlayerFlowComponent->bDashing;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetCanPlayerDash() const
 	{
-		return bCanDash;
+		return SSIMPlayerFlowComponent->bCanDash;
 	}
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerStaggered() const
 	{
-		return bStaggered;
+		return SSIMPlayerDamageReactionComponent->bStaggered;
+	}
+	FORCEINLINE bool GetIsPlayerInvulnerable() const
+	{
+		return SSIMPlayerStatsComponent->bInvulnerable;
 	}
 	
 #pragma endregion Inline Getters
@@ -227,7 +235,6 @@ private:
 	void HandleMoveCompleted();
 	
 	void SetupAttackCollision();
-	void BindToStateChangesInComponents() const;
 	
 #pragma region Handler Functions
 	
@@ -241,34 +248,10 @@ private:
 	void HandleDash(); 
 	
 #pragma endregion Handler Functions
-	
-#pragma region State Handlers
-	
+
 private:
 	UFUNCTION()
-	void OnAttackStartedHandler();
-	UFUNCTION()
-	void OnAttackEndedHandler();
-	
-	UFUNCTION()
-	void OnPogoStartedHandler();
-	UFUNCTION()
-	void OnPogoEndedHandler();
-	
-	UFUNCTION()
-	void OnDashStartedHandler();
-	UFUNCTION()
-	void OnDashEndedHandler();
-	
-	UFUNCTION()
-	void OnCanDashStateChangedHandler(bool InCanDash);
-	
-	UFUNCTION()
-	void OnStaggerStartedHandler();
-	UFUNCTION()
-	void OnStaggerEndedHandler();
-	
-#pragma endregion State Handlers
+	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
 private:
 	bool CanMove() const;

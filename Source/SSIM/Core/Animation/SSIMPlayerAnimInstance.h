@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Core/Animation/SSIMAnimInstance.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 #include "SSIMPlayerAnimInstance.generated.h"
 
@@ -30,6 +31,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
+	TObjectPtr<UAnimMontage> CurrentAttackMontage;
+		
+
 #pragma region Pogo Modify Bones
 	
 protected:
@@ -77,8 +82,11 @@ private:
 	
 	// Debug
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG|Pogo")
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG")
 	bool bShowPogoBlendLogs = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG")
+	bool bShowSwapHitMontageLogs = false;
 
 // Overriden Functions
 public:
@@ -91,7 +99,7 @@ protected:
 	virtual void SetOwnerReference() override;
 	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG|Pogo")
-	EPogoBonesState GetPogoBonesState() const
+	FORCEINLINE EPogoBonesState GetPogoBonesState() const
 	{
 		return PogoBonesState;
 	}
@@ -102,6 +110,11 @@ private:
 	
 	void BlendInPogoBone(float InDeltaSeconds, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
 	void BlendOutPogoBone(float InBlendElapsedTime, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
+	
+	void SwapHitMontage(EPlayerAttackDirectionType InPlayerAttackDirectionType);
+	
+	UFUNCTION()
+	void OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType);
 	
 #pragma region Reset Pogo Handlers
 	

@@ -47,16 +47,19 @@ void USSIMPlayerDamageReactionComponent::InitStagger()
 	
 	if (!IsValid(StaggeredFirstFrame))
 	{
+		
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredFirstFrame montage is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	SSIMPlayer->PlayAnimMontage(StaggeredFirstFrame, 0.f);
 		
+	bStaggered = true;
 	OnStaggerStartedDelegate.Broadcast();
-	OnInvulnerabilityStartedDelegate.Broadcast();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
+	if (bShowStaggerLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
+	}
 	
 	StartStaggerSequence();
 }
@@ -68,8 +71,7 @@ void USSIMPlayerDamageReactionComponent::StartStaggerSequence()
 	Steps = {
 		{ StaggeredFirstFrameBlendInTime, [this]() {StartStopFrame();}},
 		{StopFrameDuration * 0.001f,		[this]() {StartStagger();}},
-		{StaggerDuration,					[this]() {EndStagger();}},
-		{InvulnerabilityDuration,			[this]() {EndInvulnerability(); }}
+		{StaggerDuration,					[this]() {EndStagger();}}
 	};
 	
 	ExecuteNextStaggerSequenceStep();
@@ -79,7 +81,10 @@ void USSIMPlayerDamageReactionComponent::ExecuteNextStaggerSequenceStep()
 {
 	if (!Steps.IsValidIndex(CurrentStaggerSequenceStep))
 	{
-		UE_LOG(LogSSIMValidations, Log, TEXT("%s | Stagger Sequence ended"), TEXT(__FUNCTION__));
+		if (bShowStaggerLogs)
+		{
+			UE_LOG(LogSSIMValidations, Log, TEXT("%s | Stagger Sequence ended"), TEXT(__FUNCTION__));
+		}
 		return;
 	}
 	
@@ -125,7 +130,7 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 	SSIMPlayer->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
 #if !UE_BUILD_SHIPPING
-	if (bDrawReboundDirectionArrow)
+	if (bDrawReboundDebug)
 	{
 		ReboundDrawDebug();
 	}
@@ -141,18 +146,16 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
     SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 }
 
-void USSIMPlayerDamageReactionComponent::EndStagger() const
+void USSIMPlayerDamageReactionComponent::EndStagger()
 {
+	bStaggered = false;
 	OnStaggerEndedDelegate.Broadcast();
 	SSIMPlayer->StopAnimMontage(FrontStaggeredMontage);
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
-}
-
-void USSIMPlayerDamageReactionComponent::EndInvulnerability() const
-{
-	OnInvulnerabilityEndedDelegate.Broadcast();
 	
-	UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
+	if (bShowStaggerLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
+	}
 }
 
 void USSIMPlayerDamageReactionComponent::ReboundDrawDebug()

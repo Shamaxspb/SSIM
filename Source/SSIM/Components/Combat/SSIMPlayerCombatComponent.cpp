@@ -13,7 +13,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+}
 
+// Overriden Functions
 void USSIMPlayerCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -23,6 +29,17 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	PlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 	
 	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
+}
+
+void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (SSIMPlayer->GetIsPlayerAttackKnockbackActive() && AttackKnockbackType == EAttackKnockbackType::EAKT_Ground)
+	{
+		//SSIMPlayer->GetCharacterMovement()->Velocity.Z = 0.f;
+		SSIMPlayer->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
 }
 
 // My Functions
@@ -141,12 +158,12 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 		{
 		case EPlayerAttackDirectionType::EPADT_Frontal:
 			{
-				if (PlayerFrontalAttackMontages.IsEmpty())
+				if (UpperBodyPlayerFrontalAttackMontages.IsEmpty())
 				{
 					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No FRONTAL Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
-				AttackMontage = PlayerFrontalAttackMontages[FMath::RandHelper(PlayerFrontalAttackMontages.Num())];			
+				AttackMontage = UpperBodyPlayerFrontalAttackMontages[FMath::RandHelper(UpperBodyPlayerFrontalAttackMontages.Num())];			
 				break;
 			}
 	
@@ -178,64 +195,111 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 {
 	HitEnemies.AddUnique(OtherActor);
 	
-	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
-	{
-		PogoInit();
-		return;
-	}
-	
-	DealDamageToEnemy();
+	HitRegistration(OtherActor);
 }
 
-void USSIMPlayerCombatComponent::DealDamageToEnemy()
+// Internal
+void USSIMPlayerCombatComponent::HitRegistration(AActor* OtherActor)
 {
-	if (HitEnemies.IsEmpty())
-	{
-		if (bShowAttackLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
-		}
-		return;
-	}
-	
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
 	
-	for (auto Element : HitEnemies)
+	if (bShowAttackLogs)
 	{
-		if (!Element->Implements<USSIMDamageableInterface>())
-		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
-			return;
-		}
-		
-		if (bShowAttackLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s"), TEXT(__FUNCTION__), *Element->GetName());
-		}
-		
-		if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward
-			&&
-			SSIMPlayer->GetIsPlayerPogoActive())
-		{
-			// If Pogo is active and hit another target - restart EndPogo timer
-		GetWorld()->GetTimerManager().SetTimer(
-			EndPogoTimerHandle,
-			EndPogoTimerDelegate,
-			PogoStateDuration,
-			false
-			);
-		}
-		
-		if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward
-			&&
-			!SSIMPlayer->GetCanPlayerDash())
-		{
-			//SSIMPlayer->GetPlayerFlowComponent()->ResetDash();
-		}
-		
-		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
+		UE_LOG(LogSSIMGameplayMessages, Error, TEXT("Hit Registration"));
 	}
+	
+	if (!OtherActor->Implements<USSIMDamageableInterface>())
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
+		return;
+	}
+		
+	if (bShowAttackLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s for %d damage"), TEXT(__FUNCTION__), *OtherActor->GetName(), RegularAttackDamage);
+	}
+		
+	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(OtherActor, DamageData);
+	
+	OnHitRegistrationDelegate.Broadcast(PlayerAttackDirectionType);
+	
+	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Frontal && !bAttackKnockbackActive)
+	{
+		AttackKnockback();
+	}
+		
+	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
+	{
+		PogoInit();
+	}
+	
+}
+
+void USSIMPlayerCombatComponent::AttackKnockback()
+{
+	float AttackKnockbackVelocity;
+	bool bShouldOverrideZ;
+	
+	if (!SSIMPlayer->GetCharacterMovement()->IsFalling())
+	{
+		AttackKnockbackType = EAttackKnockbackType::EAKT_Ground;
+	}
+	else
+	{
+		AttackKnockbackType = EAttackKnockbackType::EAKT_Air;
+	}
+
+	switch (AttackKnockbackType)
+	{
+	case EAttackKnockbackType::EAKT_Ground:
+		{
+			AttackKnockbackVelocity = GroundAttackKnockbackVelocity;
+			bShouldOverrideZ = true;
+			break;
+		}
+	case EAttackKnockbackType::EAKT_Air:
+		{
+			AttackKnockbackVelocity = AirAttackKnockbackVelocity;
+			bShouldOverrideZ = false;
+			break;
+		}
+	default:
+		{
+			AttackKnockbackVelocity = GroundAttackKnockbackVelocity;
+			bShouldOverrideZ = false;
+		}
+	}
+	
+	bAttackKnockbackActive = true;
+	OnAttackKnockbackStartedDelegate.Broadcast();
+	
+	SSIMPlayer->LaunchCharacter(SSIMPlayer->GetActorForwardVector() * -1.f * AttackKnockbackVelocity,true, bShouldOverrideZ);
+	
+	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationWalking = 0.f;
+	
+	FTimerHandle KnockbackTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		KnockbackTimerHandle,
+		this, &USSIMPlayerCombatComponent::ResetAttackKnockbackState,
+		AttackKnockbackDuration,
+		false
+		);
+	
+	if (bShowAttackKnockbackLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Perform Attack Knockback"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Player Forward Vector: %s"), TEXT(__FUNCTION__), *SSIMPlayer->GetActorForwardVector().ToString());
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Knockback Velocity: %f"), TEXT(__FUNCTION__), GroundAttackKnockbackVelocity);
+	}
+}
+
+void USSIMPlayerCombatComponent::ResetAttackKnockbackState()
+{
+	SSIMPlayer->SetPlayerBrakingDecelerationWalkingToDefault();
+	
+	bAttackKnockbackActive = false;
+	OnAttackKnockbackEndedDelegate.Broadcast();
 }
 
 #pragma region Pogo
@@ -249,6 +313,7 @@ void USSIMPlayerCombatComponent::PogoInit()
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Check Enemy  = %f"), FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	}
 	
+	bPogoActive = true;
 	OnPogoStartedDelegate.Broadcast();
 	
 	if (SSIMPlayer->GetActorLocation().Z - SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() 
@@ -331,8 +396,6 @@ void USSIMPlayerCombatComponent::AdjustPogoStartLocation(FVector AdjustedPlayerL
 
 void USSIMPlayerCombatComponent::PogoStart()
 {	
-	DealDamageToEnemy();
-	
 	SSIMPlayer->GetCharacterMovement()->GravityScale = PogoTemporaryGravityScale;
 	
 	GetWorld()->GetTimerManager().SetTimer(
@@ -371,10 +434,11 @@ void USSIMPlayerCombatComponent::PogoStart()
 #endif
 }
 
-void USSIMPlayerCombatComponent::EndPogo() const
+void USSIMPlayerCombatComponent::EndPogo()
 {
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
+	bPogoActive = false;
 	OnPogoEndedDelegate.Broadcast();
 }
 #pragma endregion Pogo
