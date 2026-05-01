@@ -27,7 +27,11 @@ public:
 	
 #pragma region Metadata
 
+public:
+	bool bAttacking = false;
+	
 protected:
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	

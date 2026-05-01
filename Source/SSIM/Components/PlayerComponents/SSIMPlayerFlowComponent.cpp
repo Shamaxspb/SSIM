@@ -23,7 +23,6 @@ void USSIMPlayerFlowComponent::BeginPlay()
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stats component is not valid"), TEXT(__FUNCTION__));
 	}
 	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnDamageReceivedHandler);
-	PlayerCombatComponent->OnAttackStartedDelegate.AddDynamic(this, &USSIMPlayerFlowComponent::OnAttackStartedHandler);
 	PlayerCombatComponent->OnPogoStartedDelegate.AddUniqueDynamic(this, &USSIMPlayerFlowComponent::ResetDashOnPogo);
 	
 }
@@ -80,7 +79,9 @@ void USSIMPlayerFlowComponent::StartDash()
 			false);
 	}
 	
+	bDashing = true;
 	OnDashStartedDelegate.Broadcast();
+	bCanDash = false;
 	OnCanDashChangedDelegate.Broadcast(false);
 	
 	if (bShowDashLogs)
@@ -121,6 +122,7 @@ FVector USSIMPlayerFlowComponent::GetDashLaunchVelocity() const
 
 void USSIMPlayerFlowComponent::EndDash()
 {
+	bDashing = false;
 	OnDashEndedDelegate.Broadcast();
 	
 	SSIMPlayer->SetContactDamageCollisionShapeDefault();
@@ -144,6 +146,8 @@ void USSIMPlayerFlowComponent::ResetDash()
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash RESET"), TEXT(__FUNCTION__));
 	}
+	
+	bCanDash = true;
 	OnCanDashChangedDelegate.Broadcast(true);
 }
 
@@ -156,6 +160,7 @@ void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
 	
 	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
 	
+	bCanDash = true;
 	OnCanDashChangedDelegate.Broadcast(true);
 }
 
@@ -167,6 +172,7 @@ void USSIMPlayerFlowComponent::ResetDashOnPogo()
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash on Pogo RESET"), TEXT(__FUNCTION__));
 		}
+		bCanDash = true;
 		OnCanDashChangedDelegate.Broadcast(true);
 	}
 }
@@ -176,9 +182,4 @@ void USSIMPlayerFlowComponent::ResetDashOnPogo()
 void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData& DamageData)
 {
 	EndDash();
-}
-
-void USSIMPlayerFlowComponent::OnAttackStartedHandler()
-{
-	
 }

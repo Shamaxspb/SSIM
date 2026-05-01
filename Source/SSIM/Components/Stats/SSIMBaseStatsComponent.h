@@ -29,7 +29,7 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|DEBUG")
-	bool bShowLogs;
+	bool bShowStatsLogs;
 	
 	
 // My Functions

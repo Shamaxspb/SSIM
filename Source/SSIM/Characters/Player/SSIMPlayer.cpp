@@ -11,7 +11,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
-#include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
 
 // Overriden Functions
@@ -40,7 +39,7 @@ void ASSIMPlayer::BeginPlay()
 	
 	GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
 	
-	BindToStateChangesInComponents();
+	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
 }
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -112,14 +111,14 @@ void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 
 void ASSIMPlayer::HandleMoveCompleted()
 {
-	if (bStaggered || bDashing)
+	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerFlowComponent->bDashing)
 	{
 		if (bShowLogs)
 		{
 			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Set Velocity Y = 0.f on COMPLETED denied: bStaggered: %s, bDashing: %s"), 
 													  TEXT(__FUNCTION__), 
-													  bStaggered ? TEXT("true") : TEXT("false"),
-													  bDashing ? TEXT("true") : TEXT("false"));
+													  SSIMPlayerDamageReactionComponent->bStaggered ? TEXT("true") : TEXT("false"),
+													  SSIMPlayerFlowComponent->bDashing ? TEXT("true") : TEXT("false"));
 		}
 		return;
 	}
@@ -147,29 +146,6 @@ void ASSIMPlayer::SetupAttackCollision()
 		Element->SetGenerateOverlapEvents(true);
 		Element->SetCollisionProfileName("MeleeAttack", true);
 	}
-	
-}
-
-void ASSIMPlayer::BindToStateChangesInComponents() const
-{
-	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
-	
-	SSIMPlayerCombatComponent->OnAttackStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackStartedHandler);
-	SSIMPlayerCombatComponent->OnAttackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackEndedHandler);
-	
-	SSIMPlayerCombatComponent->OnAttackKnockbackStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackKnockbackStartedHandler);
-	SSIMPlayerCombatComponent->OnAttackKnockbackEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnAttackKnockbackEndedHandler);
-	
-	SSIMPlayerCombatComponent->OnPogoStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoStartedHandler);
-	SSIMPlayerCombatComponent->OnPogoEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnPogoEndedHandler);
-	
-	SSIMPlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashStartedHandler);
-	SSIMPlayerFlowComponent->OnDashEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnDashEndedHandler);
-	
-	SSIMPlayerFlowComponent->OnCanDashChangedDelegate.AddDynamic(this,&ASSIMPlayer::OnCanDashStateChangedHandler);
-	
-	SSIMPlayerDamageReactionComponent->OnStaggerStartedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggerStartedHandler);
-	SSIMPlayerDamageReactionComponent->OnStaggerEndedDelegate.AddDynamic(this, &ASSIMPlayer::OnStaggerEndedHandler);
 	
 }
 
@@ -235,62 +211,9 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 	MoveInputValue = 0.f;
 }
 
-#pragma region State Handlers
-void ASSIMPlayer::OnAttackStartedHandler()
-{
-	bAttacking = true;
-}
-void ASSIMPlayer::OnAttackEndedHandler()
-{
-	bAttacking = false;
-}
-
-void ASSIMPlayer::OnAttackKnockbackStartedHandler()
-{
-	bAttackKnockbackActive = true;
-}
-void ASSIMPlayer::OnAttackKnockbackEndedHandler()
-{
-	bAttackKnockbackActive = false;
-}
-
-void ASSIMPlayer::OnPogoStartedHandler()
-{
-	bPogoActive = true;
-}
-void ASSIMPlayer::OnPogoEndedHandler()
-{
-	bPogoActive = false;
-}
-
-void ASSIMPlayer::OnDashStartedHandler()
-{
-	bDashing = true;
-}
-void ASSIMPlayer::OnDashEndedHandler()
-{
-	bDashing = false;
-}
-
-void ASSIMPlayer::OnCanDashStateChangedHandler(bool InCanDash)
-{
-	bCanDash = InCanDash;
-}
-
-void ASSIMPlayer::OnStaggerStartedHandler()
-{
-	bStaggered = true;
-}
-
-void ASSIMPlayer::OnStaggerEndedHandler()
-{
-	bStaggered = false;
-}
-#pragma endregion State Handlers
-
 bool ASSIMPlayer::CanMove() const
 {
-	if (bDashing || bStaggered || bAttackKnockbackActive)
+	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerCombatComponent->bAttackKnockbackActive)
 	{
 		return false;
 	}
@@ -299,16 +222,16 @@ bool ASSIMPlayer::CanMove() const
 
 bool ASSIMPlayer::CanAttack() const
 {
-	if (bAttacking || bDashing)
+	if (SSIMPlayerCombatComponent->bAttacking || SSIMPlayerFlowComponent->bDashing)
 	{
-		if (bAttacking)
+		if (SSIMPlayerCombatComponent->bAttacking)
 		{
 			if (bShowLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (bDashing)
+		if (SSIMPlayerFlowComponent->bDashing)
 		{
 			if (bShowLogs)
 			{
@@ -322,31 +245,23 @@ bool ASSIMPlayer::CanAttack() const
 
 bool ASSIMPlayer::CanDash() const
 {
-	if (/*bPogoActive || */bDashing || !bCanDash || bStaggered)
+	if (SSIMPlayerFlowComponent->bDashing || !SSIMPlayerFlowComponent->bCanDash || SSIMPlayerDamageReactionComponent->bStaggered)
 	{
-		/*if (bPogoActive)
-		{
-			if (bShowLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Pogo is still in process"), TEXT(__FUNCTION__));
-			}
-			return false;
-		}*/
-		if (bDashing)
+		if (SSIMPlayerFlowComponent->bDashing)
 		{
 			if (bShowLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (!bCanDash)
+		if (!SSIMPlayerFlowComponent->bCanDash)
 		{
 			if (bShowLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
 			}
 		}
-		if (bStaggered)
+		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowLogs)
 			{

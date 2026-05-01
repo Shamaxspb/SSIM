@@ -10,8 +10,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStaggerStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStaggerEndedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityStartedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityEndedSignature);
 
 
 class USSIMPlayerStatsComponent;
@@ -36,9 +34,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|DamageProcessing")
 	FOnStaggerStartedSignature OnStaggerStartedDelegate;
 	FOnStaggerEndedSignature OnStaggerEndedDelegate;
-	FOnInvulnerabilityStartedSignature OnInvulnerabilityStartedDelegate;
-	FOnInvulnerabilityEndedSignature OnInvulnerabilityEndedDelegate;
 	
+	bool bStaggered;
 	
 protected:
 	
@@ -57,9 +54,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float StaggerDuration = 0.4f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
-	float InvulnerabilityDuration = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityY = 1000.f;
@@ -101,8 +95,7 @@ private:
 	void StartStopFrame() const;
 	void EndStopFrame() const;
 	void StartStagger();
-	void EndStagger() const;
-	void EndInvulnerability() const;
+	void EndStagger();
 	
 	// Debug
 protected:

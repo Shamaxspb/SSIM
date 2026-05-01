@@ -59,7 +59,7 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 	}
 	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
 	
-	if (bStaggerShowLogs)
+	if (bShowStaggerLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
 	}
@@ -74,7 +74,7 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 	
 	SSIMEnemy->StopAnimMontage();
 	
-	if (bStaggerShowLogs)
+	if (bShowStaggerLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
 		// or 
@@ -120,12 +120,12 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 	
 #if !UE_BUILD_SHIPPING
 	
-	if (bReboundShowLogs)
+	if (bShowReboundLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player Attack Direction Type: %s"), TEXT(__FUNCTION__),  *UEnum::GetValueAsString(PlayerAttackDirectionType));
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Rebound Velocity: %s"), TEXT(__FUNCTION__), *ReboundVelocity.ToString());
 	}
-	if (bDrawReboundDirectionArrow)
+	if (bDrawReboundDebug)
 	{
 		ReboundDrawDebug();
 	}

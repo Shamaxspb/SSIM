@@ -23,7 +23,7 @@ void USSIMDebugUtils::PrintPlayerStates(const UObject* WorldContextObject)
 	bool bDashing	   			  = SSIMPlayer->GetIsPlayerDashing();
 	bool bCanDash	   			  = SSIMPlayer->GetCanPlayerDash();
 	bool bStaggered	   			  = SSIMPlayer->GetIsPlayerStaggered();
-	bool bInvulnerable 			  = PlayerStatsComponent->GetPlayerInvulnerableState();
+	bool bInvulnerable 			  = SSIMPlayer->GetIsPlayerInvulnerable();
 	
 	
 	GEngine->AddOnScreenDebugMessage(

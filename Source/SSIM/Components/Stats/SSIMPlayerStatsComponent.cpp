@@ -3,43 +3,40 @@
 
 #include "SSIMPlayerStatsComponent.h"
 
-#include "GameFramework/Character.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Components/DamageReaction/SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
-
-void USSIMPlayerStatsComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	SetReferences();
-	PlayerDamageReactionComponent->OnInvulnerabilityStartedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityStartedHandler);
-	PlayerDamageReactionComponent->OnInvulnerabilityEndedDelegate.AddDynamic(this, &USSIMPlayerStatsComponent::OnInvulnerabilityEndedHandler);
-}
-
-void USSIMPlayerStatsComponent::SetReferences()
-{
-	Super::SetReferences();
-	PlayerDamageReactionComponent = SSIMOwnerCharacter->FindComponentByClass<USSIMPlayerDamageReactionComponent>();
-}
 
 // My Functions
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	if (bInvulnerable)
 	{
-		if (bShowLogs)
+		if (bShowStatsLogs)
 		{
 			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
 		}
 		return;
 	}
 	
+	bInvulnerable = true;
+	OnInvulnerabilityStartedDelegate.Broadcast();
+	
+	if (bShowStatsLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
+	}
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		InvulnerabilityTimerHandle,
+		this, &USSIMPlayerStatsComponent::EndInvulnerability,
+		InvulnerabilityDuration,
+		false);
+	
 	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
-	if (bShowLogs)
+	if (bShowStatsLogs)
 	{
 		UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
 														Health, 
@@ -54,22 +51,23 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 	Health += InHealValue;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	
-	if (bShowLogs)
+	if (bShowStatsLogs)
 	{
 		UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
 														Health, 
 														MaxHealth);
 	}
-	
 }
 
-void USSIMPlayerStatsComponent::OnInvulnerabilityStartedHandler()
-{
-	bInvulnerable = true;
-}
-void USSIMPlayerStatsComponent::OnInvulnerabilityEndedHandler()
+void USSIMPlayerStatsComponent::EndInvulnerability()
 {
 	bInvulnerable = false;
+	OnInvulnerabilityEndedDelegate.Broadcast();
+	
+	if (bShowStatsLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
+	}
 }
 
 

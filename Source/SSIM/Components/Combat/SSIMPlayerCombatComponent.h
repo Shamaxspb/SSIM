@@ -36,6 +36,10 @@ public:
 	FOnAttackKnockbackStartedSignature OnAttackKnockbackStartedDelegate;
 	FOnAttackKnockbackEndedSignature   OnAttackKnockbackEndedDelegate;
 	
+	bool bAttackKnockbackActive = false;
+	bool bPogoActive 			= false;
+	
+	
 #pragma region Stats
 	
 public:
@@ -102,34 +106,24 @@ protected:
 	
 #pragma region Pogo Debug
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo")
-	bool bShowPogoDebug;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug", EditConditionHides,
-																	  DisplayAfter = "bShowPogoDebug"))
 	bool bShowPogoLogs;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug", EditConditionHides,
-																 	  DisplayAfter = "bShowPogoLogs"))
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo")
 	bool bDrawPogoDebug;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
-																 	  DisplayAfter = "bDrawPogoDebug"))
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bDrawPogoDebug", EditConditionHides))
 	float bDrawPogoDebugDuration = 5.f;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
-															 	  DisplayAfter = "bDrawPogoDebug"))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bDrawPogoDebug", EditConditionHides))
 	FLinearColor PogoAdjustmentStartPointColor = FLinearColor::Red;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
-															 	  DisplayAfter = "bDrawPogoDebug"))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bDrawPogoDebug", EditConditionHides))
 	FLinearColor PogoAdjustmentEndPointColor = FLinearColor::Green;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
-															 	  DisplayAfter = "bDrawPogoDebug"))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bDrawPogoDebug", EditConditionHides))
 	FLinearColor PogoAdjustmentDirectionArrowColor = FLinearColor::Yellow;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bShowPogoDebug && bDrawPogoDebug", EditConditionHides,
-																  DisplayAfter = "bDrawPogoDebug"))
+	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bDrawPogoDebug", EditConditionHides))
 	FLinearColor PogoReboundDirectionArrowColor = FLinearColor::Blue;
 #pragma endregion Pogo Debug
 	
@@ -187,7 +181,7 @@ private:
 	void PogoInit();
 	void AdjustPogoStartLocation(FVector AdjustedPlayerLocation);
 	void PogoStart();
-	void EndPogo() const;
+	void EndPogo();
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);

@@ -17,6 +17,7 @@ void USSIMBaseCombatComponent::StartAttack()
 	AttackMontage = GetAttackMontage();
 	
 	// set to false in ANS_AttackProcessing::NotifyEnd, so ANS_AttackProcessing MUST be in AnimMontage
+	bAttacking = true;
 	OnAttackStartedDelegate.Broadcast();
 	
 	AnimInstance->Montage_Play(AttackMontage);
@@ -28,6 +29,7 @@ void USSIMBaseCombatComponent::StartAttack()
 
 void USSIMBaseCombatComponent::EndAttack()
 {
+	bAttacking = false;
 	OnAttackEndedDelegate.Broadcast();
 	
 	if (bShowAttackLogs)

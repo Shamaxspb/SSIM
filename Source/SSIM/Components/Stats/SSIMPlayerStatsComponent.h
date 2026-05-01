@@ -7,7 +7,9 @@
 
 #include "SSIMPlayerStatsComponent.generated.h"
 
-class USSIMPlayerDamageReactionComponent;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityEndedSignature);
+
 class ASSIMPlayer;
 struct FStaggerSequenceStep;
 struct FDamageData;
@@ -20,24 +22,25 @@ class SSIM_API USSIMPlayerStatsComponent : public USSIMBaseStatsComponent
 
 // Variables
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
+	//Delegates
+	FOnInvulnerabilityStartedSignature OnInvulnerabilityStartedDelegate;
+	FOnInvulnerabilityEndedSignature OnInvulnerabilityEndedDelegate;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Stats", meta = (ClampMin = 0))	
 	int32 MaxHealth = 5;
 	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Combat|Stats|Health", meta = (ClampMin = 0))	
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Stats", meta = (ClampMin = 0))	
 	int32 Health = MaxHealth;
-	
-	
-private:
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerDamageReactionComponent> PlayerDamageReactionComponent;
 	
 	bool bInvulnerable;
 	
-// Overriden Functions
 protected:
-	virtual void BeginPlay() override;
-	virtual void SetReferences() override;
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")	
+	float InvulnerabilityDuration = 1.f;
 	
+private:
+	FTimerHandle InvulnerabilityTimerHandle;
+
 	
 // My Functions
 public:
@@ -47,19 +50,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void IncreaseHealth(int32 InHealValue) override;
 	
-	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
-	bool GetPlayerInvulnerableState() const
-	{
-		return bInvulnerable;
-	}
-
-private:
-	UFUNCTION()
-	void OnInvulnerabilityStartedHandler();
-	UFUNCTION()
-	void OnInvulnerabilityEndedHandler();
-	
+	void EndInvulnerability();
 	
 // DEBUG
 public:

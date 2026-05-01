@@ -276,7 +276,9 @@ void USSIMPlayerCombatComponent::AttackKnockback()
 		}
 	}
 	
+	bAttackKnockbackActive = true;
 	OnAttackKnockbackStartedDelegate.Broadcast();
+	
 	SSIMPlayer->LaunchCharacter(SSIMPlayer->GetActorForwardVector() * -1.f * AttackKnockbackVelocity,true, bShouldOverrideZ);
 	
 	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationWalking = 0.f;
@@ -300,6 +302,8 @@ void USSIMPlayerCombatComponent::AttackKnockback()
 void USSIMPlayerCombatComponent::ResetAttackKnockbackState()
 {
 	SSIMPlayer->SetPlayerBrakingDecelerationWalkingToDefault();
+	
+	bAttackKnockbackActive = false;
 	OnAttackKnockbackEndedDelegate.Broadcast();
 }
 
@@ -314,6 +318,7 @@ void USSIMPlayerCombatComponent::PogoInit()
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("Check Enemy  = %f"), FirstHitEnemy->GetActorLocation().Z + FirstHitEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	}
 	
+	bPogoActive = true;
 	OnPogoStartedDelegate.Broadcast();
 	
 	if (SSIMPlayer->GetActorLocation().Z - SSIMPlayer->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() 
@@ -434,10 +439,11 @@ void USSIMPlayerCombatComponent::PogoStart()
 #endif
 }
 
-void USSIMPlayerCombatComponent::EndPogo() const
+void USSIMPlayerCombatComponent::EndPogo()
 {
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
+	bPogoActive = false;
 	OnPogoEndedDelegate.Broadcast();
 }
 #pragma endregion Pogo
