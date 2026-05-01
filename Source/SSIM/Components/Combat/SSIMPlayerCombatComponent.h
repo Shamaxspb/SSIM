@@ -10,6 +10,7 @@
 
 class USSIMPlayerFlowComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitRegistrationSignature, EPlayerAttackDirectionType, AttackDirectionType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
@@ -29,6 +30,7 @@ class SSIM_API USSIMPlayerCombatComponent : public USSIMBaseCombatComponent
 // Variables
 public:
 	// Delegates
+	FOnHitRegistrationSignature		   OnHitRegistrationDelegate;
 	FOnPogoStartedSignature			   OnPogoStartedDelegate;
 	FOnPogoEndedSignature			   OnPogoEndedDelegate;
 	FOnPogoAnimationStartedSignature   OnPogoAnimationStartedDelegate;
@@ -50,20 +52,23 @@ public:
 	
 #pragma region Montages
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TArray<TObjectPtr<UAnimMontage>> PlayerFrontalAttackMontages;
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|FrontalAttack")
+	TArray<TObjectPtr<UAnimMontage>> UpperBodyPlayerFrontalAttackMontages;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|FrontalAttack")
+	TArray<TObjectPtr<UAnimMontage>> FullBodyPlayerFrontalAttackMontages;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|FrontalAttack")
 	TArray<TObjectPtr<UAnimMontage>> PlayerAirFrontalAttackMontages;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|UpwardAttack")
 	TArray<TObjectPtr<UAnimMontage>> PlayerUpwardAttackMontages;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|UpwardAttack")
 	TArray<TObjectPtr<UAnimMontage>> PlayerAirUpwardAttackMontages;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|PogoAttack")
 	TArray<TObjectPtr<UAnimMontage>> PlayerPogoMontages;
 
 #pragma endregion Montages
@@ -146,6 +151,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack")
 	float AttackKnockbackDuration = 0.1f;
 
+	// Debug
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug|Attack")
+	bool bShowAttackKnockbackLogs;
+	
 // Overriden Functions
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

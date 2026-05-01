@@ -14,6 +14,7 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 	
+	SSIMPlayer->GetPlayerCombatComponent()->OnHitRegistrationDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnHitRegistrationHandle);
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoAnimationStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationStartedHandler);
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoAnimationEndedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler);
 	
@@ -178,6 +179,37 @@ void USSIMPlayerAnimInstance::BlendOutPogoBone(float InSmoothedAlpha, FRotator& 
 						FRotator::ZeroRotator,
 						   InSmoothedAlpha,
 			   true);
+	
+}
+
+void USSIMPlayerAnimInstance::OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType)
+{
+	if (InPlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Frontal && !SSIMPlayer->GetCharacterMovement()->IsFalling())
+	{
+		// [0] for now, rework later
+		UAnimMontage* CurrentUpperBodyAttackMontage = SSIMPlayer->GetPlayerCombatComponent()->UpperBodyPlayerFrontalAttackMontages[0];
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | CURRENT Upper Body Attack Montage: %s"), TEXT(__FUNCTION__), *CurrentUpperBodyAttackMontage->GetName());
+		UAnimMontage* FullBodyAttackMontage = SSIMPlayer->GetPlayerCombatComponent()->FullBodyPlayerFrontalAttackMontages[0];
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | FULL Body Attack Montage: %s"), TEXT(__FUNCTION__), *FullBodyAttackMontage->GetName());
+		
+		FName CurrentSection = Montage_GetCurrentSection(CurrentUpperBodyAttackMontage);
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | CURRENT Upper Body Attack Montage SECTION: %s"), TEXT(__FUNCTION__), *CurrentSection.ToString());
+		
+		float CurrentAttackMontagePosition = Montage_GetPosition(CurrentUpperBodyAttackMontage);
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | CURRENT Upper Body Attack Montage POSITION: %f"), TEXT(__FUNCTION__), CurrentAttackMontagePosition);
+		
+		Montage_Stop(0.01f, CurrentUpperBodyAttackMontage);
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | Montage STOP"), TEXT(__FUNCTION__));
+		
+		Montage_Play(FullBodyAttackMontage, 0.6f, EMontagePlayReturnType::MontageLength, CurrentAttackMontagePosition);
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | Montage PLAY"), TEXT(__FUNCTION__));
+		
+		Montage_JumpToSection(CurrentSection, FullBodyAttackMontage);
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | Montage JUMP TO SECTION"), TEXT(__FUNCTION__));
+		
+		Montage_SetPosition(FullBodyAttackMontage, CurrentAttackMontagePosition);
+		UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | Montage SET POSITION"), TEXT(__FUNCTION__));
+	}
 	
 }
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SSIM/Core/Animation/SSIMAnimInstance.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 #include "SSIMPlayerAnimInstance.generated.h"
 
@@ -95,7 +96,7 @@ protected:
 	virtual void SetOwnerReference() override;
 	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG|Pogo")
-	EPogoBonesState GetPogoBonesState() const
+	FORCEINLINE EPogoBonesState GetPogoBonesState() const
 	{
 		return PogoBonesState;
 	}
@@ -106,6 +107,9 @@ private:
 	
 	void BlendInPogoBone(float InDeltaSeconds, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
 	void BlendOutPogoBone(float InBlendElapsedTime, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
+	
+	UFUNCTION()
+	void OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType);
 	
 #pragma region Reset Pogo Handlers
 	

@@ -159,12 +159,12 @@ UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
 		{
 		case EPlayerAttackDirectionType::EPADT_Frontal:
 			{
-				if (PlayerFrontalAttackMontages.IsEmpty())
+				if (UpperBodyPlayerFrontalAttackMontages.IsEmpty())
 				{
 					UE_LOG(LogSSIMValidations, Error, TEXT("%s | No FRONTAL Attack Montages found"), TEXT(__FUNCTION__));
 					return nullptr;
 				}
-				AttackMontage = PlayerFrontalAttackMontages[FMath::RandHelper(PlayerFrontalAttackMontages.Num())];			
+				AttackMontage = UpperBodyPlayerFrontalAttackMontages[FMath::RandHelper(UpperBodyPlayerFrontalAttackMontages.Num())];			
 				break;
 			}
 	
@@ -214,7 +214,9 @@ void USSIMPlayerCombatComponent::HitRegistration()
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
 	
-	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Frontal)
+	UE_LOG(LogSSIMGameplayMessages, Error, TEXT("Hit Registration"));
+	
+	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Frontal && !bAttackKnockbackActive)
 	{
 		AttackKnockback();
 	}
@@ -223,6 +225,8 @@ void USSIMPlayerCombatComponent::HitRegistration()
 	{
 		PogoInit();
 	}
+	
+	OnHitRegistrationDelegate.Broadcast(PlayerAttackDirectionType);
 	
 	for (auto Element : HitEnemies)
 	{
@@ -291,7 +295,7 @@ void USSIMPlayerCombatComponent::AttackKnockback()
 		false
 		);
 	
-	if (bShowAttackLogs)
+	if (bShowAttackKnockbackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Perform Attack Knockback"), TEXT(__FUNCTION__));
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Player Forward Vector: %s"), TEXT(__FUNCTION__), *SSIMPlayer->GetActorForwardVector().ToString());
