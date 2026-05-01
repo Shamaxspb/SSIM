@@ -82,8 +82,11 @@ private:
 	
 	// Debug
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG|Pogo")
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG")
 	bool bShowPogoBlendLogs = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|DEBUG")
+	bool bShowSwapHitMontageLogs = false;
 
 // Overriden Functions
 public:
@@ -107,6 +110,8 @@ private:
 	
 	void BlendInPogoBone(float InDeltaSeconds, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
 	void BlendOutPogoBone(float InBlendElapsedTime, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
+	
+	void SwapHitMontage(EPlayerAttackDirectionType InPlayerAttackDirectionType);
 	
 	UFUNCTION()
 	void OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType);

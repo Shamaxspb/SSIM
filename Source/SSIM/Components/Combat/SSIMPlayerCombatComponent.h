@@ -182,7 +182,7 @@ protected:
 											   const FHitResult& SweepResult) override;
 	
 private:
-	void HitRegistration();
+	void HitRegistration(AActor* OtherActor);
 	
 	void AttackKnockback();
 	void ResetAttackKnockbackState();

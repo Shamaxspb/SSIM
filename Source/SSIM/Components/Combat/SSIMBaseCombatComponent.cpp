@@ -75,6 +75,14 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 	CurrentAttackCollision->SetHiddenInGame(true);
 	#endif
 
+	if (HitEnemies.IsEmpty())
+	{
+		if (bShowAttackLogs)
+		{
+			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
+		}
+	}
+	
 	HitEnemies.Empty();
 	
 	if (bShowAttackLogs)

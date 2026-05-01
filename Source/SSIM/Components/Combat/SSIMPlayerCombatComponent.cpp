@@ -43,7 +43,6 @@ void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickT
 }
 
 // My Functions
-// Virtual
 void USSIMPlayerCombatComponent::StartAttack()
 {
 	Super::StartAttack();
@@ -196,25 +195,34 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 {
 	HitEnemies.AddUnique(OtherActor);
 	
-	HitRegistration();
+	HitRegistration(OtherActor);
 }
 
 // Internal
-void USSIMPlayerCombatComponent::HitRegistration()
+void USSIMPlayerCombatComponent::HitRegistration(AActor* OtherActor)
 {
-	if (HitEnemies.IsEmpty())
-	{
-		if (bShowAttackLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit nothing"), TEXT(__FUNCTION__));
-		}
-		return;
-	}
-	
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
 	
-	UE_LOG(LogSSIMGameplayMessages, Error, TEXT("Hit Registration"));
+	if (bShowAttackLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Error, TEXT("Hit Registration"));
+	}
+	
+	if (!OtherActor->Implements<USSIMDamageableInterface>())
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
+		return;
+	}
+		
+	if (bShowAttackLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s for %d damage"), TEXT(__FUNCTION__), *OtherActor->GetName(), RegularAttackDamage);
+	}
+		
+	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(OtherActor, DamageData);
+	
+	OnHitRegistrationDelegate.Broadcast(PlayerAttackDirectionType);
 	
 	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Frontal && !bAttackKnockbackActive)
 	{
@@ -226,23 +234,6 @@ void USSIMPlayerCombatComponent::HitRegistration()
 		PogoInit();
 	}
 	
-	OnHitRegistrationDelegate.Broadcast(PlayerAttackDirectionType);
-	
-	for (auto Element : HitEnemies)
-	{
-		if (!Element->Implements<USSIMDamageableInterface>())
-		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
-			return;
-		}
-		
-		if (bShowAttackLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s for %d damage"), TEXT(__FUNCTION__), *Element->GetName(), RegularAttackDamage);
-		}
-		
-		ISSIMDamageableInterface::Execute_ReceiveDamageInterface(Element, DamageData);
-	}
 }
 
 void USSIMPlayerCombatComponent::AttackKnockback()
