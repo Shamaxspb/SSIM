@@ -113,12 +113,12 @@ void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 
 void ASSIMPlayer::HandleMoveCompleted()
 {
+	MoveInputValue = 0.f;
 	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerFlowComponent->bDashing)
 	{
 		return;
 	}
 	GetCharacterMovement()->Velocity.Y = 0.f;
-	MoveInputValue = 0.f;
 }
 
 void ASSIMPlayer::SetupAttackCollision()

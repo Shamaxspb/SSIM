@@ -150,6 +150,7 @@ void USSIMPlayerDamageReactionComponent::EndStagger()
 	bStaggered = false;
 	OnStaggerEndedDelegate.Broadcast();
 	SSIMPlayer->StopAnimMontage(FrontStaggeredMontage);
+	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
 	
 	if (bShowStaggerLogs)
 	{

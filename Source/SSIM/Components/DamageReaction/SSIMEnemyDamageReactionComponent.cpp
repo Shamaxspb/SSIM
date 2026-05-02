@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/SSIM.h"
@@ -132,6 +133,7 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 
 #endif !UE_BUILD_SHIPPING
 	
+	SSIMEnemy->GetCharacterMovement()->StopMovementImmediately();
 	SSIMEnemy->LaunchCharacter(ReboundVelocity, true, true);
 }
 

@@ -96,9 +96,12 @@ public:
 
 	void ResetDash();
 	UFUNCTION()
-	void ResetDashFromAir(const FHitResult& Hit);
+	void ResetDashFromAir();
 	UFUNCTION()
 	void ResetDashOnPogo();
+	
+	UFUNCTION()
+	void OnLandedFromDashHandler(const FHitResult& Hit);
 	
 private:
 	FVector GetDashLaunchVelocity() const;

@@ -64,7 +64,7 @@ void USSIMPlayerFlowComponent::StartDash()
 	
 	if (SSIMPlayer->GetCharacterMovement()->IsFalling())
 	{
-		SSIMPlayer->LandedDelegate.AddUniqueDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
+		SSIMPlayer->LandedDelegate.AddUniqueDynamic(this, &USSIMPlayerFlowComponent::OnLandedFromDashHandler);
 		SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = DashBrakingDecelerationFalling;
 	}
 	else
@@ -151,14 +151,12 @@ void USSIMPlayerFlowComponent::ResetDash()
 	OnCanDashChangedDelegate.Broadcast(true);
 }
 
-void USSIMPlayerFlowComponent::ResetDashFromAir(const FHitResult& Hit)
+void USSIMPlayerFlowComponent::ResetDashFromAir()
 {
 	if (bShowDashLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash From Air RESET"), TEXT(__FUNCTION__));
 	}
-	
-	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::ResetDashFromAir);
 	
 	bCanDash = true;
 	OnCanDashChangedDelegate.Broadcast(true);
@@ -177,6 +175,12 @@ void USSIMPlayerFlowComponent::ResetDashOnPogo()
 	}
 }
 
+void USSIMPlayerFlowComponent::OnLandedFromDashHandler(const FHitResult& Hit)
+{
+	ResetDashFromAir();
+	AnimInstance->Montage_Stop(0.2f,PlayerDashMontage);
+	SSIMPlayer->LandedDelegate.RemoveDynamic(this, &USSIMPlayerFlowComponent::OnLandedFromDashHandler);
+}
 
 
 void USSIMPlayerFlowComponent::OnDamageReceivedHandler(const FDamageData& DamageData)
