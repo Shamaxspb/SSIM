@@ -86,7 +86,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_AttackDownward_Chord")
 	UInputAction* DownwardAttackChord;
-	
+
 #pragma endregion Input	
 	
 protected:
@@ -242,8 +242,10 @@ private:
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
-	void HandleStartAttackTrace();
-	void HandleEndAttackTrace();
+	void HandleStartAttackTrace() const;
+	void HandleEndAttackTrace() const;
+	
+	
 	
 	void HandleDash(); 
 	

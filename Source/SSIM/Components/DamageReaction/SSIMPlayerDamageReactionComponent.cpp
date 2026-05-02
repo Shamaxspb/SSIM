@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
-#include "SSIM/Components/Stats/SSIMBaseStatsComponent.h"
 
 
 // Overriden functions

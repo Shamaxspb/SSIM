@@ -62,7 +62,9 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		
 	SSIMInputComponent->BindAction(MoveInputAction,				ETriggerEvent::Triggered, this, &ASSIMPlayer::HandleMove);
 	SSIMInputComponent->BindAction(MoveInputAction,				ETriggerEvent::Completed, this, &ASSIMPlayer::HandleMoveCompleted);
+	
 	SSIMInputComponent->BindAction(DashInputAction,				ETriggerEvent::Started,   this, &ASSIMPlayer::HandleDash);
+	
 	SSIMInputComponent->BindAction(AttackInputAction,			ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackFrontal);
 	SSIMInputComponent->BindAction(AttackUpwardInputAction,		ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackUpward);
 	SSIMInputComponent->BindAction(AttackDownwardInputAction,	ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackDownward);
@@ -113,13 +115,6 @@ void ASSIMPlayer::HandleMoveCompleted()
 {
 	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerFlowComponent->bDashing)
 	{
-		if (bShowLogs)
-		{
-			UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Set Velocity Y = 0.f on COMPLETED denied: bStaggered: %s, bDashing: %s"), 
-													  TEXT(__FUNCTION__), 
-													  SSIMPlayerDamageReactionComponent->bStaggered ? TEXT("true") : TEXT("false"),
-													  SSIMPlayerFlowComponent->bDashing ? TEXT("true") : TEXT("false"));
-		}
 		return;
 	}
 	GetCharacterMovement()->Velocity.Y = 0.f;
@@ -187,12 +182,12 @@ void ASSIMPlayer::HandleAttackDownward()
 	}
 }
 
-void ASSIMPlayer::HandleStartAttackTrace()
+void ASSIMPlayer::HandleStartAttackTrace() const
 {
 	SSIMPlayerCombatComponent->StartAttackTrace();
 }
 
-void ASSIMPlayer::HandleEndAttackTrace()
+void ASSIMPlayer::HandleEndAttackTrace() const
 {
 	SSIMPlayerCombatComponent->EndAttackTrace();
 
@@ -222,20 +217,31 @@ bool ASSIMPlayer::CanMove() const
 
 bool ASSIMPlayer::CanAttack() const
 {
-	if (SSIMPlayerCombatComponent->bAttacking || SSIMPlayerFlowComponent->bDashing)
+	if (SSIMPlayerCombatComponent->bAttacking 
+		|| 
+		SSIMPlayerFlowComponent->bDashing
+		||
+		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
 		if (SSIMPlayerCombatComponent->bAttacking)
 		{
 			if (bShowLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerFlowComponent->bDashing)
 		{
 			if (bShowLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+			}
+		}
+		if (SSIMPlayerDamageReactionComponent->bStaggered)
+		{
+			if (bShowLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Player staggered"), TEXT(__FUNCTION__));
 			}
 		}
 		return false;
@@ -251,21 +257,21 @@ bool ASSIMPlayer::CanDash() const
 		{
 			if (bShowLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (!SSIMPlayerFlowComponent->bCanDash)
 		{
 			if (bShowLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
 			}
 		}
 		return false;

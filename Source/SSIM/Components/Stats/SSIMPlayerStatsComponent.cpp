@@ -12,9 +12,13 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	if (bInvulnerable)
 	{
+		
 		if (bShowStatsLogs)
 		{
-			UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+			if (bShowInvulnerabilityCheck)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player is invulnerable"), TEXT(__FUNCTION__));
+			}
 		}
 		return;
 	}

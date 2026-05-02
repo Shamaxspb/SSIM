@@ -41,6 +41,11 @@ protected:
 private:
 	FTimerHandle InvulnerabilityTimerHandle;
 
+	// Debug
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|DEBUG", 
+		meta = (EditCondition = "bShowStatsLogs", EditConditionHides, DisplayAfter = "bShowStatsLogs"))
+	bool bShowInvulnerabilityCheck;
 	
 // My Functions
 public:
