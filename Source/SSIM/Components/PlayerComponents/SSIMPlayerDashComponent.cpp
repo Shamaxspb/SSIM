@@ -148,22 +148,19 @@ FVector USSIMPlayerDashComponent::GetDashLaunchVelocity() const
 {
 	// Calculate Player direction
 	FVector DashDirectionVector;
-	float DirectionDotProduct = FVector::DotProduct(SSIMPlayer->GetActorForwardVector(), FVector::RightVector);
-		
-	if (FMath::IsNearlyEqual(DirectionDotProduct, 1.f))
+	switch (SSIMPlayer->GetPlayerFacingDirection())
 	{
-		DashDirectionVector = FVector::RightVector;
+	case EFacingDirection::EPD_Right:
+		{
+			DashDirectionVector = FVector::RightVector;
+			break;
+		}
+	case EFacingDirection::EPD_Left:
+		{
+			DashDirectionVector = FVector::RightVector * -1.f;
+			break;
+		}
 	}
-	else if (FMath::IsNearlyEqual(DirectionDotProduct, -1.f))
-	{
-		DashDirectionVector = FVector::RightVector * -1.f;
-	}
-	else
-	{
-		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Couldn't determine player direction. Return -1.f"), TEXT(__FUNCTION__));
-		return FVector(-1.f, -1.f, -1.f);
-	}
-	
 	FVector OutLaunchVelocity =  DashDirectionVector * DashVelocity;
 	
 	if (bShowDashLogs)
