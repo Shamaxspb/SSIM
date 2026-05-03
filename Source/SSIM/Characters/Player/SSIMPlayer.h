@@ -153,6 +153,11 @@ public:
 	{
 		return SSIMPlayerStatsComponent;
 	}
+	UFUNCTION()
+	FORCEINLINE USSIMPlayerDamageReactionComponent* GetPlayerDamageReactionComponent() const
+	{
+		return SSIMPlayerDamageReactionComponent;
+	}
 	
 	UFUNCTION()
 	FORCEINLINE UBoxComponent* GetFrontalAttackCollision() const

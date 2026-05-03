@@ -28,8 +28,6 @@ void USSIMPlayerDamageReactionComponent::SetReferences()
 }
 
 // My Functions
-
-
 void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	Super::OnDamageReceivedHandler(InDamageData);
@@ -119,12 +117,15 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 	FRotator PlayerRotation = SSIMPlayer->GetActorRotation(); 
 	PlayerRotation.Yaw = FVector(DamageData.Instigator->GetActorLocation() - SSIMPlayer->GetActorLocation()).Rotation().Yaw;
 	SSIMPlayer->SetActorRotation(PlayerRotation);
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | PlayerRotation: %s"), TEXT(__FUNCTION__), *PlayerRotation.ToString());
 	
 	bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y;
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | bEnemyIsToTheRight: %s"), TEXT(__FUNCTION__), bEnemyIsToTheRight ? TEXT("True") : TEXT("False"));
 	ReboundLaunchVelocity = FVector(
 							0.0f, 
 							ReboundVelocityY * (bEnemyIsToTheRight ? -1.f : 1.f), 
 							ReboundVelocityZ);
+	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | ReboundLaunchVelocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
 	
 	SSIMPlayer->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	

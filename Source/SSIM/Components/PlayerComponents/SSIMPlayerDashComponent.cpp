@@ -54,7 +54,6 @@ void USSIMPlayerDashComponent::StartDash()
 	
 	SetDashDamageCollision();
 	
-	FTimerHandle DashInProcessTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 									DashInProcessTimerHandle, 
 									this, 
@@ -101,7 +100,7 @@ void USSIMPlayerDashComponent::EndDash()
 	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = 0.f;
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
-	SetDefaultDamageCollision();
+	//SetDefaultDamageCollision();
 	
 	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
 	SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_Stop(PlayerDashMontage->BlendOut.GetBlendTime());
@@ -184,12 +183,13 @@ void USSIMPlayerDashComponent::SetDashDamageCollision() const
 	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleHalfHeight(DashHitRegistrationCollisionHalfHeight);
 	SSIMPlayer->GetContactDamageCollision()->SetCapsuleHalfHeight(DashContactDamageCollisionHalfHeight);
 }
-void USSIMPlayerDashComponent::SetDefaultDamageCollision() const
+void USSIMPlayerDashComponent::SetDefaultDamageCollision()
 {
 	SSIMPlayer->GetContactDamageCollision()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	SSIMPlayer->GetHitRegistrationCollision()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultContactDamageCollisionRadius);
+	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultContactDamageCollisionHalfHeight);
 	SSIMPlayer->GetContactDamageCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultHitRegistrationCollisionHalfHeight);
+	SSIMPlayer->GetPlayerDamageReactionComponent()->OnStaggerEndedDelegate.RemoveDynamic(this, &USSIMPlayerDashComponent::SetDefaultDamageCollision);
 }
 
 void USSIMPlayerDashComponent::OnLandedFromDashHandler(const FHitResult& Hit)
@@ -201,5 +201,7 @@ void USSIMPlayerDashComponent::OnLandedFromDashHandler(const FHitResult& Hit)
 
 void USSIMPlayerDashComponent::OnDamageReceivedHandler(const FDamageData& DamageData)
 {
+	GetWorld()->GetTimerManager().ClearTimer(DashInProcessTimerHandle);
 	EndDash();
+	SSIMPlayer->GetPlayerDamageReactionComponent()->OnStaggerEndedDelegate.AddUniqueDynamic(this, &USSIMPlayerDashComponent::SetDefaultDamageCollision);
 }

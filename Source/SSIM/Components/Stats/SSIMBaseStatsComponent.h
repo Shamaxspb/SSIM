@@ -21,10 +21,10 @@ class SSIM_API USSIMBaseStatsComponent : public USSIMBaseComponent
 // Variables
 public:
 	// Delegates
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Health")
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, BlueprintReadWrite, Category = "SSIM|Health")
 	FOnDamageReceivedSignature OnDamageReceivedDelegate;
 	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Health")
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, BlueprintReadWrite, Category = "SSIM|Health")
 	FOnHealReceivedSignature OnHealReceivedDelegate;
 	
 protected:

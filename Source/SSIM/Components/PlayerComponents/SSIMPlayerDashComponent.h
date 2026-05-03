@@ -85,11 +85,12 @@ private:
 private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
-	
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerCombatComponent> PlayerCombatComponent;
+	
+	FTimerHandle DashInProcessTimerHandle;
 	
 	
 // Overriden Functions
@@ -119,7 +120,8 @@ private:
 	FVector GetDashLaunchVelocity() const;
 	
 	void SetDashDamageCollision() const;
-	void SetDefaultDamageCollision() const;
+	UFUNCTION()
+	void SetDefaultDamageCollision();
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& DamageData);
