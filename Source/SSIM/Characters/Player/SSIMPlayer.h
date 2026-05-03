@@ -8,10 +8,10 @@
 #include "SSIM/Components/DamageReaction/SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
-#include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
+#include "SSIM/Core/Types/EPlayerTypes.h"
 
 #include "SSIMPlayer.generated.h"
 
@@ -89,10 +89,6 @@ protected:
 
 #pragma endregion Input	
 	
-protected:
-	/*UPROPERTY()
-	EPlayerState CurrentPlayerState;*/
-	
 #pragma region Player Defaults
 	
 public:
@@ -116,13 +112,20 @@ public:
 	
 #pragma endregion  Player Defaults
 	
+#pragma region Metadata
+	
+private:
+	float MoveInputValue;
+	EFacingDirection PlayerFacingDirection;
+
+#pragma endregion Metadata
+	
 	// Debug
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|DEBUG")
-	bool bShowLogs;
+	bool bShowPlayerInputLogs;
 	
 private:
 	float CachedPlayerRotationYaw;
-	float MoveInputValue;
 	
 	
 // Overriden Functions
@@ -180,6 +183,11 @@ public:
 	{
 		return MoveInputValue;
 	}
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player")
+	FORCEINLINE EFacingDirection GetPlayerFacingDirection() const
+	{
+		return PlayerFacingDirection;
+	}
 	
 	// State getters
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
@@ -234,15 +242,12 @@ public:
 		ContactDamageCollision->SetCapsuleRadius(DefaultContactDamageCollisionRadius);
 		ContactDamageCollision->SetCapsuleHalfHeight(DefaultContactDamageCollisionHalfHeight);
 	}
-	FORCEINLINE void SetContactDamageCollisionShapeDash() const
-	{
-		ContactDamageCollision->SetCapsuleRadius(
-								GetContactDamageCollision()->GetScaledCapsuleHalfHeight(),
-								true);
-		ContactDamageCollision->SetCapsuleHalfHeight(DefaultContactDamageCollisionHalfHeight);
-	}
 
 #pragma endregion Inline Setters
+	
+public:
+	void SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirection);
+	
 	
 private:
 	void HandleMove(const FInputActionValue& Value);

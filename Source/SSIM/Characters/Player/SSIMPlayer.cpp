@@ -39,6 +39,9 @@ void ASSIMPlayer::BeginPlay()
 	
 	GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
 	
+	PlayerFacingDirection = FVector::DotProduct(GetActorForwardVector(), FVector::RightVector) > 0.f ?
+												EFacingDirection::EPD_Right : EFacingDirection::EPD_Left;
+	
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
 }
 
@@ -71,43 +74,54 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 }
 
 
+void ASSIMPlayer::SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirection)
+{
+	PlayerFacingDirection = InPlayerFacingDirection;
+	FRotator PlayerRotation = GetActorRotation();
+	switch (InPlayerFacingDirection)
+	{
+	case EFacingDirection::EPD_Right:
+		{
+			PlayerRotation.Yaw = 90.f;
+			break;
+		}
+	case EFacingDirection::EPD_Left:
+		{
+			PlayerRotation.Yaw = -90.f;
+			break;
+		}
+	}
+	SetActorRotation(PlayerRotation);
+}
+
 // My Functions
 void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 {
 	if (CanMove())
 	{
 		MoveInputValue = Value.Get<float>();
-		
-		float PlayerRotationYaw;
-		float CachedInputValue;
+
+		float CachedInputValue = Value.Get<float>();
 		
 		// Move Right
  		if (Value.Get<float>() > 0.f)
 		{
-			CachedInputValue = FMath::Clamp(Value.Get<float>(),1.f, 1.f);
-			PlayerRotationYaw = 90.f;
+			CachedInputValue = FMath::Clamp(MoveInputValue,1.f, 1.f);
+ 			SetPlayerFacingDirection(EFacingDirection::EPD_Right);
 		}
-		
 		// Move Left
 		else if (Value.Get<float>() < 0.f)
 		{
-			CachedInputValue = FMath::Clamp(Value.Get<float>(),-1.f, -1.f);
-			PlayerRotationYaw = -90.f;
+			CachedInputValue = FMath::Clamp(MoveInputValue,-1.f, -1.f);
+			SetPlayerFacingDirection(EFacingDirection::EPD_Left);
 		}
-		
 		// Do not move
 		else
 		{
-			CachedInputValue = 0.f;
-			PlayerRotationYaw = CachedPlayerRotationYaw;
+			MoveInputValue = 0.f;
 		}
 		
 		AddMovementInput(FVector::RightVector, CachedInputValue, false);
-		SetActorRotation(FRotator(0, 
-								   PlayerRotationYaw, 
-								   0));
-		
-		CachedPlayerRotationYaw = PlayerRotationYaw;
 	}
 }
 
@@ -168,7 +182,7 @@ void ASSIMPlayer::HandleAttackDownward()
 	{
 		if (!GetCharacterMovement()->IsFalling())
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Cannot attack downwards from the ground. Frontal Attack used instead"), TEXT(__FUNCTION__));
 			}
@@ -225,21 +239,21 @@ bool ASSIMPlayer::CanAttack() const
 	{
 		if (SSIMPlayerCombatComponent->bAttacking)
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerDashComponent->bDashing)
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Player staggered"), TEXT(__FUNCTION__));
 			}
@@ -255,21 +269,21 @@ bool ASSIMPlayer::CanDash() const
 	{
 		if (SSIMPlayerDashComponent->bDashing)
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (!SSIMPlayerDashComponent->bCanDash)
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
-			if (bShowLogs)
+			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
 			}

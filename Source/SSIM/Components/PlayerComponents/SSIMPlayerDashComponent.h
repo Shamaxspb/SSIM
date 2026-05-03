@@ -60,13 +60,13 @@ protected:
 	float DashCooldown = 2.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
-	float DashHitRegistrationCollisionHalfHeight = 55.f;
+	float DashHitRegistrationCollisionHalfHeight = 80.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashHitRegistrationCollisionRadius = 24.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
-	float DashContactDamageCollisionHalfHeight = 75.f;
+	float DashContactDamageCollisionHalfHeight = 105.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashContactDamageCollisionRadius = 35.f;
@@ -121,7 +121,7 @@ private:
 	
 	void SetDashDamageCollision() const;
 	UFUNCTION()
-	void SetDefaultDamageCollision();
+	void SetDefaultDamageCollision() const;
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& DamageData);

@@ -49,7 +49,6 @@ void USSIMPlayerDashComponent::StartDash()
 	
 	SSIMPlayer->StopJumping();
 	SSIMPlayer->LaunchCharacter(GetDashLaunchVelocity() ,true, true);
-	//SSIMPlayer->SetContactDamageCollisionShapeDash();
 	SSIMPlayer->GetCharacterMovement()->GravityScale = DashGravityScale;
 	
 	SetDashDamageCollision();
@@ -95,12 +94,11 @@ void USSIMPlayerDashComponent::EndDash()
 	bDashing = false;
 	OnDashEndedDelegate.Broadcast();
 	
-	//SSIMPlayer->SetContactDamageCollisionShapeDefault();
 	SSIMPlayer->SetPlayerBrakingDecelerationWalkingToDefault();
 	SSIMPlayer->GetCharacterMovement()->BrakingDecelerationFalling = 0.f;
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
-	//SetDefaultDamageCollision();
+	SetDefaultDamageCollision();
 	
 	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
 	SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_Stop(PlayerDashMontage->BlendOut.GetBlendTime());
@@ -180,16 +178,23 @@ void USSIMPlayerDashComponent::SetDashDamageCollision() const
 {
 	SSIMPlayer->GetHitRegistrationCollision()->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
 	SSIMPlayer->GetContactDamageCollision()->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	
 	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleHalfHeight(DashHitRegistrationCollisionHalfHeight);
+	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleRadius(DashHitRegistrationCollisionRadius);
+	
 	SSIMPlayer->GetContactDamageCollision()->SetCapsuleHalfHeight(DashContactDamageCollisionHalfHeight);
+	SSIMPlayer->GetContactDamageCollision()->SetCapsuleRadius(DashContactDamageCollisionRadius);
 }
-void USSIMPlayerDashComponent::SetDefaultDamageCollision()
+void USSIMPlayerDashComponent::SetDefaultDamageCollision() const
 {
 	SSIMPlayer->GetContactDamageCollision()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	SSIMPlayer->GetHitRegistrationCollision()->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultContactDamageCollisionHalfHeight);
-	SSIMPlayer->GetContactDamageCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultHitRegistrationCollisionHalfHeight);
-	SSIMPlayer->GetPlayerDamageReactionComponent()->OnStaggerEndedDelegate.RemoveDynamic(this, &USSIMPlayerDashComponent::SetDefaultDamageCollision);
+	
+	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultHitRegistrationCollisionHalfHeight);
+	SSIMPlayer->GetHitRegistrationCollision()->SetCapsuleRadius(SSIMPlayer->DefaultHitRegistrationCollisionRadius);
+	
+	SSIMPlayer->GetContactDamageCollision()->SetCapsuleHalfHeight(SSIMPlayer->DefaultContactDamageCollisionHalfHeight);
+	SSIMPlayer->GetContactDamageCollision()->SetCapsuleRadius(SSIMPlayer->DefaultContactDamageCollisionRadius);
 }
 
 void USSIMPlayerDashComponent::OnLandedFromDashHandler(const FHitResult& Hit)
@@ -203,5 +208,4 @@ void USSIMPlayerDashComponent::OnDamageReceivedHandler(const FDamageData& Damage
 {
 	GetWorld()->GetTimerManager().ClearTimer(DashInProcessTimerHandle);
 	EndDash();
-	SSIMPlayer->GetPlayerDamageReactionComponent()->OnStaggerEndedDelegate.AddUniqueDynamic(this, &USSIMPlayerDashComponent::SetDefaultDamageCollision);
 }

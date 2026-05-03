@@ -25,11 +25,6 @@ void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
 	FVector Location = GetActorLocation();
 	Location.X = 0.f;
 	SetActorLocation(Location);
-	
-	// Set rotation
-	FRotator Rotation = GetActorRotation();
-	Rotation.Yaw = -90.f;
-	SetActorRotation(Rotation);
 }
 
 // My Functions
@@ -42,11 +37,6 @@ void ASSIMBaseCharacter::RestrictXAxisMovement() const
 	
 	GetMovementComponent()->SetPlaneConstraintEnabled(true);
 	GetMovementComponent()->SetPlaneConstraintAxisSetting(EPlaneConstraintAxisSetting::X);
-	
-	/*UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s | Plane Constraint Axis Setting: %s (%s)"),
-											 TEXT(__FUNCTION__), 
-											 *UEnum::GetValueAsString(GetMovementComponent()->GetPlaneConstraintAxisSetting()),
-											 *GetName());*/
 }
 
 void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
