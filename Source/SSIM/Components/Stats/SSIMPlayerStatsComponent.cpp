@@ -4,15 +4,28 @@
 #include "SSIMPlayerStatsComponent.h"
 
 #include "SSIM/SSIM.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 
+void USSIMPlayerStatsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	SetReferences();
+}
+
 // My Functions
+void USSIMPlayerStatsComponent::SetReferences()
+{
+	Super::SetReferences();
+	
+	SSIMPlayer = CastChecked<ASSIMPlayer>(SSIMOwnerCharacter);
+}
+
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	if (bInvulnerable)
 	{
-		
 		if (bShowStatsLogs)
 		{
 			if (bShowInvulnerabilityCheck)
@@ -22,9 +35,6 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 		}
 		return;
 	}
-	
-	bInvulnerable = true;
-	OnInvulnerabilityStartedDelegate.Broadcast();
 	
 	if (bShowStatsLogs)
 	{
@@ -47,6 +57,12 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 														MaxHealth);
 	}
 	
+	SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SSIMPlayer->GetHitRegistrationCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	bInvulnerable = true;
+	OnInvulnerabilityStartedDelegate.Broadcast();
+	
 	Super::ReduceHealth(InDamageData);
 }
 
@@ -65,6 +81,9 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 
 void USSIMPlayerStatsComponent::EndInvulnerability()
 {
+	SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SSIMPlayer->GetHitRegistrationCollision()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	
 	bInvulnerable = false;
 	OnInvulnerabilityEndedDelegate.Broadcast();
 	

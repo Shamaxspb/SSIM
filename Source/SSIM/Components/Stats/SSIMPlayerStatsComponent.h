@@ -39,6 +39,9 @@ protected:
 	float InvulnerabilityDuration = 1.f;
 	
 private:
+	UPROPERTY()
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	
 	FTimerHandle InvulnerabilityTimerHandle;
 
 	// Debug
@@ -46,6 +49,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|DEBUG", 
 		meta = (EditCondition = "bShowStatsLogs", EditConditionHides, DisplayAfter = "bShowStatsLogs"))
 	bool bShowInvulnerabilityCheck;
+	
+	
+// My Functions
+	virtual void BeginPlay() override;
+	
 	
 // My Functions
 public:
@@ -56,6 +64,9 @@ public:
 	virtual void IncreaseHealth(int32 InHealValue) override;
 	
 	void EndInvulnerability();
+	
+protected:
+	virtual void SetReferences() override;
 	
 // DEBUG
 public:

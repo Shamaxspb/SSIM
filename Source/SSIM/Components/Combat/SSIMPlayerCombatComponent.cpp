@@ -7,7 +7,7 @@
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
