@@ -6,7 +6,7 @@
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction/SSIMPlayerDamageReactionComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Core/Types/EPlayerState.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
@@ -21,7 +21,7 @@ class USSIMPlayerStatsComponent;
 class UBoxComponent;
 class UInputAction;
 class USSIMPlayerCombatComponent;
-class USSIMPlayerFlowComponent;
+class USSIMPlayerDashComponent;
 
 
 UCLASS(meta = (PrioritizeCategories = "SSIM"))
@@ -41,8 +41,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "StatsComponent")
 	TObjectPtr<USSIMPlayerStatsComponent> SSIMPlayerStatsComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "FlowComponent")
-	TObjectPtr<USSIMPlayerFlowComponent> SSIMPlayerFlowComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "DashComponent")
+	TObjectPtr<USSIMPlayerDashComponent> SSIMPlayerDashComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "DamageReactionComponent")
 	TObjectPtr<USSIMPlayerDamageReactionComponent> SSIMPlayerDamageReactionComponent;
@@ -95,13 +95,22 @@ protected:
 	
 #pragma region Player Defaults
 	
-protected:
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultPlayerGravityScale = 7.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultPlayerBrakingDecelerationWalking = 10000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
+	float DefaultHitRegistrationCollisionHalfHeight = 55.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
+	float DefaultHitRegistrationCollisionRadius = 24.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultContactDamageCollisionHalfHeight = 75.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Defaults")
 	float DefaultContactDamageCollisionRadius = 35.f;
 	
@@ -135,14 +144,19 @@ public:
 		return SSIMPlayerCombatComponent;
 	}
 	UFUNCTION()
-	FORCEINLINE USSIMPlayerFlowComponent* GetPlayerFlowComponent() const
+	FORCEINLINE USSIMPlayerDashComponent* GetPlayerFlowComponent() const
 	{
-		return SSIMPlayerFlowComponent;
+		return SSIMPlayerDashComponent;
 	}
 	UFUNCTION()
 	FORCEINLINE USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
 	{
 		return SSIMPlayerStatsComponent;
+	}
+	UFUNCTION()
+	FORCEINLINE USSIMPlayerDamageReactionComponent* GetPlayerDamageReactionComponent() const
+	{
+		return SSIMPlayerDamageReactionComponent;
 	}
 	
 	UFUNCTION()
@@ -186,12 +200,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerDashing() const
 	{
-		return SSIMPlayerFlowComponent->bDashing;
+		return SSIMPlayerDashComponent->bDashing;
 	}
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetCanPlayerDash() const
 	{
-		return SSIMPlayerFlowComponent->bCanDash;
+		return SSIMPlayerDashComponent->bCanDash;
 	}
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerStaggered() const

@@ -7,7 +7,7 @@
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 void USSIMPlayerAnimInstance::NativeBeginPlay()

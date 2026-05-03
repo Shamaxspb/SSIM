@@ -8,7 +8,7 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
-class USSIMPlayerFlowComponent;
+class USSIMPlayerDashComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitRegistrationSignature, EPlayerAttackDirectionType, AttackDirectionType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
@@ -89,7 +89,7 @@ private:
 	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
 	
 	UPROPERTY()
-	TObjectPtr<USSIMPlayerFlowComponent> PlayerFlowComponent;
+	TObjectPtr<USSIMPlayerDashComponent> PlayerFlowComponent;
 
 #pragma region Pogo
 	

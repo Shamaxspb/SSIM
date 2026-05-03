@@ -11,7 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerFlowComponent.h"
+#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 
 // Overriden Functions
 ASSIMPlayer::ASSIMPlayer()
@@ -21,7 +21,7 @@ ASSIMPlayer::ASSIMPlayer()
 	GetCapsuleComponent()->SetCollisionProfileName("Player", true);
 	GetMesh()->SetCollisionProfileName("Player", true);
 	
-	SSIMPlayerFlowComponent	  		  = CreateDefaultSubobject<USSIMPlayerFlowComponent>(TEXT("PlayerFlowComponent"));
+	SSIMPlayerDashComponent	  		  = CreateDefaultSubobject<USSIMPlayerDashComponent>(TEXT("PlayerDashComponent"));
 	SSIMPlayerCombatComponent 		  = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
 	SSIMPlayerStatsComponent  		  = CreateDefaultSubobject<USSIMPlayerStatsComponent>(TEXT("PlayerStatsComponent"));
 	SSIMPlayerDamageReactionComponent = CreateDefaultSubobject<USSIMPlayerDamageReactionComponent>(TEXT("PlayerDamageReactionComponent"));
@@ -114,7 +114,7 @@ void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 void ASSIMPlayer::HandleMoveCompleted()
 {
 	MoveInputValue = 0.f;
-	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerFlowComponent->bDashing)
+	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerDashComponent->bDashing)
 	{
 		return;
 	}
@@ -197,7 +197,7 @@ void ASSIMPlayer::HandleDash()
 {
 	if (CanDash())
 	{
-		SSIMPlayerFlowComponent->StartDash();
+		SSIMPlayerDashComponent->StartDash();
 	}
 }
 
@@ -208,7 +208,7 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 
 bool ASSIMPlayer::CanMove() const
 {
-	if (SSIMPlayerFlowComponent->bDashing || SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerCombatComponent->bAttackKnockbackActive)
+	if (SSIMPlayerDashComponent->bDashing || SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerCombatComponent->bAttackKnockbackActive)
 	{
 		return false;
 	}
@@ -219,7 +219,7 @@ bool ASSIMPlayer::CanAttack() const
 {
 	if (SSIMPlayerCombatComponent->bAttacking 
 		|| 
-		SSIMPlayerFlowComponent->bDashing
+		SSIMPlayerDashComponent->bDashing
 		||
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
@@ -230,7 +230,7 @@ bool ASSIMPlayer::CanAttack() const
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (SSIMPlayerFlowComponent->bDashing)
+		if (SSIMPlayerDashComponent->bDashing)
 		{
 			if (bShowLogs)
 			{
@@ -251,20 +251,20 @@ bool ASSIMPlayer::CanAttack() const
 
 bool ASSIMPlayer::CanDash() const
 {
-	if (SSIMPlayerFlowComponent->bDashing || !SSIMPlayerFlowComponent->bCanDash || SSIMPlayerDamageReactionComponent->bStaggered)
+	if (SSIMPlayerDashComponent->bDashing || !SSIMPlayerDashComponent->bCanDash || SSIMPlayerDamageReactionComponent->bStaggered)
 	{
-		if (SSIMPlayerFlowComponent->bDashing)
+		if (SSIMPlayerDashComponent->bDashing)
 		{
 			if (bShowLogs)
 			{
 				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (!SSIMPlayerFlowComponent->bCanDash)
+		if (!SSIMPlayerDashComponent->bCanDash)
 		{
 			if (bShowLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerFlowComponent->DashCooldownTimerHandle));
+				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
@@ -304,7 +304,7 @@ void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
 
 void ASSIMPlayer::EndDashInterface_Implementation() const
 {
-	SSIMPlayerFlowComponent->EndDash();
+	SSIMPlayerDashComponent->EndDash();
 }
 
 

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "SSIM/Components/SSIMBaseComponent.h"
 
-#include "SSIMPlayerFlowComponent.generated.h"
+#include "SSIMPlayerDashComponent.generated.h"
 
 class USSIMPlayerCombatComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashStartedSignature);
@@ -22,7 +22,7 @@ struct FDamageData;
 
 
 UCLASS(Blueprintable, ClassGroup=(PlayerComponents))
-class SSIM_API USSIMPlayerFlowComponent : public USSIMBaseComponent
+class SSIM_API USSIMPlayerDashComponent : public USSIMBaseComponent
 {
 	GENERATED_BODY()
 
@@ -38,34 +38,46 @@ public:
 	bool bCanDash = true;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animation")
 	TObjectPtr<UAnimMontage> PlayerDashMontage;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
 	float DashDuration = 0.5f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
 	float DashVelocity = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
 	float DashGravityScale = 0.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
 	float DashBrakingDecelerationWalking = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
 	float DashBrakingDecelerationFalling = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
 	float DashCooldown = 2.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
+	float DashHitRegistrationCollisionHalfHeight = 55.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
+	float DashHitRegistrationCollisionRadius = 24.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
+	float DashContactDamageCollisionHalfHeight = 75.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
+	float DashContactDamageCollisionRadius = 35.f;
+	
 #pragma region Metadata
 
 public:
 	FTimerHandle DashCooldownTimerHandle;
 	
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Dash")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG")
 	bool bShowDashLogs;
 
 #pragma endregion Metadata
@@ -73,11 +85,12 @@ private:
 private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
-	
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
 	UPROPERTY()
 	TObjectPtr<USSIMPlayerCombatComponent> PlayerCombatComponent;
+	
+	FTimerHandle DashInProcessTimerHandle;
 	
 	
 // Overriden Functions
@@ -105,6 +118,10 @@ public:
 	
 private:
 	FVector GetDashLaunchVelocity() const;
+	
+	void SetDashDamageCollision() const;
+	UFUNCTION()
+	void SetDefaultDamageCollision();
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& DamageData);
