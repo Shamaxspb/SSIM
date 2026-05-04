@@ -63,15 +63,14 @@ protected:
 
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
-	
 	TArray<FStaggerSequenceStep> Steps;
-	int32 CurrentStaggerSequenceStep = 0;
 	FTimerHandle StaggerSequenceHandle;
 	
 #pragma endregion Stagger
 	
 #pragma region Metadata
 
+	int32 CurrentStaggerSequenceStep = 0;
 	FVector ReboundLaunchVelocity = FVector::ZeroVector;
 	
 #pragma endregion Metadata

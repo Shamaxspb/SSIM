@@ -114,20 +114,35 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 {
 	EndStopFrame();
 	
-	FRotator PlayerRotation = SSIMPlayer->GetActorRotation(); 
-	PlayerRotation.Yaw = FVector(DamageData.Instigator->GetActorLocation() - SSIMPlayer->GetActorLocation()).Rotation().Yaw;
-	SSIMPlayer->SetActorRotation(PlayerRotation);
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | PlayerRotation: %s"), TEXT(__FUNCTION__), *PlayerRotation.ToString());
+	if (!IsValid(FrontStaggeredMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
 	
-	bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y;
+	const bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y;
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | bEnemyIsToTheRight: %s"), TEXT(__FUNCTION__), bEnemyIsToTheRight ? TEXT("True") : TEXT("False"));
-	ReboundLaunchVelocity = FVector(
-							0.0f, 
-							ReboundVelocityY * (bEnemyIsToTheRight ? -1.f : 1.f), 
-							ReboundVelocityZ);
+	
+	float LocalReboundVelocityY = ReboundVelocityY;
+	
+	if (bEnemyIsToTheRight)
+	{
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
+		LocalReboundVelocityY = 1.f;
+	}
+	else
+	{
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
+		LocalReboundVelocityY = -1.f;
+	}
+	
+	ReboundLaunchVelocity = FVector(0.0f, LocalReboundVelocityY, ReboundVelocityZ);
 	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | ReboundLaunchVelocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
 	
 	SSIMPlayer->LaunchCharacter(ReboundLaunchVelocity, true, true);
+	
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
+	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 	
 #if !UE_BUILD_SHIPPING
 	if (bDrawReboundDebug)
@@ -135,15 +150,6 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 		ReboundDrawDebug();
 	}
 #endif !UE_BUILD_SHIPPING
-	
-	SSIMPlayer->SetPlayerGravityScaleToDefault();
-	
-	if (!IsValid(FrontStaggeredMontage))
-    {
-    	UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
-    	return;
-    }
-    SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 }
 
 void USSIMPlayerDamageReactionComponent::EndStagger()

@@ -41,6 +41,14 @@ void USSIMEnemyDamageReactionComponent::OnDamageReceivedHandler(const FDamageDat
 
 void USSIMEnemyDamageReactionComponent::StartStagger()
 {
+	if (!IsValid(SelectStaggerMontage()))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | %s montage is not valid"), 
+												TEXT(__FUNCTION__), 
+													 *GetNameSafe(SelectStaggerMontage()));
+		return;
+	}
+	
 	EnemyStatsComponent->EnemyState = EEnemyState::EES_Staggered;
 	
 	GetWorld()->GetTimerManager().SetTimer(
@@ -51,13 +59,6 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 		false
 		);
 	
-	if (!IsValid(SelectStaggerMontage()))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | %s montage is not valid"), 
-											    TEXT(__FUNCTION__), 
-													 *GetNameSafe(SelectStaggerMontage()));
-		return;
-	}
 	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
 	
 	if (bShowStaggerLogs)
@@ -142,6 +143,11 @@ UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
 	TObjectPtr<UAnimMontage> StaggeredMontage;
 	FVector InstigatorDirection = DamageData.Instigator->GetActorForwardVector();
 	FVector EnemyDirection = SSIMEnemy->GetActorForwardVector();
+	
+	/*
+	 if enemy facing direction == player facing direction - back hit reaction
+	 if enemy facing direction != player facing direction - front hit reaction
+	*/
 	
 	if (FVector::DotProduct(InstigatorDirection, EnemyDirection) > 0.f)
 	{
