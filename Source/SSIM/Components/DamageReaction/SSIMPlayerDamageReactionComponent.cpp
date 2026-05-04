@@ -14,10 +14,8 @@
 void USSIMPlayerDamageReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReferences();
 	
 	StaggeredFirstFrame->BlendIn = StaggeredFirstFrameBlendInTime;
-	
 }
 
 void USSIMPlayerDamageReactionComponent::SetReferences()
@@ -33,6 +31,27 @@ void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(const FDamageDa
 	Super::OnDamageReceivedHandler(InDamageData);
 	
 	InitStagger();
+}
+
+void USSIMPlayerDamageReactionComponent::ReboundOnHit()
+{
+	ReboundLaunchVelocity.Y = ReboundVelocityY * SSIMPlayer->GetPlayerFacingDirectionValue() * -1.f;
+	ReboundLaunchVelocity.Z = ReboundVelocityZ;
+	
+	// if Player is to the Right to Enemy
+	if (SSIMPlayer->GetActorLocation().Y > DamageData.Instigator->GetActorLocation().Y)
+	{
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
+	}
+	else
+	{
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
+	}
+	
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
+	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
+	
+	Super::ReboundOnHit();
 }
 
 #pragma region Stagger processing
@@ -114,36 +133,13 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 {
 	EndStopFrame();
 	
-	FRotator PlayerRotation = SSIMPlayer->GetActorRotation(); 
-	PlayerRotation.Yaw = FVector(DamageData.Instigator->GetActorLocation() - SSIMPlayer->GetActorLocation()).Rotation().Yaw;
-	SSIMPlayer->SetActorRotation(PlayerRotation);
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | PlayerRotation: %s"), TEXT(__FUNCTION__), *PlayerRotation.ToString());
-	
-	bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y;
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | bEnemyIsToTheRight: %s"), TEXT(__FUNCTION__), bEnemyIsToTheRight ? TEXT("True") : TEXT("False"));
-	ReboundLaunchVelocity = FVector(
-							0.0f, 
-							ReboundVelocityY * (bEnemyIsToTheRight ? -1.f : 1.f), 
-							ReboundVelocityZ);
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | ReboundLaunchVelocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
-	
-	SSIMPlayer->LaunchCharacter(ReboundLaunchVelocity, true, true);
-	
-#if !UE_BUILD_SHIPPING
-	if (bDrawReboundDebug)
-	{
-		ReboundDrawDebug();
-	}
-#endif !UE_BUILD_SHIPPING
-	
-	SSIMPlayer->SetPlayerGravityScaleToDefault();
-	
 	if (!IsValid(FrontStaggeredMontage))
-    {
-    	UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
-    	return;
-    }
-    SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredAnimation montage is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	ReboundOnHit();
 }
 
 void USSIMPlayerDamageReactionComponent::EndStagger()
@@ -157,17 +153,6 @@ void USSIMPlayerDamageReactionComponent::EndStagger()
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
 	}
-}
-
-void USSIMPlayerDamageReactionComponent::ReboundDrawDebug()
-{
-	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
-								SSIMPlayer->GetActorLocation(), 
-								 SSIMPlayer->GetActorLocation() + ReboundLaunchVelocity.GetSafeNormal() * 400.f, 
-							   25.f, 
-										 ReboundDirectionArrowColor, 
-										 DrawDuration, 
-							   5.f);
 }
 
 #pragma endregion Stagger processing

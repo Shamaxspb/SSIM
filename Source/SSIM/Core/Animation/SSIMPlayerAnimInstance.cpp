@@ -20,7 +20,7 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDamageReceivedHandler);
 	
-	SSIMPlayer->GetPlayerFlowComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDashStartedHandler);
+	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDashStartedHandler);
 }
 
 void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

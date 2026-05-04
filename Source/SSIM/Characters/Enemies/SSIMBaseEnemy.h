@@ -9,6 +9,7 @@
 
 #include "SSIMBaseEnemy.generated.h"
 
+enum class EFacingDirection : uint8;
 class USSIMEnemyDamageReactionComponent;
 class USSIMEnemyCombatComponent;
 class USSIMEnemyStatsComponent;
@@ -37,35 +38,60 @@ protected:
 	
 #pragma endregion Components
 	
+#pragma region Metadata
+
+	EFacingDirection EnemyFacingDirection;
+
+#pragma endregion Metadata
+	
 	
 // Overriden Functions
 public:
 	ASSIMBaseEnemy();
 	
+	virtual void BeginPlay() override;
+	
+	virtual void Tick(float DeltaSeconds) override;
+	
+	
+// My Functions
+#pragma region Inline Getters
+
+public:
 	UFUNCTION()
 	FORCEINLINE UBoxComponent* GetAttackCollision() const
 	{
 		return AttackBoxCollision;
 	}
-	
 	FORCEINLINE USSIMEnemyCombatComponent* GetEnemyCombatComponent() const
 	{
 		return EnemyCombatComponent;
 	}
-	
 	FORCEINLINE USSIMEnemyStatsComponent* GetEnemyStatsComponent() const
 	{
 		return EnemyStatsComponent;
 	}
-	
 	FORCEINLINE USSIMEnemyDamageReactionComponent* GetEnemyDamageReactionComponent() const
 	{
 		return EnemyDamageReactionComponent;
 	}
 	
-// My Functions
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Enemy")
+	FORCEINLINE EFacingDirection GetEnemyFacingDirection() const
+	{
+		return EnemyFacingDirection;
+	}
+	
+#pragma endregion Inline Getters
+
 protected:
 	void SetupAttackCollision();
+	
+public:
+	void SetEnemyFacingDirection(EFacingDirection InPlayerFacingDirection);
+	
+private:
+	void UpdateFacingDirection();
 	
 // Interfaces
 public:

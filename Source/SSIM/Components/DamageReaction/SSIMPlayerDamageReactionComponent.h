@@ -63,21 +63,19 @@ protected:
 
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
-	
 	TArray<FStaggerSequenceStep> Steps;
-	int32 CurrentStaggerSequenceStep = 0;
 	FTimerHandle StaggerSequenceHandle;
 	
 #pragma endregion Stagger
 	
 #pragma region Metadata
 
-	FVector ReboundLaunchVelocity = FVector::ZeroVector;
+	int32 CurrentStaggerSequenceStep = 0;
 	
 #pragma endregion Metadata
 	
 // Overriden Functions
-protected:
+public:
 	virtual void BeginPlay() override;
 
 // My Functions
@@ -86,6 +84,8 @@ protected:
 	
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
 
+	virtual void ReboundOnHit() override;
+	
 private:
 	// Damage processing
 	UFUNCTION()
@@ -96,9 +96,5 @@ private:
 	void EndStopFrame() const;
 	void StartStagger();
 	void EndStagger();
-	
-	// Debug
-protected:
-	virtual void ReboundDrawDebug() override;
 	
 };

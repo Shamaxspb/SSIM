@@ -52,10 +52,6 @@ protected:
 	
 	
 // My Functions
-	virtual void BeginPlay() override;
-	
-	
-// My Functions
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
 	virtual void ReduceHealth(const FDamageData& InDamageData) override;

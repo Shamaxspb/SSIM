@@ -8,6 +8,7 @@
 #include "SSIM/Components/Combat/SSIMEnemyCombatComponent.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
 #include "SSIM/Components/DamageReaction/SSIMEnemyDamageReactionComponent.h"
+#include "SSIM/Core/Types/EPlayerTypes.h"
 
 // Overriden Functions
 ASSIMBaseEnemy::ASSIMBaseEnemy()
@@ -22,6 +23,21 @@ ASSIMBaseEnemy::ASSIMBaseEnemy()
 	SetupAttackCollision();
 }
 
+void ASSIMBaseEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	EnemyFacingDirection = FVector::DotProduct(GetActorForwardVector(), FVector::RightVector) > 0.f ?
+												EFacingDirection::EPD_Right : EFacingDirection::EPD_Left;
+}
+
+void ASSIMBaseEnemy::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	UpdateFacingDirection();
+}
+
 void ASSIMBaseEnemy::SetupAttackCollision()
 {
 	AttackBoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
@@ -32,6 +48,37 @@ void ASSIMBaseEnemy::SetupAttackCollision()
 	AttackBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ASSIMBaseEnemy::SetEnemyFacingDirection(EFacingDirection InEnemyFacingDirection)
+{
+	EnemyFacingDirection = InEnemyFacingDirection;
+	FRotator EnemyRotation = GetActorRotation();
+	switch (InEnemyFacingDirection)
+	{
+	case EFacingDirection::EPD_Right:
+		{
+			EnemyRotation.Yaw = 90.f;
+			break;
+		}
+	case EFacingDirection::EPD_Left:
+		{
+			EnemyRotation.Yaw = -90.f;
+			break;
+		}
+	}
+	SetActorRotation(EnemyRotation);
+}
+
+void ASSIMBaseEnemy::UpdateFacingDirection()
+{
+	if (GetVelocity().Y > 0.f)
+	{
+		EnemyFacingDirection = EFacingDirection::EPD_Right;
+	}
+	else if (GetVelocity().Y < 0.f)
+	{
+		EnemyFacingDirection = EFacingDirection::EPD_Left;
+	}
+}
 
 // Interfaces
 void ASSIMBaseEnemy::StartAttackInterface_Implementation() const

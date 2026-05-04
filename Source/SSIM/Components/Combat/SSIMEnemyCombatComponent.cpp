@@ -13,7 +13,6 @@
 void USSIMEnemyCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReferences();
 	
 	SSIMEnemy->GetContactDamageCollision()->OnComponentBeginOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionBeginOverlap);
 	SSIMEnemy->GetContactDamageCollision()->OnComponentEndOverlap.AddDynamic(this, &USSIMEnemyCombatComponent::OnContactDamageCollisionEndOverlap);

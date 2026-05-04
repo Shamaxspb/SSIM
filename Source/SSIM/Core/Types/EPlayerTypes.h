@@ -4,9 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-//#include "EPlayerState.generated.h"
-
-
+#include "EPlayerTypes.generated.h"
 
 /*UENUM(BlueprintType)
 enum class EPlayerState : uint8
@@ -16,13 +14,11 @@ enum class EPlayerState : uint8
 	EPS_Attack		UMETA(DisplayName = "Attack"),
 	EPS_Dodge		UMETA(DisplayName = "Dodge"),
 	EPS_Hit			UMETA(DisplayName = "Hit")
-};
+};*/
 
 UENUM(BlueprintType)
-enum class EPlayerDirection : uint8
+enum class EFacingDirection : uint8
 {
-	EPD_Default		UMETA(DisplayName = "Default"),
 	EPD_Right		UMETA(DisplayName = "Right"),
 	EPD_Left		UMETA(DisplayName = "Left")
 };
-*/

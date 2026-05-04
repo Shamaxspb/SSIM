@@ -4,14 +4,14 @@
 #include "SSIMPlayerCombatComponent.h"
 
 #include "SSIM/SSIM.h"
-#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
 {
@@ -23,10 +23,9 @@ USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
 void USSIMPlayerCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReferences();
 	
-	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
-	PlayerFlowComponent->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
+	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
+	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 	
 	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 }
@@ -37,7 +36,6 @@ void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	
 	if (SSIMPlayer->GetIsPlayerAttackKnockbackActive() && AttackKnockbackType == EAttackKnockbackType::EAKT_Ground)
 	{
-		//SSIMPlayer->GetCharacterMovement()->Velocity.Z = 0.f;
 		SSIMPlayer->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 }
@@ -50,7 +48,7 @@ void USSIMPlayerCombatComponent::StartAttack()
 	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
 	{
 		FOnMontageEnded OnPogoAnimationEnded;
-		OnPogoAnimationEnded.BindUObject(this, &USSIMPlayerCombatComponent::PogoAnimationCallback);
+		OnPogoAnimationEnded.BindUObject(this, &USSIMPlayerCombatComponent::PogoAnimationEndedCallback);
 		
 		OnPogoAnimationStartedDelegate.Broadcast();
 		SSIMPlayer->GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(OnPogoAnimationEnded, AttackMontage);
@@ -99,8 +97,6 @@ void USSIMPlayerCombatComponent::SetReferences()
 	Super::SetReferences();
 	
 	SSIMPlayer = CastChecked<ASSIMPlayer>(GetOwner());
-	PlayerStatsComponent = SSIMPlayer->GetPlayerStatsComponent();
-	PlayerFlowComponent  = SSIMPlayer->GetPlayerFlowComponent();
 }
 
 UAnimMontage* USSIMPlayerCombatComponent::GetAttackMontage()
@@ -193,13 +189,15 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	HitEnemies.AddUnique(OtherActor);
-	
-	HitRegistration(OtherActor);
+	if (OtherActor != SSIMPlayer)
+	{
+		HitEnemies.AddUnique(OtherActor);
+		HitRegistration(OtherActor);
+	}
 }
 
 // Internal
-void USSIMPlayerCombatComponent::HitRegistration(AActor* OtherActor)
+void USSIMPlayerCombatComponent::HitRegistration(const AActor* OtherActor)
 {
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
@@ -218,8 +216,10 @@ void USSIMPlayerCombatComponent::HitRegistration(AActor* OtherActor)
 	if (bShowAttackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s for %d damage"), TEXT(__FUNCTION__), *OtherActor->GetName(), RegularAttackDamage);
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Player Direction Type: "), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
 	}
 		
+	ISSIMDamageableInterface::Execute_ReceivePlayerAttackDirectionType(OtherActor, PlayerAttackDirectionType);
 	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(OtherActor, DamageData);
 	
 	OnHitRegistrationDelegate.Broadcast(PlayerAttackDirectionType);
@@ -339,6 +339,13 @@ void USSIMPlayerCombatComponent::PogoInit()
 		SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
 		SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		
+		GetWorld()->GetTimerManager().SetTimer(
+			PogoAdjustHeightHandle,
+			PogoAdjustHeightDelegate,
+			PogoInterpolationStepTime,
+			true
+			);
+		
 #if !UE_BUILD_SHIPPING
 		
 		if (bDrawPogoDebug)
@@ -365,12 +372,6 @@ void USSIMPlayerCombatComponent::PogoInit()
 		}
 #endif
 		
-		GetWorld()->GetTimerManager().SetTimer(
-			PogoAdjustHeightHandle,
-			PogoAdjustHeightDelegate,
-			PogoInterpolationStepTime,
-			true
-		);
 	}
 	else
 	{
@@ -390,6 +391,7 @@ void USSIMPlayerCombatComponent::AdjustPogoStartLocation(FVector AdjustedPlayerL
 	if (SSIMPlayer->GetActorLocation().Equals(AdjustedPlayerLocation, 0.5f))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(PogoAdjustHeightHandle);
+		
 		PogoStart();
 	}
 }
@@ -454,7 +456,7 @@ void USSIMPlayerCombatComponent::OnDashStartedHandler()
 	EndAttack(); // interrupt attack so to avoid stuck in attack if dash interrupts attack
 }
 
-void USSIMPlayerCombatComponent::PogoAnimationCallback(UAnimMontage* PogoMontage, bool Interrupted) const
+void USSIMPlayerCombatComponent::PogoAnimationEndedCallback(UAnimMontage* PogoMontage, bool Interrupted) const
 {
 	OnPogoAnimationEndedDelegate.Broadcast(Interrupted);
 }
