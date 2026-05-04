@@ -220,8 +220,10 @@ void USSIMPlayerCombatComponent::HitRegistration(AActor* OtherActor)
 	if (bShowAttackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s for %d damage"), TEXT(__FUNCTION__), *OtherActor->GetName(), RegularAttackDamage);
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Player Direction Type: "), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
 	}
 		
+	ISSIMDamageableInterface::Execute_ReceivePlayerAttackDirectionType(OtherActor, PlayerAttackDirectionType);
 	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(OtherActor, DamageData);
 	
 	OnHitRegistrationDelegate.Broadcast(PlayerAttackDirectionType);

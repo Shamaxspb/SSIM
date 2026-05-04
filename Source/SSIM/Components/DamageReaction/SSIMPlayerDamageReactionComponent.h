@@ -71,7 +71,6 @@ private:
 #pragma region Metadata
 
 	int32 CurrentStaggerSequenceStep = 0;
-	FVector ReboundLaunchVelocity = FVector::ZeroVector;
 	
 #pragma endregion Metadata
 	
@@ -95,9 +94,5 @@ private:
 	void EndStopFrame() const;
 	void StartStagger();
 	void EndStagger();
-	
-	// Debug
-protected:
-	virtual void ReboundDrawDebug() override;
 	
 };

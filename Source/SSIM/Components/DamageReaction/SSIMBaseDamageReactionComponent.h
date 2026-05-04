@@ -26,19 +26,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations", meta = (DisplayPriority = 1))
 	TObjectPtr<UAnimMontage> FrontStaggeredMontage;
 
+#pragma region Metadata
+	
+	FVector ReboundLaunchVelocity = FVector::ZeroVector;
+
+#pragma endregion Metadata
+	
 #pragma region Rebound Debug
 	
 	// DEBUG
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound")
 	bool bShowReboundLogs;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Rebound")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound")
 	bool bDrawReboundDebug;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bDrawReboundDebug", EditConditionHides))
-	float DrawDuration = 3.f;
+	float ReboundDrawDuration = 3.f;
 	
-	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bDrawReboundDebug", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bDrawReboundDebug", EditConditionHides))
+	float ReboundDirectionArrowLength = 200.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DEBUG|Rebound", meta = (EditCondition = "bDrawReboundDebug", EditConditionHides))
 	FLinearColor ReboundDirectionArrowColor = FLinearColor(1.f, 0.148f, 0.106f, 1.f);
 	
 #pragma endregion Rebound Debug
@@ -57,6 +66,8 @@ protected:
 	UFUNCTION()
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
+// Debug
+protected:
 	virtual void ReboundDrawDebug();
 	
 };

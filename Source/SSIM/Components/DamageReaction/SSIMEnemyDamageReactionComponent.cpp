@@ -3,15 +3,11 @@
 
 #include "SSIMEnemyDamageReactionComponent.h"
 
-#include "AIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
+#include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMEnemyStatsComponent.h"
-#include "SSIM/Core/Helpers/SSIMBlackboardHelper.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 //
@@ -89,33 +85,33 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 
 void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 {
-	FVector EnemyLocation = SSIMEnemy->GetActorLocation();
-	FVector PlayerLocation = DamageData.Instigator->GetActorLocation();
-	FVector ReboundVelocity;
-	FVector ReboundDirection;
-	
 	switch (PlayerAttackDirectionType)
 	{
+	case EPlayerAttackDirectionType::EPADT_Frontal:
+		{
+			ASSIMPlayer* Player = Cast<ASSIMPlayer>(DamageData.Instigator);
+			ReboundLaunchVelocity.Y = FrontalReboundVelocityY * Player->GetPlayerFacingDirectionValue();
+			ReboundLaunchVelocity.Z = FrontalReboundVelocityZ; 
+			break;	
+		}
+	case EPlayerAttackDirectionType::EPADT_Upward:
+		{
+			// Just VectorUp from Enemy location
+			ReboundLaunchVelocity.Z = UpwardReboundVelocityZ;
+			break;
+		}
 	case EPlayerAttackDirectionType::EPADT_Downward:
 		{
-			// Just vector down from Enemy location
-			ReboundDirection = EnemyLocation + FVector::DownVector;
-			ReboundVelocity = ReboundDirection * -ReboundVelocityZ;
+			// Just VectorDown from Enemy location
+			ReboundLaunchVelocity.Z = -DownwardReboundVelocityZ;
 			break;
 		}
 	default:
 		{
-			// Determine if Player is to the right or to the left
-			bool bPlayerToTheRight = PlayerLocation.Y > EnemyLocation.Y;
-	
-			// Get unit vector from Player to Enemy and Negate that vector
-			ReboundDirection = UKismetMathLibrary::NegateVector(UKismetMathLibrary::GetDirectionUnitVector(EnemyLocation, PlayerLocation));
-	
-			// Add rotation to that vector (around X axis)
-			RotatedDirection = ReboundDirection.RotateAngleAxis(bPlayerToTheRight ? -ReboundAngle : ReboundAngle, FVector::ForwardVector);
-
-			// Multiply by coef for launch
-			ReboundVelocity = RotatedDirection * ReboundVelocityCoef;
+			if (bShowReboundLogs)
+			{
+				UE_LOG(LogSSIMGameplayMessages, Error, TEXT("%s | wtf is Player Attack Direction"), TEXT(__FUNCTION__));
+			}
 			break;
 		}
 	}
@@ -125,7 +121,7 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 	if (bShowReboundLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player Attack Direction Type: %s"), TEXT(__FUNCTION__),  *UEnum::GetValueAsString(PlayerAttackDirectionType));
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Rebound Velocity: %s"), TEXT(__FUNCTION__), *ReboundVelocity.ToString());
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Rebound Velocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
 	}
 	if (bDrawReboundDebug)
 	{
@@ -135,21 +131,18 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 #endif !UE_BUILD_SHIPPING
 	
 	SSIMEnemy->GetCharacterMovement()->StopMovementImmediately();
-	SSIMEnemy->LaunchCharacter(ReboundVelocity, true, true);
+	SSIMEnemy->LaunchCharacter(ReboundLaunchVelocity, true, true);
+	
+	// Reset value for proper next Rebound calculation 
+	ReboundLaunchVelocity = FVector::ZeroVector;
 }
 
 UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
 {
 	TObjectPtr<UAnimMontage> StaggeredMontage;
-	FVector InstigatorDirection = DamageData.Instigator->GetActorForwardVector();
-	FVector EnemyDirection = SSIMEnemy->GetActorForwardVector();
+	const ASSIMPlayer* Player = Cast<ASSIMPlayer>(DamageData.Instigator);
 	
-	/*
-	 if enemy facing direction == player facing direction - back hit reaction
-	 if enemy facing direction != player facing direction - front hit reaction
-	*/
-	
-	if (FVector::DotProduct(InstigatorDirection, EnemyDirection) > 0.f)
+	if (SSIMEnemy->GetEnemyFacingDirection() == Player->GetPlayerFacingDirection())
 	{
 		StaggeredMontage = BackStaggeredMontage;
 	}
@@ -157,6 +150,7 @@ UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
 	{
 		StaggeredMontage = FrontStaggeredMontage;
 	}
+	
 	return StaggeredMontage;
 }
 
@@ -164,15 +158,4 @@ void USSIMEnemyDamageReactionComponent::ReceivePlayerAttackDirectionType(
 	EPlayerAttackDirectionType InPlayerAttackDirectionType) // This value initialized by interface, not OnDamageReceived
 {
 	PlayerAttackDirectionType = InPlayerAttackDirectionType;
-}
-
-void USSIMEnemyDamageReactionComponent::ReboundDrawDebug()
-{
-	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
-								SSIMEnemy->GetActorLocation(), 
-								 SSIMEnemy->GetActorLocation() + (RotatedDirection * 250.f), 
-							   25.f, 
-										 ReboundDirectionArrowColor, 
-										 DrawDuration, 
-							   5.f);
 }

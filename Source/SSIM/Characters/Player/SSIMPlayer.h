@@ -188,6 +188,10 @@ public:
 	{
 		return PlayerFacingDirection;
 	}
+	FORCEINLINE float GetPlayerFacingDirectionValue() const
+	{
+		return PlayerFacingDirection == EFacingDirection::EPD_Right ? 1.f : -1.f;
+	}
 	
 	// State getters
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")

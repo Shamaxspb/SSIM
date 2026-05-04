@@ -32,6 +32,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
 	
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations", meta = (DisplayPriority = 2))
 	TObjectPtr<UAnimMontage> BackStaggeredMontage;
 	
@@ -50,20 +51,25 @@ private:
 #pragma region Rebound
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Stagger|Rebound")
-	float ReboundAngle = 45.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Stagger|Rebound")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Rebound")
 	float ReboundVelocityCoef = 700.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Stagger|Rebound")
-	float ReboundVelocityZ = 250.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Rebound")
+	float FrontalReboundVelocityY = 250.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Rebound")
+	float FrontalReboundVelocityZ = 250.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Rebound")
+	float UpwardReboundVelocityZ = 250.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Rebound")
+	float DownwardReboundVelocityZ = 250.f;
 	
 #pragma endregion Rebound
 
 #pragma region Metadata
-	
-	FVector RotatedDirection = FVector::ZeroVector;
 	
 	EPlayerAttackDirectionType PlayerAttackDirectionType;
 	
@@ -88,8 +94,5 @@ private:
 	void ReboundOnHit();
 	
 	UAnimMontage* SelectStaggerMontage() const;
-	
-	// Debug
-protected:
-	virtual void ReboundDrawDebug() override;
+
 };

@@ -141,10 +141,14 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 	
 	SSIMPlayer->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
+	// Reset value for proper next Rebound calculation 
+	ReboundLaunchVelocity = FVector::ZeroVector;
+	
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 	
 #if !UE_BUILD_SHIPPING
+	
 	if (bDrawReboundDebug)
 	{
 		ReboundDrawDebug();
@@ -163,17 +167,6 @@ void USSIMPlayerDamageReactionComponent::EndStagger()
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger ENDED (%s)"), TEXT(__FUNCTION__), *SSIMPlayer->GetName());
 	}
-}
-
-void USSIMPlayerDamageReactionComponent::ReboundDrawDebug()
-{
-	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
-								SSIMPlayer->GetActorLocation(), 
-								 SSIMPlayer->GetActorLocation() + ReboundLaunchVelocity.GetSafeNormal() * 400.f, 
-							   25.f, 
-										 ReboundDirectionArrowColor, 
-										 DrawDuration, 
-							   5.f);
 }
 
 #pragma endregion Stagger processing

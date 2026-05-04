@@ -4,7 +4,7 @@
 #include "SSIMBaseDamageReactionComponent.h"
 
 #include "GameFramework/Character.h"
-#include "SSIM/SSIM.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 
@@ -31,5 +31,11 @@ void USSIMBaseDamageReactionComponent::OnDamageReceivedHandler(const FDamageData
 
 void USSIMBaseDamageReactionComponent::ReboundDrawDebug()
 {
-	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | Rebound Draw Debug is not implemented"), TEXT(__FUNCTION__));
+	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 
+								GetOwner()->GetActorLocation(), 
+								 GetOwner()->GetActorLocation() + ReboundLaunchVelocity.GetSafeNormal() * ReboundDirectionArrowLength, 
+							   25.f, 
+										 ReboundDirectionArrowColor, 
+										 ReboundDrawDuration, 
+							   5.f);
 }
