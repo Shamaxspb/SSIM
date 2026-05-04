@@ -71,9 +71,11 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	SSIMInputComponent->BindAction(AttackInputAction,			ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackFrontal);
 	SSIMInputComponent->BindAction(AttackUpwardInputAction,		ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackUpward);
 	SSIMInputComponent->BindAction(AttackDownwardInputAction,	ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackDownward);
+	
+	SSIMInputComponent->BindAction(HealInputAction,				ETriggerEvent::Started,   this, &ASSIMPlayer::HandleHeal);
 }
 
-
+// My Functions
 void ASSIMPlayer::SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirection)
 {
 	PlayerFacingDirection = InPlayerFacingDirection;
@@ -94,7 +96,6 @@ void ASSIMPlayer::SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirect
 	SetActorRotation(PlayerRotation);
 }
 
-// My Functions
 void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 {
 	if (CanMove())
@@ -207,6 +208,14 @@ void ASSIMPlayer::HandleEndAttackTrace() const
 
 }
 
+void ASSIMPlayer::HandleHeal()
+{
+	if (CanHeal())
+	{
+		SSIMPlayerStatsComponent->IncreaseHealth(3);
+	}
+}
+
 void ASSIMPlayer::HandleDash()
 {
 	if (CanDash())
@@ -222,10 +231,49 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 
 bool ASSIMPlayer::CanMove() const
 {
-	if (SSIMPlayerDashComponent->bDashing || SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerCombatComponent->bAttackKnockbackActive)
+	if (SSIMPlayerDashComponent->bDashing 
+		|| 
+		SSIMPlayerDamageReactionComponent->bStaggered 
+		|| 
+		SSIMPlayerCombatComponent->bAttackKnockbackActive)
 	{
 		return false;
 	}
+	return true;
+}
+
+bool ASSIMPlayer::CanDash() const
+{
+	if (SSIMPlayerDashComponent->bDashing 
+		|| 
+		!SSIMPlayerDashComponent->bCanDash 
+		|| 
+		SSIMPlayerDamageReactionComponent->bStaggered)
+	{
+		if (SSIMPlayerDashComponent->bDashing)
+		{
+			if (bShowPlayerInputLogs)
+			{
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
+			}
+		}
+		if (!SSIMPlayerDashComponent->bCanDash)
+		{
+			if (bShowPlayerInputLogs)
+			{
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
+			}
+		}
+		if (SSIMPlayerDamageReactionComponent->bStaggered)
+		{
+			if (bShowPlayerInputLogs)
+			{
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while staggered"), TEXT(__FUNCTION__));
+			}
+		}
+		return false;
+	}
+	
 	return true;
 }
 
@@ -241,21 +289,21 @@ bool ASSIMPlayer::CanAttack() const
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerDashComponent->bDashing)
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Player staggered"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while staggered"), TEXT(__FUNCTION__));
 			}
 		}
 		return false;
@@ -263,36 +311,19 @@ bool ASSIMPlayer::CanAttack() const
 	return true;
 }
 
-bool ASSIMPlayer::CanDash() const
+bool ASSIMPlayer::CanHeal() const
 {
-	if (SSIMPlayerDashComponent->bDashing || !SSIMPlayerDashComponent->bCanDash || SSIMPlayerDamageReactionComponent->bStaggered)
+	if (SSIMPlayerDamageReactionComponent->bStaggered)
 	{
-		if (SSIMPlayerDashComponent->bDashing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
-			}
-		}
-		if (!SSIMPlayerDashComponent->bCanDash)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
-			}
-		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Can't Dash during stagger"), TEXT(__FUNCTION__));
-			}
+			UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Heal while staggered"), TEXT(__FUNCTION__));
 		}
 		return false;
 	}
-	
 	return true;
 }
+
 
 #pragma region Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const

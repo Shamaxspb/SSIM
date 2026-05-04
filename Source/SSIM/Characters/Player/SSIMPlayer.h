@@ -87,6 +87,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input|Attack", DisplayName = "IA_AttackDownward_Chord")
 	UInputAction* DownwardAttackChord;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Player|Input", DisplayName = "IA_Heal")
+	UInputAction* HealInputAction;
+	
 #pragma endregion Input	
 	
 #pragma region Player Defaults
@@ -251,26 +254,25 @@ public:
 	
 public:
 	void SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirection);
-	
-	
+
 private:
-	void HandleMove(const FInputActionValue& Value);
-	void HandleMoveCompleted();
-	
 	void SetupAttackCollision();
 	
 #pragma region Handler Functions
 	
 private:
+	void HandleMove(const FInputActionValue& Value);
+	void HandleMoveCompleted();
+	
+	void HandleDash(); 
+	
 	void HandleAttackFrontal();
 	void HandleAttackUpward();
 	void HandleAttackDownward();
 	void HandleStartAttackTrace() const;
 	void HandleEndAttackTrace() const;
 	
-	
-	
-	void HandleDash(); 
+	void HandleHeal(); 
 	
 #pragma endregion Handler Functions
 
@@ -280,8 +282,9 @@ private:
 	
 private:
 	bool CanMove() const;
-	bool CanAttack() const;
 	bool CanDash() const;
+	bool CanAttack() const;
+	bool CanHeal() const;
 	
 // Interfaces
 public:

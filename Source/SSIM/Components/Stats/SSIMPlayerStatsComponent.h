@@ -70,5 +70,5 @@ public:
 	void DecrementHealth_DEBUG();
 	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
-	void IncrementHealth_DEBUG();
+	void ReceiveHeal_DEBUG();
 };

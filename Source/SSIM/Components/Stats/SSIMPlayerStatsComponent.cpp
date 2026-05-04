@@ -104,7 +104,7 @@ void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()
 	};
 }
 
-void USSIMPlayerStatsComponent::IncrementHealth_DEBUG()
+void USSIMPlayerStatsComponent::ReceiveHeal_DEBUG()
 {
 	Health++;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
@@ -112,5 +112,6 @@ void USSIMPlayerStatsComponent::IncrementHealth_DEBUG()
 														Health, 
 														MaxHealth);	
 	
+	OnHealReceivedDelegate.Broadcast(3);
 }
  
