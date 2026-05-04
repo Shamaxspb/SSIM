@@ -3,7 +3,6 @@
 
 #include "SSIMEnemyDamageReactionComponent.h"
 
-#include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Enemies/SSIMBaseEnemy.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
@@ -11,21 +10,11 @@
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 //
-
-
-void USSIMEnemyDamageReactionComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	SetReferences();
-	
-}
-
 void USSIMEnemyDamageReactionComponent::SetReferences()
 {
 	Super::SetReferences();
 	
 	SSIMEnemy = CastChecked<ASSIMBaseEnemy>(SSIMOwnerCharacter);
-	EnemyStatsComponent = CastChecked<USSIMEnemyStatsComponent>(BaseStatsComponent);
 }
 
 void USSIMEnemyDamageReactionComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
@@ -45,7 +34,7 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 		return;
 	}
 	
-	EnemyStatsComponent->EnemyState = EEnemyState::EES_Staggered;
+	SSIMEnemy->GetEnemyStatsComponent()->EnemyState = EEnemyState::EES_Staggered;
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		StaggerTimerHandle,
@@ -68,7 +57,7 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 
 void USSIMEnemyDamageReactionComponent::EndStagger() const
 {
-	EnemyStatsComponent->EnemyState = EEnemyState::EES_Combat; // Since enemy can be staggered only in combat (not sure about this)
+	SSIMEnemy->GetEnemyStatsComponent()->EnemyState = EEnemyState::EES_Combat; // Since enemy can be staggered only in combat (not sure about this)
 	
 	SSIMEnemy->StopAnimMontage();
 	
@@ -116,7 +105,8 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 		}
 	}
 	
-#if !UE_BUILD_SHIPPING
+	Super::ReboundOnHit();
+/*#if !UE_BUILD_SHIPPING
 	
 	if (bShowReboundLogs)
 	{
@@ -134,7 +124,7 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 	SSIMEnemy->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
 	// Reset value for proper next Rebound calculation 
-	ReboundLaunchVelocity = FVector::ZeroVector;
+	ReboundLaunchVelocity = FVector::ZeroVector;*/
 }
 
 UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const

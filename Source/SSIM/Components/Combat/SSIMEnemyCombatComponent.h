@@ -46,8 +46,9 @@ private:
 
 
 // Overriden Functions
-protected:
+public:
 	virtual void BeginPlay() override;
+	
 	
 // My Functions
 public:

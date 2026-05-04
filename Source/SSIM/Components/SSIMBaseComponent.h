@@ -31,7 +31,6 @@ protected:
 public:
 	USSIMBaseComponent();
 
-protected:
 	virtual void BeginPlay() override;
 	
 	

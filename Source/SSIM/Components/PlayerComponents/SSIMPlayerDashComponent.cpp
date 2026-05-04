@@ -16,14 +16,9 @@
 void USSIMPlayerDashComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReferences();
 	
-	if (!IsValid(PlayerStatsComponent))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stats component is not valid"), TEXT(__FUNCTION__));
-	}
-	PlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerDashComponent::OnDamageReceivedHandler);
-	PlayerCombatComponent->OnPogoStartedDelegate.AddUniqueDynamic(this, &USSIMPlayerDashComponent::ResetDashOnPogo);
+	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerDashComponent::OnDamageReceivedHandler);
+	SSIMPlayer->GetPlayerCombatComponent()->OnPogoStartedDelegate.AddUniqueDynamic(this, &USSIMPlayerDashComponent::ResetDashOnPogo);
 	
 }
 
@@ -32,8 +27,6 @@ void USSIMPlayerDashComponent::SetReferences()
 	Super::SetReferences();
 	
 	SSIMPlayer = CastChecked<ASSIMPlayer>(SSIMOwnerCharacter);
-	PlayerStatsComponent  = SSIMPlayer->GetPlayerStatsComponent();
-	PlayerCombatComponent = SSIMPlayer->GetPlayerCombatComponent();
 }
 
 
@@ -146,22 +139,8 @@ void USSIMPlayerDashComponent::ResetDashOnPogo()
 
 FVector USSIMPlayerDashComponent::GetDashLaunchVelocity() const
 {
-	// Calculate Player direction
-	FVector DashDirectionVector;
-	switch (SSIMPlayer->GetPlayerFacingDirection())
-	{
-	case EFacingDirection::EPD_Right:
-		{
-			DashDirectionVector = FVector::RightVector;
-			break;
-		}
-	case EFacingDirection::EPD_Left:
-		{
-			DashDirectionVector = FVector::RightVector * -1.f;
-			break;
-		}
-	}
-	FVector OutLaunchVelocity =  DashDirectionVector * DashVelocity;
+	FVector OutLaunchVelocity = FVector::ZeroVector;
+	OutLaunchVelocity.Y = SSIMPlayer->GetPlayerFacingDirectionValue() * DashVelocity;
 	
 	if (bShowDashLogs)
 	{

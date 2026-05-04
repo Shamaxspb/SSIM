@@ -14,10 +14,8 @@
 void USSIMPlayerDamageReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReferences();
 	
 	StaggeredFirstFrame->BlendIn = StaggeredFirstFrameBlendInTime;
-	
 }
 
 void USSIMPlayerDamageReactionComponent::SetReferences()
@@ -33,6 +31,27 @@ void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(const FDamageDa
 	Super::OnDamageReceivedHandler(InDamageData);
 	
 	InitStagger();
+}
+
+void USSIMPlayerDamageReactionComponent::ReboundOnHit()
+{
+	ReboundLaunchVelocity.Y = ReboundVelocityY * SSIMPlayer->GetPlayerFacingDirectionValue() * -1.f;
+	ReboundLaunchVelocity.Z = ReboundVelocityZ;
+	
+	// if Player is to the Right to Enemy
+	if (SSIMPlayer->GetActorLocation().Y > DamageData.Instigator->GetActorLocation().Y)
+	{
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
+	}
+	else
+	{
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
+	}
+	
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
+	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
+	
+	Super::ReboundOnHit();
 }
 
 #pragma region Stagger processing
@@ -120,40 +139,7 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 		return;
 	}
 	
-	const bool  bEnemyIsToTheRight = DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y;
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | bEnemyIsToTheRight: %s"), TEXT(__FUNCTION__), bEnemyIsToTheRight ? TEXT("True") : TEXT("False"));
-	
-	float LocalReboundVelocityY = ReboundVelocityY;
-	
-	if (bEnemyIsToTheRight)
-	{
-		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
-		LocalReboundVelocityY *= -1.f;
-	}
-	else
-	{
-		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
-		LocalReboundVelocityY *= 1.f;
-	}
-	
-	ReboundLaunchVelocity = FVector(0.0f, LocalReboundVelocityY, ReboundVelocityZ);
-	UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | ReboundLaunchVelocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
-	
-	SSIMPlayer->LaunchCharacter(ReboundLaunchVelocity, true, true);
-	
-	// Reset value for proper next Rebound calculation 
-	ReboundLaunchVelocity = FVector::ZeroVector;
-	
-	SSIMPlayer->SetPlayerGravityScaleToDefault();
-	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
-	
-#if !UE_BUILD_SHIPPING
-	
-	if (bDrawReboundDebug)
-	{
-		ReboundDrawDebug();
-	}
-#endif !UE_BUILD_SHIPPING
+	ReboundOnHit();
 }
 
 void USSIMPlayerDamageReactionComponent::EndStagger()

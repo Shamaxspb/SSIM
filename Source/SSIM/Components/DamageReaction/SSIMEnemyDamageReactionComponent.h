@@ -11,7 +11,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartStaggerSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndStaggerSignature);
 
 class ASSIMBaseEnemy;
-class USSIMEnemyStatsComponent;
 
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -29,9 +28,6 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<ASSIMBaseEnemy> SSIMEnemy;
-	UPROPERTY()
-	TObjectPtr<USSIMEnemyStatsComponent> EnemyStatsComponent;
-	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations", meta = (DisplayPriority = 2))
 	TObjectPtr<UAnimMontage> BackStaggeredMontage;
@@ -77,7 +73,6 @@ protected:
 
 // Overriden Functions
 protected:
-	virtual void BeginPlay() override;
 	virtual void SetReferences() override;
 	
 // My Functions
@@ -86,12 +81,12 @@ public:
 	
 protected:
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
+	virtual void ReboundOnHit() override;
 	
 private:
 	void StartStagger();
 	void EndStagger() const;
 	
-	void ReboundOnHit();
 	
 	UAnimMontage* SelectStaggerMontage() const;
 

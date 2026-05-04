@@ -7,7 +7,6 @@
 
 #include "SSIMPlayerDashComponent.generated.h"
 
-class USSIMPlayerCombatComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashEndedSignature);
 
@@ -36,6 +35,8 @@ public:
 	
 	bool bDashing;
 	bool bCanDash = true;
+	
+#pragma region Settings
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animation")
@@ -71,6 +72,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashContactDamageCollisionRadius = 35.f;
 	
+#pragma endregion Settings
+
 #pragma region Metadata
 
 public:
@@ -85,16 +88,12 @@ private:
 private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerCombatComponent> PlayerCombatComponent;
 	
 	FTimerHandle DashInProcessTimerHandle;
 	
 	
 // Overriden Functions
-protected:
+public:
 	virtual void BeginPlay() override;
 	
 	

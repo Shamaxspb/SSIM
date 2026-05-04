@@ -75,7 +75,7 @@ private:
 #pragma endregion Metadata
 	
 // Overriden Functions
-protected:
+public:
 	virtual void BeginPlay() override;
 
 // My Functions
@@ -84,6 +84,8 @@ protected:
 	
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
 
+	virtual void ReboundOnHit() override;
+	
 private:
 	// Damage processing
 	UFUNCTION()

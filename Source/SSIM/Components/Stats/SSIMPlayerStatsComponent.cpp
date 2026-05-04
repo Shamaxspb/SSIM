@@ -8,12 +8,6 @@
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 
-void USSIMPlayerStatsComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	SetReferences();
-}
-
 // My Functions
 void USSIMPlayerStatsComponent::SetReferences()
 {

@@ -8,8 +8,6 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
-class USSIMPlayerDashComponent;
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitRegistrationSignature, EPlayerAttackDirectionType, AttackDirectionType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
@@ -37,11 +35,7 @@ public:
 	FOnPogoAnimationEndedSignature	   OnPogoAnimationEndedDelegate;
 	FOnAttackKnockbackStartedSignature OnAttackKnockbackStartedDelegate;
 	FOnAttackKnockbackEndedSignature   OnAttackKnockbackEndedDelegate;
-	
-	bool bAttackKnockbackActive = false;
-	bool bPogoActive 			= false;
-	
-	
+
 #pragma region Stats
 	
 public:
@@ -76,6 +70,9 @@ public:
 #pragma region Metadata
 	
 public:
+	bool bAttackKnockbackActive = false;
+	bool bPogoActive 			= false;
+	
 	EPlayerAttackDirectionType PlayerAttackDirectionType;
 	EAttackKnockbackType AttackKnockbackType;
 
@@ -84,12 +81,6 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
-	
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerStatsComponent> PlayerStatsComponent;
-	
-	UPROPERTY()
-	TObjectPtr<USSIMPlayerDashComponent> PlayerFlowComponent;
 
 #pragma region Pogo
 	
@@ -157,13 +148,11 @@ private:
 	
 // Overriden Functions
 public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-protected:
 	USSIMPlayerCombatComponent();
 	
 	virtual void BeginPlay() override;
 	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 // My Functions
 public:
@@ -182,7 +171,7 @@ protected:
 											   const FHitResult& SweepResult) override;
 	
 private:
-	void HitRegistration(AActor* OtherActor);
+	void HitRegistration(const AActor* OtherActor);
 	
 	void AttackKnockback();
 	void ResetAttackKnockbackState();
@@ -199,6 +188,6 @@ private:
 	void OnDashStartedHandler();
 	
 	UFUNCTION()
-	void PogoAnimationCallback(UAnimMontage* PogoMontage, bool Interrupted) const;
+	void PogoAnimationEndedCallback(UAnimMontage* PogoMontage, bool Interrupted) const;
 
 };

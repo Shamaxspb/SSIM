@@ -147,7 +147,7 @@ public:
 		return SSIMPlayerCombatComponent;
 	}
 	UFUNCTION()
-	FORCEINLINE USSIMPlayerDashComponent* GetPlayerFlowComponent() const
+	FORCEINLINE USSIMPlayerDashComponent* GetPlayerDashComponent() const
 	{
 		return SSIMPlayerDashComponent;
 	}

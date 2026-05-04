@@ -56,7 +56,7 @@ protected:
 	bool bShowStaggerLogs;
 	
 // Overriden Functions
-protected:
+public:
 	virtual void BeginPlay() override;
 
 // My Functions
@@ -65,6 +65,8 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	
+	virtual void ReboundOnHit();
 	
 // Debug
 protected:
