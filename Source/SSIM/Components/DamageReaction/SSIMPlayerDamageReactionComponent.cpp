@@ -128,12 +128,12 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 	if (bEnemyIsToTheRight)
 	{
 		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
-		LocalReboundVelocityY = 1.f;
+		LocalReboundVelocityY *= -1.f;
 	}
 	else
 	{
 		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
-		LocalReboundVelocityY = -1.f;
+		LocalReboundVelocityY *= 1.f;
 	}
 	
 	ReboundLaunchVelocity = FVector(0.0f, LocalReboundVelocityY, ReboundVelocityZ);
