@@ -10,6 +10,9 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityEndedSignature);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealingStartedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealingEndedSignature);
+
 class ASSIMPlayer;
 struct FStaggerSequenceStep;
 struct FDamageData;
@@ -26,23 +29,37 @@ public:
 	FOnInvulnerabilityStartedSignature OnInvulnerabilityStartedDelegate;
 	FOnInvulnerabilityEndedSignature OnInvulnerabilityEndedDelegate;
 	
+	FOnHealingStartedSignature OnHealingStartedDelegate;
+	FOnHealingEndedSignature OnHealingEndedDelegate;
+	
+	bool bHealing = false;
+	bool bInvulnerable = false;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Stats", meta = (ClampMin = 0))	
 	int32 MaxHealth = 5;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Stats", meta = (ClampMin = 0))	
 	int32 Health = MaxHealth;
 	
-	bool bInvulnerable;
-	
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")	
+	int32 HealAmount = 3;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")	
 	float InvulnerabilityDuration = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animation")
+	TObjectPtr<UAnimMontage> HealingMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")	
+	float AirHangingDuration = 1.f;
 	
 private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 	
 	FTimerHandle InvulnerabilityTimerHandle;
+	FTimerHandle AirHangingTimerHandle;
 
 	// Debug
 protected:
@@ -53,16 +70,23 @@ protected:
 	
 // My Functions
 public:
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
 	virtual void ReduceHealth(const FDamageData& InDamageData) override;
 	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Combat|Stats")
-	virtual void IncreaseHealth(int32 InHealValue) override;
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
+	virtual void IncreaseHealth(const int32 InHealValue) override;
+	
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
+	void StartHealing();
 	
 	void EndInvulnerability();
 	
 protected:
 	virtual void SetReferences() override;
+	
+private:
+	void StartAirHanging();
+	void EndAirHanging();
 	
 // DEBUG
 public:

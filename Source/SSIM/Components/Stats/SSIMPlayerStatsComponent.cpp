@@ -60,7 +60,7 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 	Super::ReduceHealth(InDamageData);
 }
 
-void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
+void USSIMPlayerStatsComponent::IncreaseHealth(const int32 InHealValue)
 {
 	Health += InHealValue;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
@@ -71,6 +71,47 @@ void USSIMPlayerStatsComponent::IncreaseHealth(int32 InHealValue)
 														Health, 
 														MaxHealth);
 	}
+}
+
+void USSIMPlayerStatsComponent::StartHealing()
+{
+	if (!IsValid(HealingMontage))
+	{
+		if (bShowStatsLogs)
+		{
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s | Hanging is not valid"), TEXT(__FUNCTION__));
+		}
+		return;
+	}
+	
+	AnimInstance->Montage_Play(HealingMontage);
+	StartAirHanging();
+	
+	bHealing = true;
+	OnHealingStartedDelegate.Broadcast();
+}
+
+void USSIMPlayerStatsComponent::StartAirHanging()
+{
+	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
+	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.0f;
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		AirHangingTimerHandle,
+		this, &USSIMPlayerStatsComponent::EndAirHanging,
+		AirHangingDuration,
+		false
+		);
+}
+
+void USSIMPlayerStatsComponent::EndAirHanging()
+{
+	IncreaseHealth(HealAmount);
+	AnimInstance->Montage_Stop(HealingMontage->BlendOut.GetBlendTime());
+	SSIMPlayer->SetPlayerGravityScaleToDefault();
+	
+	bHealing = false;
+	OnHealingEndedDelegate.Broadcast();
 }
 
 void USSIMPlayerStatsComponent::EndInvulnerability()
@@ -106,11 +147,12 @@ void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()
 
 void USSIMPlayerStatsComponent::ReceiveHeal_DEBUG()
 {
-	Health++;
+	StartHealing();
+	/*Health++;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
 														Health, 
-														MaxHealth);	
+														MaxHealth);	*/
 	
 	OnHealReceivedDelegate.Broadcast(3);
 }

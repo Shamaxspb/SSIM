@@ -23,6 +23,7 @@ void USSIMDebugUtils::PrintPlayerStates(const UObject* WorldContextObject)
 	bool bDashing	   			  = SSIMPlayer->GetIsPlayerDashing();
 	bool bCanDash	   			  = SSIMPlayer->GetCanPlayerDash();
 	bool bStaggered	   			  = SSIMPlayer->GetIsPlayerStaggered();
+	bool bHealing	 			  = SSIMPlayer->GetIsPlayerHealing();
 	bool bInvulnerable 			  = SSIMPlayer->GetIsPlayerInvulnerable();
 	
 	
@@ -71,6 +72,14 @@ void USSIMDebugUtils::PrintPlayerStates(const UObject* WorldContextObject)
 		0.f, 
 		FColor::Magenta, 
 		FString::Printf(TEXT("bStaggered: %s"), bStaggered ? TEXT("true") : TEXT("false")), 
+		true,
+		FVector2D(1.5f, 1.5f));
+	
+	GEngine->AddOnScreenDebugMessage(
+		-1, 
+		0.f, 
+		FColor::Green, 
+		FString::Printf(TEXT("bHealing: %s"), bHealing ? TEXT("true") : TEXT("false")), 
 		true,
 		FVector2D(1.5f, 1.5f));
 	

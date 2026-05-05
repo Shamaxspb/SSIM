@@ -227,6 +227,12 @@ public:
 	{
 		return SSIMPlayerDamageReactionComponent->bStaggered;
 	}
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
+	FORCEINLINE bool GetIsPlayerHealing() const
+	{
+		return SSIMPlayerStatsComponent->bHealing;
+	}
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerInvulnerable() const
 	{
 		return SSIMPlayerStatsComponent->bInvulnerable;

@@ -212,7 +212,7 @@ void ASSIMPlayer::HandleHeal()
 {
 	if (CanHeal())
 	{
-		SSIMPlayerStatsComponent->IncreaseHealth(3);
+		SSIMPlayerStatsComponent->StartHealing();
 	}
 }
 
@@ -235,7 +235,9 @@ bool ASSIMPlayer::CanMove() const
 		|| 
 		SSIMPlayerDamageReactionComponent->bStaggered 
 		|| 
-		SSIMPlayerCombatComponent->bAttackKnockbackActive)
+		SSIMPlayerCombatComponent->bAttackKnockbackActive
+		||
+		SSIMPlayerStatsComponent->bHealing)
 	{
 		return false;
 	}
