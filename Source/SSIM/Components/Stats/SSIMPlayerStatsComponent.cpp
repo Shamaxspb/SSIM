@@ -18,6 +18,11 @@ void USSIMPlayerStatsComponent::SetReferences()
 
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
+	if (Health - InDamageData.Value <= 0)
+	{
+		UE_LOG(LogSSIMStatsCalculation, Warning, TEXT("%s | Player killed by %s"), TEXT(__FUNCTION__), *InDamageData.Instigator->GetName());
+	}
+	
 	if (bInvulnerable)
 	{
 		if (bShowStatsLogs)
@@ -71,6 +76,8 @@ void USSIMPlayerStatsComponent::IncreaseHealth(const int32 InHealValue)
 														Health, 
 														MaxHealth);
 	}
+	
+	Super::IncreaseHealth(InHealValue);
 }
 
 void USSIMPlayerStatsComponent::StartHealing()
@@ -148,11 +155,6 @@ void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()
 void USSIMPlayerStatsComponent::ReceiveHeal_DEBUG()
 {
 	StartHealing();
-	/*Health++;
-	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
-	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Player Health: %d/%d"), TEXT(__FUNCTION__), 
-														Health, 
-														MaxHealth);	*/
 	
 	OnHealReceivedDelegate.Broadcast(3);
 }

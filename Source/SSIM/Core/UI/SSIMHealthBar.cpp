@@ -9,9 +9,9 @@
 
 void USSIMHealthBar::NativeConstruct()
 {
-	Super::NativeConstruct();
-	
 	Init();
+	
+	Super::NativeConstruct();
 }
 
 void USSIMHealthBar::Init()
@@ -39,5 +39,6 @@ void USSIMHealthBar::InitStatsValues()
 {
 	CachedHealth = PlayerStatsComponent->Health; // Should get from GameInstance for level transition in the future
 	MaxHealth = PlayerStatsComponent->MaxHealth;
+	UE_LOG(LogSSIMUIInitialization, Warning, TEXT("%s | Player Health: %d"), TEXT(__FUNCTION__), MaxHealth);
 	
 }

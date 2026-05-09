@@ -21,6 +21,7 @@ class SSIM_API USSIMHealthBar : public USSIMBaseUI
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "SSIM|HealthBar")
 	int32 CachedHealth;
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "SSIM|HealthBar")
 	int32 MaxHealth;
 
 private:
