@@ -283,8 +283,8 @@ bool ASSIMPlayer::CanAttack() const
 {
 	if (SSIMPlayerCombatComponent->bAttacking 
 		|| 
-		SSIMPlayerDashComponent->bDashing
-		||
+		/*SSIMPlayerDashComponent->bDashing
+		||*/
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
 		if (SSIMPlayerCombatComponent->bAttacking)
@@ -294,13 +294,13 @@ bool ASSIMPlayer::CanAttack() const
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (SSIMPlayerDashComponent->bDashing)
+		/*if (SSIMPlayerDashComponent->bDashing)
 		{
 			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
 			}
-		}
+		}*/
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowPlayerInputLogs)
