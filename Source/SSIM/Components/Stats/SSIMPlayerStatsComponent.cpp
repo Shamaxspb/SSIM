@@ -16,13 +16,6 @@ void USSIMPlayerStatsComponent::SetReferences()
 	SSIMPlayer = CastChecked<ASSIMPlayer>(SSIMOwnerCharacter);
 }
 
-void USSIMPlayerStatsComponent::DeathProcessing(const FDamageData& InDamageData)
-{
-	UE_LOG(LogSSIMStatsCalculation, Warning, TEXT("%s | Player killed by %s"), TEXT(__FUNCTION__), *InDamageData.Instigator->GetName());
-	
-	Super::DeathProcessing(InDamageData);
-}
-
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
 	if (bInvulnerable)
@@ -37,10 +30,10 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 		return;
 	}
 	
-	Super::ReduceHealth(InDamageData);
-	
 	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
+	
+	Super::ReduceHealth(InDamageData);
 	
 	if (bShowStatsLogs)
 	{
@@ -55,6 +48,13 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 	}
 	
 	StartInvulnerability();
+}
+
+void USSIMPlayerStatsComponent::DeathProcessing(const FDamageData& InDamageData)
+{
+	UE_LOG(LogSSIMStatsCalculation, Warning, TEXT("%s | Player killed by %s"), TEXT(__FUNCTION__), *InDamageData.Instigator->GetName());
+	
+	Super::DeathProcessing(InDamageData);
 }
 
 void USSIMPlayerStatsComponent::IncreaseHealth(const int32 InHealValue)

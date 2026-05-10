@@ -30,10 +30,17 @@ void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(const FDamageDa
 {
 	Super::OnDamageReceivedHandler(InDamageData);
 	
+	int32 PlayerHealth = SSIMPlayer->GetPlayerStatsComponent()->Health;
+	if (PlayerHealth <= 0)
+	{
+		LethalDamageReaction();
+		return;
+	}
+	
 	InitStagger();
 }
 
-void USSIMPlayerDamageReactionComponent::ReboundOnHit()
+void USSIMPlayerDamageReactionComponent::ReboundOnHit(UAnimMontage* InReboundMontage)
 {
 	ReboundLaunchVelocity.Y = ReboundVelocityY * SSIMPlayer->GetPlayerFacingDirectionValue() * -1.f;
 	ReboundLaunchVelocity.Z = ReboundVelocityZ;
@@ -53,7 +60,7 @@ void USSIMPlayerDamageReactionComponent::ReboundOnHit()
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 	
-	Super::ReboundOnHit();
+	Super::ReboundOnHit(InReboundMontage);
 }
 
 #pragma region Stagger processing
@@ -141,7 +148,7 @@ void USSIMPlayerDamageReactionComponent::StartStagger()
 		return;
 	}
 	
-	ReboundOnHit();
+	ReboundOnHit(FrontStaggeredMontage);
 }
 
 void USSIMPlayerDamageReactionComponent::EndStagger()
@@ -158,3 +165,9 @@ void USSIMPlayerDamageReactionComponent::EndStagger()
 }
 
 #pragma endregion Stagger processing
+
+void USSIMPlayerDamageReactionComponent::LethalDamageReaction()
+{
+	ReboundOnHit(DeathMontage);
+}
+

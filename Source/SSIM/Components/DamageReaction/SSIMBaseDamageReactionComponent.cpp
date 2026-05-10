@@ -29,8 +29,9 @@ void USSIMBaseDamageReactionComponent::OnDamageReceivedHandler(const FDamageData
 	DamageData.Value = InDamageData.Value;
 }
 
-void USSIMBaseDamageReactionComponent::ReboundOnHit()
+void USSIMBaseDamageReactionComponent::ReboundOnHit(UAnimMontage* InReboundMontage)
 {
+	SSIMOwnerCharacter->PlayAnimMontage(InReboundMontage, 1.f);
 	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
 
 #if !UE_BUILD_SHIPPING

@@ -34,12 +34,7 @@ public:
 	
 	bool bHealing = false;
 	bool bInvulnerable = false;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Stats", meta = (ClampMin = 0))	
-	int32 MaxHealth = 5;
-	
-	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Stats", meta = (ClampMin = 0))	
-	int32 Health = MaxHealth;
+
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM")	
@@ -53,9 +48,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM")	
 	float AirHangingDuration = 1.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animation")
-	TObjectPtr<UAnimMontage> DeathMontage;
 	
 private:
 	UPROPERTY()

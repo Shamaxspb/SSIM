@@ -26,11 +26,10 @@ void USSIMEnemyDamageReactionComponent::OnDamageReceivedHandler(const FDamageDat
 
 void USSIMEnemyDamageReactionComponent::StartStagger()
 {
-	if (!IsValid(SelectStaggerMontage()))
+	UAnimMontage* StaggeredMontage = SelectStaggerMontage();
+	if (!IsValid(StaggeredMontage))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | %s montage is not valid"), 
-												TEXT(__FUNCTION__), 
-													 *GetNameSafe(SelectStaggerMontage()));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Stagger montage is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	
@@ -44,14 +43,13 @@ void USSIMEnemyDamageReactionComponent::StartStagger()
 		false
 		);
 	
-	SSIMEnemy->PlayAnimMontage(SelectStaggerMontage(), 1.f);
+	ReboundOnHit(StaggeredMontage);
 	
 	if (bShowStaggerLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Stagger STARTED (%s)"), TEXT(__FUNCTION__), *SSIMEnemy->GetName());
 	}
 	
-	ReboundOnHit();
 	OnStartStaggerDelegate.Broadcast();
 }
 
@@ -72,8 +70,9 @@ void USSIMEnemyDamageReactionComponent::EndStagger() const
 	OnEndStaggerDelegate.Broadcast();
 }
 
-void USSIMEnemyDamageReactionComponent::ReboundOnHit()
+void USSIMEnemyDamageReactionComponent::ReboundOnHit(UAnimMontage* InReboundMontage)
 {
+	// Calculate Rebound direction
 	switch (PlayerAttackDirectionType)
 	{
 	case EPlayerAttackDirectionType::EPADT_Frontal:
@@ -99,32 +98,13 @@ void USSIMEnemyDamageReactionComponent::ReboundOnHit()
 		{
 			if (bShowReboundLogs)
 			{
-				UE_LOG(LogSSIMGameplayMessages, Error, TEXT("%s | wtf is Player Attack Direction"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMGameplayMessages, Error, TEXT("%s | WTF is Player Attack Direction"), TEXT(__FUNCTION__));
 			}
 			break;
 		}
 	}
 	
-	Super::ReboundOnHit();
-/*#if !UE_BUILD_SHIPPING
-	
-	if (bShowReboundLogs)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player Attack Direction Type: %s"), TEXT(__FUNCTION__),  *UEnum::GetValueAsString(PlayerAttackDirectionType));
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Rebound Velocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
-	}
-	if (bDrawReboundDebug)
-	{
-		ReboundDrawDebug();
-	}
-
-#endif !UE_BUILD_SHIPPING
-	
-	SSIMEnemy->GetCharacterMovement()->StopMovementImmediately();
-	SSIMEnemy->LaunchCharacter(ReboundLaunchVelocity, true, true);
-	
-	// Reset value for proper next Rebound calculation 
-	ReboundLaunchVelocity = FVector::ZeroVector;*/
+	Super::ReboundOnHit(InReboundMontage);
 }
 
 UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const

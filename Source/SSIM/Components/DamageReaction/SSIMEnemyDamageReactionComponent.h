@@ -81,7 +81,7 @@ public:
 	
 protected:
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
-	virtual void ReboundOnHit() override;
+	virtual void ReboundOnHit(UAnimMontage* InReboundMontage) override;
 	
 private:
 	void StartStagger();

@@ -31,10 +31,20 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "SSIM|Health")
 	FOnCharacterDiedSignature OnCharacterDiedDelegate;
 	
+	UPROPERTY(BlueprintReadWrite, Category = "SSIM|Stats|Health", meta = (ClampMin = 0))
+	int32 Health;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|Stats|Health", meta = (ClampMin = 0))
+	int32 MaxHealth;
+	
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SSIM|DEBUG")
 	bool bShowStatsLogs;
 	
+// Overriden Functions
+protected:
+	virtual void BeginPlay() override;
 	
 // My Functions
 public:

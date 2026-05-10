@@ -84,7 +84,7 @@ protected:
 	
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData) override;
 
-	virtual void ReboundOnHit() override;
+	virtual void ReboundOnHit(UAnimMontage* InReboundMontage) override;
 	
 private:
 	// Damage processing
@@ -96,5 +96,7 @@ private:
 	void EndStopFrame() const;
 	void StartStagger();
 	void EndStagger();
+	
+	void LethalDamageReaction();
 	
 };

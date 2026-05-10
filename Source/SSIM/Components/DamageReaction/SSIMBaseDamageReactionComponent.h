@@ -25,6 +25,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations", meta = (DisplayPriority = 1))
 	TObjectPtr<UAnimMontage> FrontStaggeredMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
+	TObjectPtr<UAnimMontage> DeathMontage;
 
 #pragma region Metadata
 	
@@ -66,7 +69,7 @@ protected:
 	UFUNCTION()
 	virtual void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
-	virtual void ReboundOnHit();
+	virtual void ReboundOnHit(UAnimMontage* InReboundMontage);
 	
 // Debug
 protected:

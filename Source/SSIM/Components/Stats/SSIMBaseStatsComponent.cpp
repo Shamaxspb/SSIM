@@ -4,6 +4,13 @@
 #include "SSIMBaseStatsComponent.h"
 
 
+void USSIMBaseStatsComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	Health = MaxHealth;
+}
+
 // My Functions
 void USSIMBaseStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
