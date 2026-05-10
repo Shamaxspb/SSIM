@@ -51,6 +51,33 @@ void USSIMBaseDamageReactionComponent::ReboundOnHit(UAnimMontage* InReboundMonta
 	ReboundLaunchVelocity = FVector::ZeroVector;
 }
 
+void USSIMBaseDamageReactionComponent::ReboundOnDeath()
+{
+	if (!IsValid(DeathMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | DeathMontage is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	SSIMOwnerCharacter->PlayAnimMontage(DeathMontage, 0.4f);
+	
+	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
+	
+#if !UE_BUILD_SHIPPING
+	
+	if (bShowReboundLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Warning, TEXT("%s | Death ReboundLaunchVelocity: %s"), TEXT(__FUNCTION__), *ReboundLaunchVelocity.ToString());
+	}
+	if (bDrawReboundDebug)
+	{
+		ReboundDrawDebug();
+	}
+	
+#endif !UE_BUILD_SHIPPING
+	
+	ReboundLaunchVelocity = FVector::ZeroVector;
+}
+
 void USSIMBaseDamageReactionComponent::ReboundDrawDebug()
 {
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), 

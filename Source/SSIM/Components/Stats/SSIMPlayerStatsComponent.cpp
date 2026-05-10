@@ -53,7 +53,7 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 void USSIMPlayerStatsComponent::DeathProcessing(const FDamageData& InDamageData)
 {
 	UE_LOG(LogSSIMStatsCalculation, Warning, TEXT("%s | Player killed by %s"), TEXT(__FUNCTION__), *InDamageData.Instigator->GetName());
-	
+	bDead = true;
 	Super::DeathProcessing(InDamageData);
 }
 

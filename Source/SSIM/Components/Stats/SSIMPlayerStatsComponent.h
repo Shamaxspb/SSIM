@@ -34,6 +34,7 @@ public:
 	
 	bool bHealing = false;
 	bool bInvulnerable = false;
+	bool bDead = false;
 
 	
 protected:
@@ -80,7 +81,7 @@ public:
 	
 protected:
 	virtual void SetReferences() override;
-	void DeathProcessing(const FDamageData& InDamageData) override;
+	virtual void DeathProcessing(const FDamageData& InDamageData) override;
 	
 private:
 	void StartAirHanging();

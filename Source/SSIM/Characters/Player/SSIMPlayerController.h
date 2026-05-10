@@ -8,6 +8,7 @@
 
 #include "SSIMPlayerController.generated.h"
 
+class ASSIMPlayer;
 class USSIMHealthBar;
 class UEnhancedInputLocalPlayerSubsystem;
 class UInputMappingContext;
@@ -34,6 +35,9 @@ protected:
 	
 private:
 	UPROPERTY()
+	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	
+	UPROPERTY()
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem;
 	
 // Overriden Functions
@@ -49,5 +53,8 @@ private:
 	virtual void Init(); 
 	void InitBasicInputContext();
 	void InitUI();
+	
+	UFUNCTION()
+	void OnCharacterDiedHandler();
 	
 };

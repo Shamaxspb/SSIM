@@ -15,7 +15,20 @@ void USSIMPlayerDamageReactionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (!IsValid(StaggeredFirstFrame))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | StaggeredFirstFrame is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
 	StaggeredFirstFrame->BlendIn = StaggeredFirstFrameBlendInTime;
+}
+
+void USSIMPlayerDamageReactionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	InterpolateGravityToZeroOnDeath(DeltaTime);
 }
 
 void USSIMPlayerDamageReactionComponent::SetReferences()
@@ -58,7 +71,6 @@ void USSIMPlayerDamageReactionComponent::ReboundOnHit(UAnimMontage* InReboundMon
 	}
 	
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
-	SSIMPlayer->PlayAnimMontage(FrontStaggeredMontage, 1.f);
 	
 	Super::ReboundOnHit(InReboundMontage);
 }
@@ -168,6 +180,61 @@ void USSIMPlayerDamageReactionComponent::EndStagger()
 
 void USSIMPlayerDamageReactionComponent::LethalDamageReaction()
 {
-	ReboundOnHit(DeathMontage);
+	ReboundLaunchVelocity = FVector(0.f, DeathReboundVelocityY, DeathReboundVelocityZ);
+	
+	// if Enemy is to the Right to Player
+	if (DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y)
+	{
+		ReboundLaunchVelocity.Y = DeathReboundVelocityY * -1.f; 
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
+	}
+	else
+	{
+		ReboundLaunchVelocity.Y = DeathReboundVelocityY;
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
+	}
+	
+	ReboundOnDeath();
+	
+	GravityInterpolationElapsedTime = 0.f;
+	bShouldInterpolateGravity = true;
+	
+	/*SSIMPlayer->GetCharacterMovement()->GravityScale = DeathReboundInitialGravity;
+	
+	FTimerHandle DeathGravityTimerHandle;
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		DeathGravityTimerHandle,
+		this, &USSIMPlayerDamageReactionComponent::InterpolateGravityToZero,
+		DeathGravityInterpolationDuration,
+		false
+		);*/
+}
+
+void USSIMPlayerDamageReactionComponent::InterpolateGravityToZeroOnDeath(float DeltaTime)
+{
+	if (bShouldInterpolateGravity)
+	{
+		GravityInterpolationElapsedTime += DeltaTime;
+		
+		const float Alpha = FMath::Clamp(GravityInterpolationElapsedTime / DeathGravityInterpolationDuration, 0.f, 1.f);
+		
+		SSIMPlayer->GetCharacterMovement()->GravityScale = 
+			FMath::InterpEaseOut(DeathReboundInitialGravity, 0.f, Alpha, 2.f);
+		
+		if (Alpha >= 1.f)
+		{
+			EndReboundOnDeath();
+		}
+	}
+}
+
+void USSIMPlayerDamageReactionComponent::EndReboundOnDeath()
+{
+	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.f;
+	bShouldInterpolateGravity = false;
+	GravityInterpolationElapsedTime = 0.f;
+	
+	AnimInstance->Montage_SetPlayRate(DeathMontage, 0.f);
 }
 

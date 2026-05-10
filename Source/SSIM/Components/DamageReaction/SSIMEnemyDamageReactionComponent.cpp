@@ -114,10 +114,20 @@ UAnimMontage* USSIMEnemyDamageReactionComponent::SelectStaggerMontage() const
 	
 	if (SSIMEnemy->GetEnemyFacingDirection() == Player->GetPlayerFacingDirection())
 	{
+		if (!IsValid(BackStaggeredMontage))
+		{
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s | BackStaggeredMontage is not valid"), TEXT(__FUNCTION__));
+			return nullptr;
+		}
 		StaggeredMontage = BackStaggeredMontage;
 	}
 	else
 	{
+		if (!IsValid(FrontStaggeredMontage))
+		{
+			UE_LOG(LogSSIMValidations, Error, TEXT("%s | FrontStaggeredMontage is not valid"), TEXT(__FUNCTION__));
+			return nullptr;
+		}
 		StaggeredMontage = FrontStaggeredMontage;
 	}
 	

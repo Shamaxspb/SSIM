@@ -6,6 +6,7 @@
 #include "SSIM/SSIM.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "SSIMPlayer.h"
 #include "Blueprint/UserWidget.h"
 #include "SSIM/Core/UI/SSIMHealthBar.h"
 
@@ -22,6 +23,9 @@ void ASSIMPlayerController::BeginPlay()
 	Super::BeginPlay();
 	
 	Init();
+	
+	SSIMPlayer = CastChecked<ASSIMPlayer>(GetPawn());
+	SSIMPlayer->GetPlayerStatsComponent()->OnCharacterDiedDelegate.AddDynamic(this, &ASSIMPlayerController::OnCharacterDiedHandler);
 }
 
 // My Functions
@@ -60,4 +64,9 @@ void ASSIMPlayerController::InitUI()
 	}
 	HealthBarWidget = CreateWidget<USSIMHealthBar>(this, HealthBarWidgetClass, TEXT("HealthBarWidget"));
 	HealthBarWidget->AddToViewport();
+}
+
+void ASSIMPlayerController::OnCharacterDiedHandler()
+{
+	EnhancedInputSubsystem->RemoveMappingContext(BaseInputContext);
 }

@@ -46,7 +46,7 @@ protected:
 #pragma region Stagger
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|Animations")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animations")
 	TObjectPtr<UAnimMontage> StaggeredFirstFrame;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
@@ -60,6 +60,18 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityZ = 2000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
+	float DeathReboundVelocityY = 1000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
+	float DeathReboundVelocityZ = 2000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
+	float DeathReboundInitialGravity = 2.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
+	float DeathGravityInterpolationDuration = 1.5f;
 
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
@@ -72,11 +84,16 @@ private:
 
 	int32 CurrentStaggerSequenceStep = 0;
 	
+	bool bShouldInterpolateGravity = false;
+	float GravityInterpolationElapsedTime;
+	
 #pragma endregion Metadata
 	
 // Overriden Functions
 public:
 	virtual void BeginPlay() override;
+	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
 // My Functions
 protected:
@@ -98,5 +115,7 @@ private:
 	void EndStagger();
 	
 	void LethalDamageReaction();
+	void InterpolateGravityToZeroOnDeath(float DeltaTime);
+	void EndReboundOnDeath();
 	
 };
