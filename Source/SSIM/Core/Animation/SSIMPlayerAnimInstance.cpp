@@ -18,9 +18,11 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoAnimationStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationStartedHandler);
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoAnimationEndedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler);
 	
+	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDashStartedHandler);
+	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDamageReceivedHandler);
 	
-	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDashStartedHandler);
+	SSIMPlayer->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnHealingStartedHandler);
 }
 
 void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -276,7 +278,17 @@ void USSIMPlayerAnimInstance::OnDamageReceivedHandler(const FDamageData& InDamag
 		UE_LOG(LogSSIMAnimation, Error, TEXT("%s"), TEXT(__FUNCTION__));
 	}
 	
-	StartBlendOutPogoBones(OnDamageReceivedPogoBlendOutDuration);
+	StartBlendOutPogoBones(OnPogoInterruptedBlendOutDuration);
+}
+
+void USSIMPlayerAnimInstance::OnHealingStartedHandler()
+{
+	if (bShowPogoBlendLogs)
+	{
+		UE_LOG(LogSSIMAnimation, Error, TEXT("%s"), TEXT(__FUNCTION__));
+	}
+	
+	StartBlendOutPogoBones(OnPogoInterruptedBlendOutDuration);
 }
 
 void USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler(bool bInterrupted)

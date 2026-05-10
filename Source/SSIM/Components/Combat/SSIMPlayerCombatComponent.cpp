@@ -25,6 +25,7 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
+	SSIMPlayer->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnHealingStartedHandler);
 	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 	
 	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
@@ -90,6 +91,15 @@ void USSIMPlayerCombatComponent::StartAttackTrace()
 	}
 	
 	Super::StartAttackTrace();
+}
+
+void USSIMPlayerCombatComponent::EndAttack()
+{
+	Super::EndAttack();
+	if (bPogoActive)
+	{
+		EndPogo();
+	}
 }
 
 void USSIMPlayerCombatComponent::SetReferences()
@@ -438,6 +448,7 @@ void USSIMPlayerCombatComponent::PogoStart()
 
 void USSIMPlayerCombatComponent::EndPogo()
 {
+	GetWorld()->GetTimerManager().ClearTimer(EndPogoTimerHandle);
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
 	bPogoActive = false;
@@ -449,6 +460,11 @@ void USSIMPlayerCombatComponent::EndPogo()
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
+}
+
+void USSIMPlayerCombatComponent::OnHealingStartedHandler()
+{
+	EndAttack();
 }
 
 void USSIMPlayerCombatComponent::OnDashStartedHandler()

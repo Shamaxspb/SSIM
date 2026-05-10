@@ -250,6 +250,8 @@ bool ASSIMPlayer::CanDash() const
 		|| 
 		!SSIMPlayerDashComponent->bCanDash 
 		|| 
+		SSIMPlayerStatsComponent->bHealing
+		||
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
 		if (SSIMPlayerDashComponent->bDashing)
@@ -263,14 +265,21 @@ bool ASSIMPlayer::CanDash() const
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is on cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is on Cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
+			}
+		}
+		if (SSIMPlayerStatsComponent->bHealing)
+		{
+			if (bShowPlayerInputLogs)
+			{
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while Healing"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while staggered"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while Staggered"), TEXT(__FUNCTION__));
 			}
 		}
 		return false;
@@ -283,29 +292,29 @@ bool ASSIMPlayer::CanAttack() const
 {
 	if (SSIMPlayerCombatComponent->bAttacking 
 		|| 
-		/*SSIMPlayerDashComponent->bDashing
-		||*/
+		SSIMPlayerStatsComponent->bHealing
+		||
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
 		if (SSIMPlayerCombatComponent->bAttacking)
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Attack is in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack, Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
-		/*if (SSIMPlayerDashComponent->bDashing)
+		if (SSIMPlayerStatsComponent->bHealing)
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is in process"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while Healing"), TEXT(__FUNCTION__));
 			}
-		}*/
+		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowPlayerInputLogs)
 			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while staggered"), TEXT(__FUNCTION__));
+				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while Staggered"), TEXT(__FUNCTION__));
 			}
 		}
 		return false;
@@ -319,7 +328,7 @@ bool ASSIMPlayer::CanHeal() const
 	{
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
-			UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Heal while staggered"), TEXT(__FUNCTION__));
+			UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Heal while Staggered"), TEXT(__FUNCTION__));
 		}
 		return false;
 	}

@@ -70,7 +70,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
 	float OnLandedPogoBlendInDuration = 0.11f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|Interpolation")
-	float OnDamageReceivedPogoBlendOutDuration = 0.11f;
+	float OnPogoInterruptedBlendOutDuration = 0.11f;
 	
 	// Initially set to default, will change later, depending on context
 	float PogoBlendInDuration = DefaultPogoBlendInDuration; 
@@ -113,21 +113,23 @@ private:
 	
 	void SwapHitMontage(EPlayerAttackDirectionType InPlayerAttackDirectionType);
 	
-	UFUNCTION()
-	void OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType);
-	
 #pragma region Reset Pogo Handlers
 	
 	UFUNCTION()
-	void OnPogoAnimationStartedHandler();
+	void OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType);
 	UFUNCTION()
-	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	void OnPogoAnimationStartedHandler();
 	UFUNCTION()
 	void OnPogoAnimationEndedHandler(bool bInterrupted);
 	UFUNCTION()
-	void OnPlayerLanded(const FHitResult& Hit);
-	UFUNCTION()
 	void OnDashStartedHandler();
+	UFUNCTION()
+	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	UFUNCTION()
+	void OnHealingStartedHandler();
+	
+	UFUNCTION()
+	void OnPlayerLanded(const FHitResult& Hit);
 	
 #pragma endregion Reset Pogo Handlers
 };

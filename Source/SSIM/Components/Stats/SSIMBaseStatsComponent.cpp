@@ -14,3 +14,8 @@ void USSIMBaseStatsComponent::IncreaseHealth(int32 InHealValue)
 {
 	OnHealReceivedDelegate.Broadcast(InHealValue);
 }
+
+void USSIMBaseStatsComponent::DeathProcessing(const FDamageData& InDamageData)
+{
+	OnCharacterDiedDelegate.Broadcast();
+}

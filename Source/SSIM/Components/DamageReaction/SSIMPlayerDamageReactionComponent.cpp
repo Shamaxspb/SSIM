@@ -38,14 +38,16 @@ void USSIMPlayerDamageReactionComponent::ReboundOnHit()
 	ReboundLaunchVelocity.Y = ReboundVelocityY * SSIMPlayer->GetPlayerFacingDirectionValue() * -1.f;
 	ReboundLaunchVelocity.Z = ReboundVelocityZ;
 	
-	// if Player is to the Right to Enemy
-	if (SSIMPlayer->GetActorLocation().Y > DamageData.Instigator->GetActorLocation().Y)
+	// if Enemy is to the Right to Player
+	if (DamageData.Instigator->GetActorLocation().Y > SSIMPlayer->GetActorLocation().Y)
 	{
-		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
+		ReboundLaunchVelocity.Y = ReboundVelocityY * -1.f; 
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
 	}
 	else
 	{
-		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Right);
+		ReboundLaunchVelocity.Y = ReboundVelocityY;
+		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
 	}
 	
 	SSIMPlayer->SetPlayerGravityScaleToDefault();

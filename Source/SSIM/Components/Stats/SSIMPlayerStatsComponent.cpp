@@ -16,13 +16,15 @@ void USSIMPlayerStatsComponent::SetReferences()
 	SSIMPlayer = CastChecked<ASSIMPlayer>(SSIMOwnerCharacter);
 }
 
+void USSIMPlayerStatsComponent::DeathProcessing(const FDamageData& InDamageData)
+{
+	UE_LOG(LogSSIMStatsCalculation, Warning, TEXT("%s | Player killed by %s"), TEXT(__FUNCTION__), *InDamageData.Instigator->GetName());
+	
+	Super::DeathProcessing(InDamageData);
+}
+
 void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 {
-	if (Health - InDamageData.Value <= 0)
-	{
-		UE_LOG(LogSSIMStatsCalculation, Warning, TEXT("%s | Player killed by %s"), TEXT(__FUNCTION__), *InDamageData.Instigator->GetName());
-	}
-	
 	if (bInvulnerable)
 	{
 		if (bShowStatsLogs)
@@ -35,16 +37,7 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 		return;
 	}
 	
-	if (bShowStatsLogs)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
-	}
-	
-	GetWorld()->GetTimerManager().SetTimer(
-		InvulnerabilityTimerHandle,
-		this, &USSIMPlayerStatsComponent::EndInvulnerability,
-		InvulnerabilityDuration,
-		false);
+	Super::ReduceHealth(InDamageData);
 	
 	Health -= InDamageData.Value;
 	Health = FMath::Clamp<int32>(Health, 0, MaxHealth);
@@ -56,13 +49,12 @@ void USSIMPlayerStatsComponent::ReduceHealth(const FDamageData& InDamageData)
 														MaxHealth);
 	}
 	
-	SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SSIMPlayer->GetHitRegistrationCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (Health <= 0)
+	{
+		DeathProcessing(InDamageData);
+	}
 	
-	bInvulnerable = true;
-	OnInvulnerabilityStartedDelegate.Broadcast();
-	
-	Super::ReduceHealth(InDamageData);
+	StartInvulnerability();
 }
 
 void USSIMPlayerStatsComponent::IncreaseHealth(const int32 InHealValue)
@@ -91,16 +83,24 @@ void USSIMPlayerStatsComponent::StartHealing()
 		return;
 	}
 	
-	AnimInstance->Montage_Play(HealingMontage);
-	StartAirHanging();
-	
 	bHealing = true;
 	OnHealingStartedDelegate.Broadcast();
+	
+	AnimInstance->Montage_Play(HealingMontage);
+	StartAirHanging();
+}
+
+void USSIMPlayerStatsComponent::CompleteHealing()
+{
+	bHealing = false;
+	OnHealingEndedDelegate.Broadcast();
+	IncreaseHealth(HealAmount);
 }
 
 void USSIMPlayerStatsComponent::StartAirHanging()
 {
 	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
+	SSIMPlayer->StopJumping();
 	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.0f;
 	
 	GetWorld()->GetTimerManager().SetTimer(
@@ -113,12 +113,30 @@ void USSIMPlayerStatsComponent::StartAirHanging()
 
 void USSIMPlayerStatsComponent::EndAirHanging()
 {
-	IncreaseHealth(HealAmount);
 	AnimInstance->Montage_Stop(HealingMontage->BlendOut.GetBlendTime());
 	SSIMPlayer->SetPlayerGravityScaleToDefault();
 	
-	bHealing = false;
-	OnHealingEndedDelegate.Broadcast();
+	CompleteHealing();
+}
+
+void USSIMPlayerStatsComponent::StartInvulnerability()
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		InvulnerabilityTimerHandle,
+		this, &USSIMPlayerStatsComponent::EndInvulnerability,
+		InvulnerabilityDuration,
+		false);
+	
+	SSIMPlayer->GetContactDamageCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SSIMPlayer->GetHitRegistrationCollision()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	bInvulnerable = true;
+	OnInvulnerabilityStartedDelegate.Broadcast();
+	
+	if (bShowStatsLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability STARTED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
+	}
 }
 
 void USSIMPlayerStatsComponent::EndInvulnerability()
@@ -134,7 +152,6 @@ void USSIMPlayerStatsComponent::EndInvulnerability()
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Invulnerability ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
 	}
 }
-
 
 // DEBUG
 void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()

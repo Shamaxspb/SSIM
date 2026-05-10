@@ -158,6 +158,8 @@ public:
 public:
 	virtual void StartAttack() override;
 	virtual void StartAttackTrace() override;
+	
+	virtual void EndAttack() override;
 
 protected:
 	virtual void SetReferences() override;
@@ -183,6 +185,8 @@ private:
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
+	UFUNCTION()
+	void OnHealingStartedHandler();
 
 	UFUNCTION()
 	void OnDashStartedHandler();

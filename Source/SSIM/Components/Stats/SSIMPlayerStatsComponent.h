@@ -54,6 +54,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM")	
 	float AirHangingDuration = 1.f;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Animation")
+	TObjectPtr<UAnimMontage> DeathMontage;
+	
 private:
 	UPROPERTY()
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
@@ -78,11 +81,14 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
 	void StartHealing();
+	void CompleteHealing();
 	
+	void StartInvulnerability();
 	void EndInvulnerability();
 	
 protected:
 	virtual void SetReferences() override;
+	void DeathProcessing(const FDamageData& InDamageData) override;
 	
 private:
 	void StartAirHanging();
