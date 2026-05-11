@@ -61,17 +61,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing")
 	float ReboundVelocityZ = 2000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
-	float DeathReboundVelocityY = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
-	float DeathReboundVelocityZ = 2000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
-	float DeathReboundInitialGravity = 2.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageProcessing|DeathProcessing")
-	float DeathGravityInterpolationDuration = 1.5f;
 
 private:
 	float StaggeredFirstFrameBlendInTime = 0.1f;
@@ -80,20 +71,40 @@ private:
 	
 #pragma endregion Stagger
 	
+#pragma region Death
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DeathProcessing")
+	float DeathStateDuration = 1.5f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DeathProcessing")
+	float DeathReboundVelocityY = 1000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DeathProcessing")
+	float DeathReboundVelocityZ = 2000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DeathProcessing")
+	float DeathReboundInitialGravity = 2.f;
+	
+private:
+	FVector InitialVelocity = FVector::ZeroVector;
+
+#pragma endregion Death
+	
 #pragma region Metadata
 
 	int32 CurrentStaggerSequenceStep = 0;
 	
 	bool bShouldInterpolateGravity = false;
-	float GravityInterpolationElapsedTime;
+	float GravityInterpolationElapsedTime = 0.f;
 	
 #pragma endregion Metadata
 	
 // Overriden Functions
 public:
+	USSIMPlayerDamageReactionComponent();
 	virtual void BeginPlay() override;
-	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 // My Functions
 protected:

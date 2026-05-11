@@ -10,6 +10,11 @@
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 
 
+USSIMPlayerDamageReactionComponent::USSIMPlayerDamageReactionComponent()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+}
+
 // Overriden functions
 void USSIMPlayerDamageReactionComponent::BeginPlay()
 {
@@ -43,12 +48,12 @@ void USSIMPlayerDamageReactionComponent::OnDamageReceivedHandler(const FDamageDa
 {
 	Super::OnDamageReceivedHandler(InDamageData);
 	
-	int32 PlayerHealth = SSIMPlayer->GetPlayerStatsComponent()->Health;
+	/*int32 PlayerHealth = SSIMPlayer->GetPlayerStatsComponent()->Health;
 	if (PlayerHealth <= 0)
 	{
 		LethalDamageReaction();
 		return;
-	}
+	}*/
 	
 	InitStagger();
 }
@@ -105,11 +110,24 @@ void USSIMPlayerDamageReactionComponent::StartStaggerSequence()
 {
 	CurrentStaggerSequenceStep = 0;
 	
-	Steps = {
-		{ StaggeredFirstFrameBlendInTime, [this]() {StartStopFrame();}},
-		{StopFrameDuration * 0.001f,		[this]() {StartStagger();}},
-		{StaggerDuration,					[this]() {EndStagger();}}
-	};
+	int32 PlayerHealth = SSIMPlayer->GetPlayerStatsComponent()->Health;
+	if (PlayerHealth > 0)
+	{
+		// Stagger OnHit sequence
+		Steps = {
+			{StaggeredFirstFrameBlendInTime,  [this]() {StartStopFrame();}},
+			{StopFrameDuration * 0.001f,		[this]() {StartStagger();}},
+			{StaggerDuration,					[this]() {EndStagger();}}
+		};
+	}
+	else
+	{
+		// Stagger OnDeath sequence
+		Steps = {
+			{ StaggeredFirstFrameBlendInTime, [this]() {StartStopFrame();}},
+			{ StopFrameDuration * 0.001f,		[this]() {LethalDamageReaction();}}
+		};
+	}
 	
 	ExecuteNextStaggerSequenceStep();
 }
@@ -142,7 +160,6 @@ void USSIMPlayerDamageReactionComponent::ExecuteNextStaggerSequenceStep()
 void USSIMPlayerDamageReactionComponent::StartStopFrame() const
 {
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.001f);
-	
 }
 
 void USSIMPlayerDamageReactionComponent::EndStopFrame() const
@@ -180,6 +197,10 @@ void USSIMPlayerDamageReactionComponent::EndStagger()
 
 void USSIMPlayerDamageReactionComponent::LethalDamageReaction()
 {
+	EndStopFrame();
+	
+	GravityInterpolationElapsedTime = 0.f;
+	bShouldInterpolateGravity = true;
 	ReboundLaunchVelocity = FVector(0.f, DeathReboundVelocityY, DeathReboundVelocityZ);
 	
 	// if Enemy is to the Right to Player
@@ -194,21 +215,16 @@ void USSIMPlayerDamageReactionComponent::LethalDamageReaction()
 		SSIMPlayer->SetPlayerFacingDirection(EFacingDirection::EPD_Left);
 	}
 	
+	InitialVelocity = ReboundLaunchVelocity;
+	
+	if (!IsValid(DeathMontage))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | DeathMontage is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	AnimInstance->Montage_Play(DeathMontage, 0.6 / DeathStateDuration);
+	
 	ReboundOnDeath();
-	
-	GravityInterpolationElapsedTime = 0.f;
-	bShouldInterpolateGravity = true;
-	
-	/*SSIMPlayer->GetCharacterMovement()->GravityScale = DeathReboundInitialGravity;
-	
-	FTimerHandle DeathGravityTimerHandle;
-	
-	GetWorld()->GetTimerManager().SetTimer(
-		DeathGravityTimerHandle,
-		this, &USSIMPlayerDamageReactionComponent::InterpolateGravityToZero,
-		DeathGravityInterpolationDuration,
-		false
-		);*/
 }
 
 void USSIMPlayerDamageReactionComponent::InterpolateGravityToZeroOnDeath(float DeltaTime)
@@ -217,10 +233,19 @@ void USSIMPlayerDamageReactionComponent::InterpolateGravityToZeroOnDeath(float D
 	{
 		GravityInterpolationElapsedTime += DeltaTime;
 		
-		const float Alpha = FMath::Clamp(GravityInterpolationElapsedTime / DeathGravityInterpolationDuration, 0.f, 1.f);
+		const float Alpha = FMath::Clamp(GravityInterpolationElapsedTime / DeathStateDuration, 0.f, 1.f);
+		const float SmoothedAlpha = FMath::InterpEaseOut(0.f, 1.f, Alpha, 2.5f);
 		
+		// Velocity
+		FVector NewVelocity = FMath::Lerp(InitialVelocity, FVector::ZeroVector, SmoothedAlpha);
+		SSIMPlayer->GetCharacterMovement()->Velocity = NewVelocity;
+		
+		// Gravity		
 		SSIMPlayer->GetCharacterMovement()->GravityScale = 
 			FMath::InterpEaseOut(DeathReboundInitialGravity, 0.f, Alpha, 2.f);
+		
+		// Montage slow down
+		// AnimInstance->Montage_SetPlayRate
 		
 		if (Alpha >= 1.f)
 		{

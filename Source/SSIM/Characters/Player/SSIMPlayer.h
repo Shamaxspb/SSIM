@@ -237,6 +237,11 @@ public:
 	{
 		return SSIMPlayerStatsComponent->bInvulnerable;
 	}
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
+	FORCEINLINE bool GetIsPlayerDead() const
+	{
+		return SSIMPlayerStatsComponent->bDead;
+	}
 	
 #pragma endregion Inline Getters
 	

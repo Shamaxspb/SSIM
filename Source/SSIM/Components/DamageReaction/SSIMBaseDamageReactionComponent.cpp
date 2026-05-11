@@ -53,13 +53,6 @@ void USSIMBaseDamageReactionComponent::ReboundOnHit(UAnimMontage* InReboundMonta
 
 void USSIMBaseDamageReactionComponent::ReboundOnDeath()
 {
-	if (!IsValid(DeathMontage))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | DeathMontage is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
-	SSIMOwnerCharacter->PlayAnimMontage(DeathMontage, 0.4f);
-	
 	SSIMOwnerCharacter->LaunchCharacter(ReboundLaunchVelocity, true, true);
 	
 #if !UE_BUILD_SHIPPING
