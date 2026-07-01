@@ -3,14 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "SSIM/Core/GAS/SSIMAbilitySystemComponent.h"
+
 #include "SSIMBaseCharacter.generated.h"
 
+class USSIMAttributeSet;
 class UBoxComponent;
 
 
 UCLASS(Abstract)
-class SSIM_API ASSIMBaseCharacter : public ACharacter
+class SSIM_API ASSIMBaseCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -18,6 +22,13 @@ class SSIM_API ASSIMBaseCharacter : public ACharacter
 #pragma region Components
 
 protected:
+	// GAS
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|GAS", DisplayName = "AbilitySystemComponent")
+	TObjectPtr<USSIMAbilitySystemComponent> SSIMAbilitySystemComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|GAS")
+	TObjectPtr<USSIMAttributeSet> SSIMAttributeSet;
+	
 	// To group up components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components|Damage", DisplayName = "DamageRegistrationGroup")
 	TObjectPtr<USceneComponent> DamageRegistrationGroup;
@@ -35,7 +46,14 @@ protected:
 public:
 	ASSIMBaseCharacter();
 	
+	virtual void BeginPlay() override;		
+	
 	virtual void OnConstruction(const FTransform& Transform) override;		
+	
+	virtual USSIMAbilitySystemComponent* GetAbilitySystemComponent() const override
+	{
+		return SSIMAbilitySystemComponent;	
+	}
 	
 // My Functions
 public:

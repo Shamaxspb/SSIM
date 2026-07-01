@@ -6,15 +6,30 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "SSIM/SSIM.h"
+#include "SSIM/Core/GAS/SSIMAbilitySystemComponent.h"
+#include "SSIM/Core/GAS/SSIMAttributeSet.h"
 
 // Overriden Functions
 ASSIMBaseCharacter::ASSIMBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
+	SSIMAbilitySystemComponent = CreateDefaultSubobject<USSIMAbilitySystemComponent>(TEXT("SSIMAbilitySystemComponent"));
+	SSIMAbilitySystemComponent->SetIsReplicated(false);
+	
+	SSIMAttributeSet = CreateDefaultSubobject<USSIMAttributeSet>(TEXT("SSIMAttributeSet"));
+	
+	
 	RestrictXAxisMovement();
 	SetupDamageRegistrationCollision();
 
+}
+
+void ASSIMBaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	SSIMAbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
