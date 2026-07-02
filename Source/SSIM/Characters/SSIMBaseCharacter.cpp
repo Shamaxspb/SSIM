@@ -6,7 +6,6 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Core/GAS/SSIMAbilitySystemComponent.h"
 #include "SSIM/Core/GAS/SSIMAttributeSet.h"
 
 // Overriden Functions
@@ -40,6 +39,11 @@ void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
 	FVector Location = GetActorLocation();
 	Location.X = 0.f;
 	SetActorLocation(Location);
+}
+
+USSIMAbilitySystemComponent* ASSIMBaseCharacter::GetAbilitySystemComponent() const
+{
+	return SSIMAbilitySystemComponent;	
 }
 
 // My Functions

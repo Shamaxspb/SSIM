@@ -13,6 +13,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSSIMValidations,			 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMInputValidation,		 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMStatsCalculation,	 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMAnimation,			 Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogSSIMGameplayAbilities,	 Log, All);
 
 constexpr ECollisionChannel ECC_Player			= ECC_GameTraceChannel1;
 constexpr ECollisionChannel ECC_Enemy			= ECC_GameTraceChannel2;

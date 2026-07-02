@@ -9,6 +9,7 @@
 
 #include "SSIMBaseCharacter.generated.h"
 
+class SSIMAbilitySystemComponent;
 class USSIMAttributeSet;
 class UBoxComponent;
 
@@ -50,10 +51,8 @@ public:
 	
 	virtual void OnConstruction(const FTransform& Transform) override;		
 	
-	virtual USSIMAbilitySystemComponent* GetAbilitySystemComponent() const override
-	{
-		return SSIMAbilitySystemComponent;	
-	}
+	virtual USSIMAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
 	
 // My Functions
 public:

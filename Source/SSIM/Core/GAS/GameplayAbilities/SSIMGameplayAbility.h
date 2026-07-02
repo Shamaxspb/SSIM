@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
+#include "Abilities/GameplayAbility.h"
 #include "SSIMGameplayAbility.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SSIM_API USSIMGameplayAbility : public UObject
+class SSIM_API USSIMGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 };
