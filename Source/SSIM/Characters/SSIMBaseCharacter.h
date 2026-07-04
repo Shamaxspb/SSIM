@@ -10,7 +10,7 @@
 #include "SSIMBaseCharacter.generated.h"
 
 class SSIMAbilitySystemComponent;
-class USSIMAttributeSet;
+class USSIMCombatAttributeSet;
 class UBoxComponent;
 
 
@@ -28,7 +28,7 @@ protected:
 	TObjectPtr<USSIMAbilitySystemComponent> SSIMAbilitySystemComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|GAS")
-	TObjectPtr<USSIMAttributeSet> SSIMAttributeSet;
+	TObjectPtr<USSIMCombatAttributeSet> SSIMAttributeSet;
 	
 	// To group up components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components|Damage", DisplayName = "DamageRegistrationGroup")

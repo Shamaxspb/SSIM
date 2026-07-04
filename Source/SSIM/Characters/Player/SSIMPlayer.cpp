@@ -43,6 +43,8 @@ void ASSIMPlayer::BeginPlay()
 												EFacingDirection::EPD_Right : EFacingDirection::EPD_Left;
 	
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
+	
+	InitializeAttributes();
 }
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -333,6 +335,36 @@ bool ASSIMPlayer::CanHeal() const
 		return false;
 	}
 	return true;
+}
+
+void ASSIMPlayer::InitializeAttributes()
+{
+	if (!IsValid(SSIMAbilitySystemComponent))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | SSIMAbilitySystemComponent is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	if (!IsValid(PlayerInitGE_temp))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | InitGE is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	const FGameplayEffectContextHandle EffectContext = SSIMAbilitySystemComponent->MakeEffectContext();
+	
+	const FGameplayEffectSpecHandle SpecHandle = SSIMAbilitySystemComponent->MakeOutgoingSpec(
+		PlayerInitGE_temp,
+		1.0f,
+		EffectContext);
+	
+	if (!SpecHandle.IsValid())
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | SpecHandle is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	SSIMAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
 
 

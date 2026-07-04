@@ -31,6 +31,9 @@ class SSIM_API ASSIMPlayer : public ASSIMBaseCharacter, public IPlayerDataInterf
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM")
+	TSubclassOf<UGameplayEffect> PlayerInitGE_temp;
+	
 // Variables	
 #pragma region Components
 	
@@ -296,6 +299,8 @@ private:
 	bool CanDash() const;
 	bool CanAttack() const;
 	bool CanHeal() const;
+	
+	void InitializeAttributes();
 	
 // Interfaces
 public:

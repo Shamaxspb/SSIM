@@ -6,7 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "SSIM/SSIM.h"
-#include "SSIM/Core/GAS/SSIMAttributeSet.h"
+#include "SSIM/Core/GAS/SSIMCombatAttributeSet.h"
 
 // Overriden Functions
 ASSIMBaseCharacter::ASSIMBaseCharacter()
@@ -16,12 +16,10 @@ ASSIMBaseCharacter::ASSIMBaseCharacter()
 	SSIMAbilitySystemComponent = CreateDefaultSubobject<USSIMAbilitySystemComponent>(TEXT("SSIMAbilitySystemComponent"));
 	SSIMAbilitySystemComponent->SetIsReplicated(false);
 	
-	SSIMAttributeSet = CreateDefaultSubobject<USSIMAttributeSet>(TEXT("SSIMAttributeSet"));
-	
+	SSIMAttributeSet = CreateDefaultSubobject<USSIMCombatAttributeSet>(TEXT("SSIMAttributeSet"));
 	
 	RestrictXAxisMovement();
 	SetupDamageRegistrationCollision();
-
 }
 
 void ASSIMBaseCharacter::BeginPlay()
