@@ -15,6 +15,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSSIMStatsCalculation,	 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMAnimation,			 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMGameplayAbilities,	 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMProgression,			 Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogSSIMLevelTransition,		 Log, All);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMDebug,				 Log, All);
 

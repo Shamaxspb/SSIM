@@ -12,6 +12,7 @@
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
+#include "SSIM/Core/Subsystems/SSIMTransitionSubsystem.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
 
 // Overriden Functions
@@ -46,6 +47,7 @@ void ASSIMPlayer::BeginPlay()
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
 	
 	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->ApplyProgressionToPlayer();
+	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->ApplyCurrentAttributesToPlayer();
 	
 }
 
@@ -77,6 +79,13 @@ void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	SSIMInputComponent->BindAction(AttackDownwardInputAction,	ETriggerEvent::Started,   this, &ASSIMPlayer::HandleAttackDownward);
 	
 	SSIMInputComponent->BindAction(HealInputAction,				ETriggerEvent::Started,   this, &ASSIMPlayer::HandleHeal);
+}
+
+void ASSIMPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	
+	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->CachePlayerCurrentAttributes();
 }
 
 // My Functions

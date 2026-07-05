@@ -21,6 +21,9 @@ class SSIM_API USSIMCombatAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 	
 public:
+	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Damage);
+	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Heal);
+	
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, MaxHealth);
 	
@@ -28,6 +31,11 @@ public:
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, MaxEnergy);
 	
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Combat")
+	FGameplayAttributeData Damage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Combat")
+	FGameplayAttributeData Heal;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Combat")
 	FGameplayAttributeData Health;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Combat")
@@ -39,8 +47,11 @@ protected:
 	FGameplayAttributeData MaxEnergy;
 	
 // Overriden Functions
-protected:
+public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 	
+// Custom Functions
+	void HandleDamage(const FGameplayEffectModCallbackData& Data);
+	void HandleHeal(const FGameplayEffectModCallbackData& Data);
 };

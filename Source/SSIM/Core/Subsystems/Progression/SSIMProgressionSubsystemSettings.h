@@ -15,7 +15,9 @@ class SSIM_API USSIMProgressionSubsystemSettings : public UDeveloperSettings
 	
 public:
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
-	TSubclassOf<UGameplayEffect> PlayerInitializationGE;
+	TSubclassOf<UGameplayEffect> InitPlayerMaxAttributesGE;
+	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
+	TSubclassOf<UGameplayEffect> InitPlayerCurrentAttributesGE;
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	TSubclassOf<UGameplayEffect> HealthLevelUpGE;
@@ -28,9 +30,9 @@ public:
 	int32 PlayerBaseEnergy; 
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
-	int32 PlayerMaximumHealth;
+	int32 AbsoluteMaximumHealth;
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
-	int32 PlayerMaximumEnergy; 
+	int32 AbsoluteMaximumEnergy; 
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	int32 HealthLevelUpShardsRequired;

@@ -87,9 +87,9 @@ void USSIMDebugSubsystem::UnregisterDebugCommands() const
 void USSIMDebugSubsystem::ListAllProgressionData() const
 {
 	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Base Health: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerBaseHealth);
-	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Maximum Health: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerMaximumHealth);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Maximum Health: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->AbsoluteMaximumHealth);
 	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Base Energy: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerBaseEnergy);
-	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Maximum Energy: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerMaximumEnergy);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Maximum Energy: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->AbsoluteMaximumEnergy);
 	
 	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Collected Health Shards: %d"), TEXT(__FUNCTION__), ProgressionSubsystem->CollectedHealthShards);
 	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Remaining Health Shards: %d"), TEXT(__FUNCTION__), ProgressionSubsystem->RemainingHealthShards);

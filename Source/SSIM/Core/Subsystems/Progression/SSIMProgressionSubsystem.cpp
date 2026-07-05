@@ -30,6 +30,12 @@ void USSIMProgressionSubsystem::Deinitialize()
 
 void USSIMProgressionSubsystem::ApplyProgressionToPlayer()
 {
+	ApplyMaxAttributesToPlayer();
+	
+}
+
+void USSIMProgressionSubsystem::ApplyMaxAttributesToPlayer()
+{
 	ASSIMPlayer* PlayerCharacter = Cast<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (!IsValid(PlayerCharacter))
 	{
@@ -38,8 +44,9 @@ void USSIMProgressionSubsystem::ApplyProgressionToPlayer()
 	}
 	
 	const FGameplayEffectContextHandle EffectContext = PlayerCharacter->GetAbilitySystemComponent()->MakeEffectContext();
+	
 	const FGameplayEffectSpecHandle SpecHandle = PlayerCharacter->GetAbilitySystemComponent()->MakeOutgoingSpec(
-		ProgressionSubsystemSettings->PlayerInitializationGE,
+		ProgressionSubsystemSettings->InitPlayerMaxAttributesGE,
 		1.0f,
 		EffectContext);
 	
@@ -49,11 +56,9 @@ void USSIMProgressionSubsystem::ApplyProgressionToPlayer()
 		return;
 	}
 	
-	FPlayerInitAttributes Attributes = CalculatePlayerInitAttributes();
+	FPlayerInitAttributes Attributes = CalculatePlayerInitMaxAttributes();
 	
-	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_Health,	 Attributes.Health);
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_MaxHealth, Attributes.MaxHealth);
-	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_Energy,	 Attributes.Energy);
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_MaxEnergy, Attributes.MaxEnergy);
 	
 	PlayerCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
@@ -70,7 +75,7 @@ void USSIMProgressionSubsystem::AddHealthShard()
 {
 	// If total shard limit is reached
 	if (CollectedHealthShards >=
-		(ProgressionSubsystemSettings->PlayerMaximumHealth - ProgressionSubsystemSettings->PlayerBaseHealth)
+		(ProgressionSubsystemSettings->AbsoluteMaximumHealth - ProgressionSubsystemSettings->PlayerBaseHealth)
 		* ProgressionSubsystemSettings->HealthLevelUpShardsRequired)
 	{
 		UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Total Health Shard Limit is reached"), TEXT(__FUNCTION__));
@@ -116,7 +121,7 @@ void USSIMProgressionSubsystem::AddHealthShard()
 void USSIMProgressionSubsystem::AddEnergyShard()
 {
 	if (CollectedEnergyShards >=
-		(ProgressionSubsystemSettings->PlayerMaximumEnergy - ProgressionSubsystemSettings->PlayerBaseEnergy)
+		(ProgressionSubsystemSettings->AbsoluteMaximumEnergy - ProgressionSubsystemSettings->PlayerBaseEnergy)
 				* ProgressionSubsystemSettings->EnergyLevelUpShardsRequired)
 	{
 		UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Total Energy Shard Limit is reached"), TEXT(__FUNCTION__));
@@ -162,9 +167,7 @@ void USSIMProgressionSubsystem::AddEnergyShard()
 void USSIMProgressionSubsystem::LoadProgressionSubsystemSettings()
 {
 	ProgressionSubsystemSettings = GetDefault<USSIMProgressionSubsystemSettings>();
-	
 	checkf(ProgressionSubsystemSettings, TEXT("%s | Failed to get Progression Subsystem Settings"), TEXT(__FUNCTION__));
-	
 }
 
 void USSIMProgressionSubsystem::CreateDefaultProgressionSave()
@@ -233,7 +236,7 @@ void USSIMProgressionSubsystem::DeserializeSaveData()
 	CollectedEnergyShards = ProgressionSaveData->CollectedEnergyShards;
 }
 
-FPlayerInitAttributes USSIMProgressionSubsystem::CalculatePlayerInitAttributes()
+FPlayerInitAttributes USSIMProgressionSubsystem::CalculatePlayerInitMaxAttributes()
 {
 	FPlayerInitAttributes Attributes;
 	
@@ -249,10 +252,10 @@ FPlayerInitAttributes USSIMProgressionSubsystem::CalculatePlayerInitAttributes()
 	RemainingEnergyShards = 
 		ProgressionSaveData->CollectedEnergyShards % ProgressionSubsystemSettings->EnergyLevelUpShardsRequired;
 	
+	Attributes.Health = 0;
 	Attributes.MaxHealth = ProgressionSubsystemSettings->PlayerBaseHealth + AdditionalHealth;
-	Attributes.Health = Attributes.MaxHealth;
+	Attributes.Energy = 0;
 	Attributes.MaxEnergy = ProgressionSubsystemSettings->PlayerBaseEnergy + AdditionalEnergy;
-	Attributes.Energy = 3;
 	
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | AdditionalHealth: %d"), TEXT(__FUNCTION__), AdditionalHealth);
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | RemainingHealthShards: %d"), TEXT(__FUNCTION__), RemainingHealthShards);

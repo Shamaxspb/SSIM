@@ -2,10 +2,15 @@
 
 #include "NativeGameplayTags.h"
 
+#pragma region Attributes
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Meta_Damage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Meta_Heal);
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Health);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_MaxHealth);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Energy);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_MaxEnergy);
+#pragma endregion Attributes
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Healing);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Staggered);
@@ -14,4 +19,3 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Invulnerable);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Dash);
-

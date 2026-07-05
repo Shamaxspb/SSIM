@@ -141,6 +141,7 @@ public:ASSIMPlayer();
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 // My Functions
 #pragma region Inline Getters

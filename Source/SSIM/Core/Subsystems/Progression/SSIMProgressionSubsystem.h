@@ -49,12 +49,12 @@ private:
 // Overriden Functions
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	
 	virtual void Deinitialize() override;
 	
 // Custom Functions
 public:
 	void ApplyProgressionToPlayer();
+	void ApplyMaxAttributesToPlayer();
 	
 	void SerializeSaveData() const;
 	void DeserializeSaveData();
@@ -67,6 +67,6 @@ private:
 	void CreateDefaultProgressionSave();
 	void LoadProgressionSave();
 	
-	FPlayerInitAttributes CalculatePlayerInitAttributes();
+	FPlayerInitAttributes CalculatePlayerInitMaxAttributes();
 	
 };
