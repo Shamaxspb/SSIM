@@ -300,7 +300,6 @@ private:
 	bool CanAttack() const;
 	bool CanHeal() const;
 	
-	void InitializeAttributes();
 	
 // Interfaces
 public:

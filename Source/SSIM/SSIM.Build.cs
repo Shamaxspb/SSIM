@@ -16,6 +16,7 @@ public class SSIM : ModuleRules
 			"InputCore", 
 			"EnhancedInput",
 			"UMG",
+			"DeveloperSettings",
 			
 			"GameplayAbilities",
 			"GameplayTags",

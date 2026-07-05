@@ -12,6 +12,7 @@
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
+#include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
 
 // Overriden Functions
 ASSIMPlayer::ASSIMPlayer()
@@ -44,7 +45,8 @@ void ASSIMPlayer::BeginPlay()
 	
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
 	
-	InitializeAttributes();
+	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->ApplyProgressionToPlayer();
+	
 }
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -336,37 +338,6 @@ bool ASSIMPlayer::CanHeal() const
 	}
 	return true;
 }
-
-void ASSIMPlayer::InitializeAttributes()
-{
-	if (!IsValid(SSIMAbilitySystemComponent))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | SSIMAbilitySystemComponent is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
-	
-	if (!IsValid(PlayerInitGE_temp))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | InitGE is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
-	
-	const FGameplayEffectContextHandle EffectContext = SSIMAbilitySystemComponent->MakeEffectContext();
-	
-	const FGameplayEffectSpecHandle SpecHandle = SSIMAbilitySystemComponent->MakeOutgoingSpec(
-		PlayerInitGE_temp,
-		1.0f,
-		EffectContext);
-	
-	if (!SpecHandle.IsValid())
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | SpecHandle is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
-	
-	SSIMAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-}
-
 
 #pragma region Interfaces
 void ASSIMPlayer::StartAttackInterface_Implementation() const
