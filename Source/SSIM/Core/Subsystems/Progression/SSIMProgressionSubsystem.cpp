@@ -57,12 +57,22 @@ void USSIMProgressionSubsystem::ApplyProgressionToPlayer()
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_MaxEnergy, Attributes.MaxEnergy);
 	
 	PlayerCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	
+	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s | Total Player Health: %d"), TEXT(__FUNCTION__), Attributes.MaxHealth);
+	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Remaining Health Shards: %d/%d"), TEXT(__FUNCTION__), 
+		RemainingHealthShards, ProgressionSubsystemSettings->HealthLevelUpShardsRequired);
+	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s | Total Player Energy: %d"), TEXT(__FUNCTION__), Attributes.MaxEnergy);
+	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Remaining Energy Shards: %d/%d"), TEXT(__FUNCTION__), 
+		RemainingEnergyShards, ProgressionSubsystemSettings->EnergyLevelUpShardsRequired);
 }
 
 void USSIMProgressionSubsystem::AddHealthShard()
 {
 	CollectedHealthShards++;
 	RemainingHealthShards++;
+	
+	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Health Shard added. Remaining Health Shards: %d/%d"), TEXT(__FUNCTION__), 
+		RemainingHealthShards, ProgressionSubsystemSettings->HealthLevelUpShardsRequired);
 	
 	if (RemainingHealthShards >= ProgressionSubsystemSettings->HealthLevelUpShardsRequired)
 	{
@@ -87,6 +97,10 @@ void USSIMProgressionSubsystem::AddHealthShard()
 		}
 		
 		PlayerCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		
+		RemainingHealthShards = 0;
+		
+		UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Max Health Increased"), TEXT(__FUNCTION__));
 	}
 }
 
@@ -94,6 +108,9 @@ void USSIMProgressionSubsystem::AddEnergyShard()
 {
 	CollectedEnergyShards++;
 	RemainingEnergyShards++;
+	
+	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Energy Shard added. Remaining Energy Shards: %d/%d"), TEXT(__FUNCTION__), 
+		RemainingEnergyShards, ProgressionSubsystemSettings->EnergyLevelUpShardsRequired);
 	
 	if (RemainingEnergyShards >= ProgressionSubsystemSettings->EnergyLevelUpShardsRequired)
 	{
@@ -118,6 +135,10 @@ void USSIMProgressionSubsystem::AddEnergyShard()
 		}
 		
 		PlayerCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		
+		RemainingEnergyShards = 0;
+		
+		UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Max Energy Increased"), TEXT(__FUNCTION__));
 	}
 }
 
@@ -177,6 +198,8 @@ void USSIMProgressionSubsystem::SerializeSaveData() const
 	
 	ProgressionSaveData->CollectedHealthShards = CollectedHealthShards;
 	ProgressionSaveData->CollectedEnergyShards = CollectedEnergyShards;
+	
+	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Progression Data serialized"), TEXT(__FUNCTION__));
 }
 
 void USSIMProgressionSubsystem::DeserializeSaveData()

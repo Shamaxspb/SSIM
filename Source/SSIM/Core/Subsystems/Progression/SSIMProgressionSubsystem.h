@@ -56,6 +56,9 @@ public:
 public:
 	void ApplyProgressionToPlayer();
 	
+	void SerializeSaveData() const;
+	void DeserializeSaveData();
+	
 	void AddHealthShard();
 	void AddEnergyShard();
 	
@@ -63,8 +66,7 @@ private:
 	void LoadProgressionSubsystemSettings();
 	void CreateDefaultProgressionSave();
 	void LoadProgressionSave();
-	void SerializeSaveData() const;
-	void DeserializeSaveData();
+	
 	
 	FPlayerInitAttributes CalculatePlayerInitAttributes();
 	
