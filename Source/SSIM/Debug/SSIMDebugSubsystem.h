@@ -8,6 +8,7 @@
 #include "SSIMDebugSubsystem.generated.h"
 
 
+class USSIMProgressionSubsystemSettings;
 class USSIMProgressionSubsystem;
 
 UCLASS(meta = (DisplayName = "Debug Subsystem"))
@@ -18,6 +19,8 @@ class SSIM_API USSIMDebugSubsystem : public UGameInstanceSubsystem
 // Variables
 	UPROPERTY()
 	TObjectPtr<USSIMProgressionSubsystem> ProgressionSubsystem;
+	UPROPERTY()
+	const USSIMProgressionSubsystemSettings* ProgressionSubsystemSettings;
 	
 // Overriden Functions
 public:
@@ -28,6 +31,8 @@ public:
 private:
 	void RegisterDebugCommands() const;
 	void UnregisterDebugCommands() const;
+	
+	void ListAllProgressionData() const;
 	
 	void AddHealthShard() const;
 	

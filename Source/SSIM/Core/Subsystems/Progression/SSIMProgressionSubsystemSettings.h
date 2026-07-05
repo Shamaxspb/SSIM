@@ -19,19 +19,21 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	TSubclassOf<UGameplayEffect> HealthLevelUpGE;
-	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	TSubclassOf<UGameplayEffect> EnergyLevelUpGE;
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	int32 PlayerBaseHealth;
-	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	int32 PlayerBaseEnergy; 
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
-	int32 HealthLevelUpShardsRequired;
+	int32 PlayerMaximumHealth;
+	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
+	int32 PlayerMaximumEnergy; 
 	
+	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
+	int32 HealthLevelUpShardsRequired;
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	int32 EnergyLevelUpShardsRequired;
 	

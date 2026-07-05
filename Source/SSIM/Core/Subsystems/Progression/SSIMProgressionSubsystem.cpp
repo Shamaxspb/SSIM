@@ -68,6 +68,15 @@ void USSIMProgressionSubsystem::ApplyProgressionToPlayer()
 
 void USSIMProgressionSubsystem::AddHealthShard()
 {
+	// If total shard limit is reached
+	if (CollectedHealthShards >=
+		(ProgressionSubsystemSettings->PlayerMaximumHealth - ProgressionSubsystemSettings->PlayerBaseHealth)
+		* ProgressionSubsystemSettings->HealthLevelUpShardsRequired)
+	{
+		UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Total Health Shard Limit is reached"), TEXT(__FUNCTION__));
+		return;
+	}
+	
 	CollectedHealthShards++;
 	RemainingHealthShards++;
 	
@@ -106,6 +115,14 @@ void USSIMProgressionSubsystem::AddHealthShard()
 
 void USSIMProgressionSubsystem::AddEnergyShard()
 {
+	if (CollectedEnergyShards >=
+		(ProgressionSubsystemSettings->PlayerMaximumEnergy - ProgressionSubsystemSettings->PlayerBaseEnergy)
+				* ProgressionSubsystemSettings->EnergyLevelUpShardsRequired)
+	{
+		UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Total Energy Shard Limit is reached"), TEXT(__FUNCTION__));
+		return;
+	}
+	
 	CollectedEnergyShards++;
 	RemainingEnergyShards++;
 	
@@ -200,6 +217,8 @@ void USSIMProgressionSubsystem::SerializeSaveData() const
 	ProgressionSaveData->CollectedEnergyShards = CollectedEnergyShards;
 	
 	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Progression Data serialized"), TEXT(__FUNCTION__));
+	
+	UGameplayStatics::SaveGameToSlot(ProgressionSaveData, ProgressionDataSlotName, 0);
 }
 
 void USSIMProgressionSubsystem::DeserializeSaveData()

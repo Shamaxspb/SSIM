@@ -67,7 +67,6 @@ private:
 	void CreateDefaultProgressionSave();
 	void LoadProgressionSave();
 	
-	
 	FPlayerInitAttributes CalculatePlayerInitAttributes();
 	
 };

@@ -5,16 +5,20 @@
 
 #include "SSIM/SSIM.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
+#include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystemSettings.h"
 
 void USSIMDebugSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	
 	Collection.InitializeDependency<USSIMProgressionSubsystem>();
-	
 	ProgressionSubsystem = GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>();
 	checkf(ProgressionSubsystem, TEXT("%s | Progression Subsystem is NULL"), TEXT(__FUNCTION__));
 	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Progression Subsystem loaded"), TEXT(__FUNCTION__));
+	
+	ProgressionSubsystemSettings = GetDefault<USSIMProgressionSubsystemSettings>();
+	checkf(ProgressionSubsystemSettings, TEXT("%s | Progression Subsystem Settings is NULL"), TEXT(__FUNCTION__));
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Progression Subsystem Settings loaded"), TEXT(__FUNCTION__));
 	
 	RegisterDebugCommands();
 }
@@ -28,6 +32,13 @@ void USSIMDebugSubsystem::Deinitialize()
 
 void USSIMDebugSubsystem::RegisterDebugCommands() const
 {
+	// Register List All Progression Data
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("dbg.ListAllProgressionData"),
+		TEXT("Logs all Progression variable values"),
+		FConsoleCommandDelegate::CreateUObject(this, &USSIMDebugSubsystem::ListAllProgressionData),
+		ECVF_Default);
+	
 	// Register Add Health Shard
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("dbg.AddHealthShard"),
@@ -71,6 +82,22 @@ void USSIMDebugSubsystem::UnregisterDebugCommands() const
 	IConsoleManager::Get().UnregisterConsoleObject(TEXT("dbg.AddEnergyShard"), false);
 	IConsoleManager::Get().UnregisterConsoleObject(TEXT("dbg.AddEnergyShards"), false);
 	IConsoleManager::Get().UnregisterConsoleObject(TEXT("dbg.SaveProgression"), false);
+}
+
+void USSIMDebugSubsystem::ListAllProgressionData() const
+{
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Base Health: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerBaseHealth);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Maximum Health: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerMaximumHealth);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Base Energy: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerBaseEnergy);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Player Maximum Energy: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->PlayerMaximumEnergy);
+	
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Collected Health Shards: %d"), TEXT(__FUNCTION__), ProgressionSubsystem->CollectedHealthShards);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Remaining Health Shards: %d"), TEXT(__FUNCTION__), ProgressionSubsystem->RemainingHealthShards);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Health Level Up Shards Required: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->HealthLevelUpShardsRequired);
+	
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Collected Energy Shards: %d"), TEXT(__FUNCTION__), ProgressionSubsystem->CollectedEnergyShards);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Remaining Energy Shards: %d"), TEXT(__FUNCTION__), ProgressionSubsystem->RemainingEnergyShards);
+	UE_LOG(LogSSIMDebug, Log, TEXT("%s | Energy Level Up Shards Required: %d"), TEXT(__FUNCTION__), ProgressionSubsystemSettings->EnergyLevelUpShardsRequired);
 }
 
 void USSIMDebugSubsystem::AddHealthShard() const
@@ -129,5 +156,3 @@ void USSIMDebugSubsystem::SaveProgressionData() const
 {
 	ProgressionSubsystem->SerializeSaveData();
 }
-
-
