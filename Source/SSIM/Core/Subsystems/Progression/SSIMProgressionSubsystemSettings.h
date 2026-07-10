@@ -44,6 +44,8 @@ public:
 	
 	
 	virtual FName GetCategoryName() const override;
-	virtual FText GetSectionText() const override;
 	
+#if WITH_EDITOR
+	virtual FText GetSectionText() const override;
+#endif WITH_EDITOR
 };
