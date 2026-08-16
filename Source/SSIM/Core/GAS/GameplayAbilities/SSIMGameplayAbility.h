@@ -13,4 +13,16 @@ UCLASS()
 class SSIM_API USSIMGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+	
+// Variables
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug")
+	bool bShowDebug;
+	
+// Overriden Functions
+	
+	
+// Custom Functions
+	
+	
 };

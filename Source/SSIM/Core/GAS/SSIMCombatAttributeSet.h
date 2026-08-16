@@ -25,6 +25,7 @@ public:
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Damage);
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Heal);
 	
+	/* Stats */
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, MaxHealth);
 	
