@@ -21,6 +21,7 @@ class SSIM_API USSIMCombatAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 	
 public:
+	/* META */
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Damage);
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Heal);
 	
@@ -30,7 +31,7 @@ public:
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, Energy);
 	ATTRIBUTE_ACCESSORS(USSIMCombatAttributeSet, MaxEnergy);
 	
-protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Combat")
 	FGameplayAttributeData Damage;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Combat")

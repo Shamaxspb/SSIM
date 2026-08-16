@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
 
-#include "SSIMDamageExecutionCalculation.generated.h"
+#include "SSIMPlayerDamageExecutionCalculation.generated.h"
 
 
 UCLASS()
-class SSIM_API USSIMDamageExecutionCalculation : public UGameplayEffectExecutionCalculation
+class SSIM_API USSIMPlayerDamageExecutionCalculation : public UGameplayEffectExecutionCalculation
 {
 	GENERATED_BODY()
-	
-	// This class is overengineering for now, to complex for my project
-	
+
 public:
+	USSIMPlayerDamageExecutionCalculation();
+	
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, 
 										FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 };
