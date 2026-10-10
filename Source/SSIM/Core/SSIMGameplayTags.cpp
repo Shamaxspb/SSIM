@@ -13,6 +13,7 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_MaxEnergy, "Attribute.MaxEnergy");
 #pragma endregion Attributes
 
 /* Events */
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Hit,		 "Event.Hit");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_TakeDamage, "Event.TakeDamage");
 
 /* State */
