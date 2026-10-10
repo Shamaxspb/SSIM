@@ -141,6 +141,8 @@ void USSIMEnemyCombatComponent::DealDamageToPlayer(UShapeComponent* DamageCollis
 	
 	if (DamageCollision->IsOverlappingActor(PlayerPawn))
 	{
+		DealDamage(RegularAttackDamage, PlayerPawn);
+		
 		DamageData.Instigator = SSIMOwnerCharacter;
 		DamageData.Value = RegularAttackDamage;
 		

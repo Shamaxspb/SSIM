@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
 
-#include "SSIMCombatSettings.generated.h"
+#include "SSIMCombatSubsystemSettings.generated.h"
 
 
 class UGameplayEffect;
 
 UCLASS(Config = GameplaySubsystems, DefaultConfig, meta = (DisplayName = "Progression Subsystem Settings"))
-class SSIM_API USSIMCombatSettings : public UDeveloperSettings
+class SSIM_API USSIMCombatSubsystemSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 	

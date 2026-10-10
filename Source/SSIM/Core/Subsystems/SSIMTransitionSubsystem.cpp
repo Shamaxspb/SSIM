@@ -33,43 +33,41 @@ void USSIMTransitionSubsystem::LoadProgressionSubsystemSettings()
 
 void USSIMTransitionSubsystem::ApplyCurrentAttributesToPlayer()
 {
-	ASSIMPlayer* PlayerCharacter = Cast<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (!IsValid(PlayerCharacter))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Player Character is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
+	// Max attributes depend on Player Progression, we initialize only them via ProgressionSubsystem
+	// Current Attributes are should be persistent across different levels, so we initialize them via TransitionSubsystem
 	
-	const FGameplayEffectContextHandle EffectContext = PlayerCharacter->GetAbilitySystemComponent()->MakeEffectContext();
-	const FGameplayEffectSpecHandle SpecHandle = PlayerCharacter->GetAbilitySystemComponent()->MakeOutgoingSpec(
+	const ASSIMPlayer* Player = CastChecked<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	
+	const FGameplayEffectContextHandle EffectContext = Player->GetAbilitySystemComponent()->MakeEffectContext();
+	const FGameplayEffectSpecHandle SpecHandle = Player->GetAbilitySystemComponent()->MakeOutgoingSpec(
 		ProgressionSubsystemSettings->InitPlayerCurrentAttributesGE,
 		1.0f,
 		EffectContext);
 	
-	// In case of loading first level 
-	if (TransitionalHealth == 0 && TransitionalEnergy == 0)
+	// In case of loading game first time, not transitioning between levels
+	if (TransitionalHealth == -1 && TransitionalEnergy == -1)
 	{
-		TransitionalHealth = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(USSIMCombatAttributeSet::GetMaxHealthAttribute());
+		TransitionalHealth = Player->GetAbilitySystemComponent()->GetNumericAttribute(USSIMCombatAttributeSet::GetMaxHealthAttribute());
 		TransitionalEnergy = 3;
 	}
 	
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_Health, TransitionalHealth);
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_Energy, TransitionalEnergy);
 	
-	PlayerCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	Player->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
 
 void USSIMTransitionSubsystem::CachePlayerCurrentAttributes()
 {
-	ASSIMPlayer* PlayerCharacter = Cast<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (!IsValid(PlayerCharacter))
+	const ASSIMPlayer* Player = Cast<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (!IsValid(Player))
 	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Player Character is not valid"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMLevelTransition, Error, TEXT("%s | Player is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	
-	TransitionalHealth = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(USSIMCombatAttributeSet::GetHealthAttribute());
-	TransitionalEnergy = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(USSIMCombatAttributeSet::GetEnergyAttribute());
+	TransitionalHealth = Player->GetAbilitySystemComponent()->GetNumericAttribute(USSIMCombatAttributeSet::GetHealthAttribute());
+	TransitionalEnergy = Player->GetAbilitySystemComponent()->GetNumericAttribute(USSIMCombatAttributeSet::GetEnergyAttribute());
 	
 	UE_LOG(LogSSIMLevelTransition, Log, TEXT("%s | Cached Health on transition: %d"), TEXT(__FUNCTION__), TransitionalHealth);
 	UE_LOG(LogSSIMLevelTransition, Log, TEXT("%s | Cached Energy on transition: %d"), TEXT(__FUNCTION__), TransitionalEnergy);

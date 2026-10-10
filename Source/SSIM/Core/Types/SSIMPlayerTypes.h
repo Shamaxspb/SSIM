@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "EPlayerTypes.generated.h"
+#include "SSIMPlayerTypes.generated.h"
 
 /*UENUM(BlueprintType)
 enum class EPlayerState : uint8

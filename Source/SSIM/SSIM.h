@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogSSIMDamagePipeline,		 Log, All);
+
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMInheritance,			 Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMPlayerInitialization, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSSIMEnemyInitialization,  Log, All);

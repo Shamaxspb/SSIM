@@ -11,6 +11,6 @@ FName USSIMProgressionSubsystemSettings::GetCategoryName() const
 #if WITH_EDITOR
 FText USSIMProgressionSubsystemSettings::GetSectionText() const
 {
-	return NSLOCTEXT("Settings", "Progression", "Progression Subsystem Settings");
+	return NSLOCTEXT("Settings", "Progression", "SSIM Progression Subsystem Settings");
 }
 #endif WITH_EDITOR

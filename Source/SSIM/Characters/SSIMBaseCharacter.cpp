@@ -27,6 +27,8 @@ void ASSIMBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	SSIMAbilitySystemComponent->InitAbilityActorInfo(this, this);
+	
+	InitializeAttributes();
 }
 
 void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
@@ -44,7 +46,16 @@ USSIMAbilitySystemComponent* ASSIMBaseCharacter::GetAbilitySystemComponent() con
 	return SSIMAbilitySystemComponent;	
 }
 
-// My Functions
+// Custom Functions
+/*void ASSIMBaseCharacter::InitializeAttributes()
+{
+}*/
+
+void ASSIMBaseCharacter::InitializeAttributes()
+{
+	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | InitializeAttributes is not overriden"), TEXT(__FUNCTION__));
+}
+
 void ASSIMBaseCharacter::RestrictXAxisMovement() const
 {
 	if (!GetMovementComponent())

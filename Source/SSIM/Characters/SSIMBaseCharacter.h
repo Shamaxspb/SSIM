@@ -54,7 +54,7 @@ public:
 	virtual USSIMAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	
-// My Functions
+// Custom Functions
 public:
 	FORCEINLINE TObjectPtr<UCapsuleComponent> GetHitRegistrationCollision() const
 	{
@@ -65,6 +65,9 @@ public:
 	{
 		return ContactDamageCollision;
 	}
+	
+protected:
+	virtual void InitializeAttributes();
 	
 private:
 	void RestrictXAxisMovement() const;

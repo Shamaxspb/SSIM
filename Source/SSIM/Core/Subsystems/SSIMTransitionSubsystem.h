@@ -23,9 +23,9 @@ class SSIM_API USSIMTransitionSubsystem : public UGameInstanceSubsystem
 	// Variables
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
-	int32 TransitionalHealth = 0;
+	int32 TransitionalHealth = -1;
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
-	int32 TransitionalEnergy = 0;
+	int32 TransitionalEnergy = -1;
 	
 private:
 	UPROPERTY()
@@ -39,7 +39,7 @@ public:
 	virtual void Deinitialize() override;
 	
 
-	// Custom Functions
+// Custom Functions
 public:
 	void ApplyCurrentAttributesToPlayer();
 	void CachePlayerCurrentAttributes();

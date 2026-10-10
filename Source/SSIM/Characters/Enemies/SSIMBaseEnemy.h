@@ -9,6 +9,7 @@
 
 #include "SSIMBaseEnemy.generated.h"
 
+class USSIMEnemyDataAsset;
 enum class EFacingDirection : uint8;
 class USSIMEnemyDamageReactionComponent;
 class USSIMEnemyCombatComponent;
@@ -44,6 +45,9 @@ protected:
 
 #pragma endregion Metadata
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Data")
+	TObjectPtr<USSIMEnemyDataAsset> EnemyData;
 	
 // Overriden Functions
 public:
@@ -54,9 +58,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	
 	
-// My Functions
+// Custom Functions
 #pragma region Inline Getters
-
 public:
 	UFUNCTION()
 	FORCEINLINE UBoxComponent* GetAttackCollision() const
@@ -81,16 +84,17 @@ public:
 	{
 		return EnemyFacingDirection;
 	}
-	
 #pragma endregion Inline Getters
-
-protected:
-	void SetupAttackCollision();
 	
 public:
 	void SetEnemyFacingDirection(EFacingDirection InPlayerFacingDirection);
+
+protected:
+	virtual void InitializeAttributes() override;
+	void SetupAttackCollision();
 	
 private:
+	
 	void UpdateFacingDirection();
 	
 // Interfaces

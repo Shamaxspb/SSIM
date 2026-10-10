@@ -56,4 +56,6 @@ public:
 // Custom Functions
 	void HandleDamage(const FGameplayEffectModCallbackData& Data);
 	void HandleHeal(const FGameplayEffectModCallbackData& Data);
+	
+	void HandleDeath(const FGameplayEffectModCallbackData& Data);
 };
