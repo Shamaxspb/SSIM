@@ -31,8 +31,6 @@ void USSIMDashAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
-	ASSIMPlayer* Player = Cast<ASSIMPlayer>(GetAvatarActorFromActorInfo());
-	
 	Player->SetPlayerBrakingDecelerationWalkingToDefault();
 	Player->GetCharacterMovement()->BrakingDecelerationFalling = 0.f;
 	Player->SetPlayerGravityScaleToDefault();
@@ -64,13 +62,6 @@ void USSIMDashAbility::StartDash()
 	if (!IsValid(PlayerDashMontage))
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | PlayerDashAnimation is not valid"), TEXT(__FUNCTION__));
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-	}
-		
-	ASSIMPlayer* Player = Cast<ASSIMPlayer>(GetAvatarActorFromActorInfo());
-	if (!IsValid(Player))
-	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Cast to SSIMPlayer failed"), TEXT(__FUNCTION__));
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 	}
 	

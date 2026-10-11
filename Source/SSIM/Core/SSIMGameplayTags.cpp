@@ -16,6 +16,9 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_MaxEnergy, "Attribute.MaxEnergy");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HitRegistered,	"Event.HitRegistered");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_TakeDamage,	"Event.TakeDamage");
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Started,	"Event.Heal.Started");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Ended,	"Event.Heal.Ended");
+
 /* State */
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Healing,	   "State.Healing");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Staggered,	   "State.Staggered");
@@ -26,4 +29,6 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_State_Invulnerable, "State.Invulnerable");
 // Basic
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Attack, "Ability.Combat.Attack");
 // Innate
+UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Heal,   "Ability.Innate.Heal");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Dash,   "Ability.Innate.Dash");
+

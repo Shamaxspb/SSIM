@@ -29,7 +29,7 @@ class SSIM_API USSIMPlayerAnimInstance : public USSIMAnimInstance
 // Variables
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
-	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	TObjectPtr<ASSIMPlayer> Player;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	TObjectPtr<UAnimMontage> CurrentAttackMontage;
