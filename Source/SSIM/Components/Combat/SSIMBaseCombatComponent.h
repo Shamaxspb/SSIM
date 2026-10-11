@@ -8,6 +8,7 @@
 
 #include "SSIMBaseCombatComponent.generated.h"
 
+class USSIMCombatSubsystemSettings;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackEndedSignature);
 
@@ -24,6 +25,10 @@ class SSIM_API   USSIMBaseCombatComponent : public USSIMBaseComponent
 public:
 	FOnAttackStartedSignature OnAttackStartedDelegate;
 	FOnAttackEndedSignature OnAttackEndedDelegate;
+	
+protected:
+	UPROPERTY()
+	const USSIMCombatSubsystemSettings* CombatSubsystemSettings;
 	
 #pragma region Metadata
 
@@ -53,12 +58,18 @@ protected:
 
 #pragma endregion Debug
 		
-// My Functions
+// Custom Functions
+public:
+	virtual void BeginPlay() override;
+	
+// Custom Functions
 public:
 	virtual void StartAttack();
 	virtual void EndAttack();
 	virtual void StartAttackTrace();
 	virtual void EndAttackTrace();
+	
+	void DealDamage(const float InDamageAmount, AActor* InOtherActor) const;
 	
 protected:
 	UFUNCTION()

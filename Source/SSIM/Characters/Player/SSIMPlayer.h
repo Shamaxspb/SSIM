@@ -11,7 +11,7 @@
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Types/EPlayerTypes.h"
+#include "SSIM/Core/Types/SSIMPlayerTypes.h"
 
 #include "SSIMPlayer.generated.h"
 
@@ -143,7 +143,7 @@ public:ASSIMPlayer();
 	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
-// My Functions
+// Custom Functions
 #pragma region Inline Getters
 	
 public:
@@ -269,6 +269,9 @@ public:
 	
 public:
 	void SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirection);
+	
+protected:
+	virtual void InitializeAttributes() override;
 
 private:
 	void SetupAttackCollision();
@@ -295,7 +298,6 @@ private:
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
-private:
 	bool CanMove() const;
 	bool CanDash() const;
 	bool CanAttack() const;

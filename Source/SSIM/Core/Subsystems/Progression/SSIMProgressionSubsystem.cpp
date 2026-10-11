@@ -32,20 +32,18 @@ void USSIMProgressionSubsystem::ApplyProgressionToPlayer()
 {
 	ApplyMaxAttributesToPlayer();
 	
+	// Here should be other logic such as Apply Current Tools, Apply Unlocked Skills (Abilities) etc. 
 }
 
 void USSIMProgressionSubsystem::ApplyMaxAttributesToPlayer()
 {
-	ASSIMPlayer* PlayerCharacter = Cast<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (!IsValid(PlayerCharacter))
-	{
-		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Player Character is not valid"), TEXT(__FUNCTION__));
-		return;
-	}
+	// Max attributes depend on Player Progression, we initialize only them via ProgressionSubsystem
+	// Current Attributes are should be persistent across different levels, so we initialize them via TransitionSubsystem
 	
-	const FGameplayEffectContextHandle EffectContext = PlayerCharacter->GetAbilitySystemComponent()->MakeEffectContext();
+	const ASSIMPlayer* Player = CastChecked<ASSIMPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	
-	const FGameplayEffectSpecHandle SpecHandle = PlayerCharacter->GetAbilitySystemComponent()->MakeOutgoingSpec(
+	const FGameplayEffectContextHandle EffectContext = Player->GetAbilitySystemComponent()->MakeEffectContext();
+	const FGameplayEffectSpecHandle SpecHandle = Player->GetAbilitySystemComponent()->MakeOutgoingSpec(
 		ProgressionSubsystemSettings->InitPlayerMaxAttributesGE,
 		1.0f,
 		EffectContext);
@@ -56,12 +54,12 @@ void USSIMProgressionSubsystem::ApplyMaxAttributesToPlayer()
 		return;
 	}
 	
-	FPlayerInitAttributes Attributes = CalculatePlayerInitMaxAttributes();
+	const FPlayerInitAttributes Attributes = CalculatePlayerInitMaxAttributes();
 	
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_MaxHealth, Attributes.MaxHealth);
 	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_MaxEnergy, Attributes.MaxEnergy);
 	
-	PlayerCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	Player->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	
 	UE_LOG(LogSSIMPlayerInitialization, Log, TEXT("%s | Total Player Health: %d"), TEXT(__FUNCTION__), Attributes.MaxHealth);
 	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Remaining Health Shards: %d/%d"), TEXT(__FUNCTION__), 
@@ -240,13 +238,13 @@ FPlayerInitAttributes USSIMProgressionSubsystem::CalculatePlayerInitMaxAttribute
 {
 	FPlayerInitAttributes Attributes;
 	
-	int32 AdditionalHealth = 
+	const int32 AdditionalHealth = 
 		ProgressionSaveData->CollectedHealthShards / ProgressionSubsystemSettings->HealthLevelUpShardsRequired;
 	
 	RemainingHealthShards = 
 		ProgressionSaveData->CollectedHealthShards % ProgressionSubsystemSettings->HealthLevelUpShardsRequired;
 	
-	int32 AdditionalEnergy = 
+	const int32 AdditionalEnergy = 
 		ProgressionSaveData->CollectedEnergyShards / ProgressionSubsystemSettings->EnergyLevelUpShardsRequired;
 	
 	RemainingEnergyShards = 

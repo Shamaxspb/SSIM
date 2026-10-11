@@ -5,7 +5,18 @@
 
 #include "Components/BoxComponent.h"
 #include "SSIM/SSIM.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "SSIM/Core/SSIMGameplayTags.h"
+#include "SSIM/Core/Subsystems/Combat/SSIMCombatSubsystemSettings.h"
 
+
+void USSIMBaseCombatComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	CombatSubsystemSettings = GetDefault<USSIMCombatSubsystemSettings>();
+}
 
 void USSIMBaseCombatComponent::StartAttack()
 {
@@ -88,6 +99,38 @@ void USSIMBaseCombatComponent::EndAttackTrace()
 	if (bShowAttackLogs)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack trace ENDED (%s)"), TEXT(__FUNCTION__), *GetOwner()->GetName());
+	}
+}
+
+void USSIMBaseCombatComponent::DealDamage(const float InDamageAmount, AActor* InOtherActor) const
+{
+	UAbilitySystemComponent* PlayerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InOtherActor);
+	if (!IsValid(TargetASC))
+	{
+		UE_LOG(LogSSIMDamagePipeline, Log, TEXT("%s | %s' ASC is not valid"), TEXT(__FUNCTION__), *InOtherActor->GetName());
+		return;
+	}
+	
+	const FGameplayEffectContextHandle Context = PlayerASC->MakeEffectContext();
+	const FGameplayEffectSpecHandle SpecHandle = PlayerASC->MakeOutgoingSpec(
+		CombatSubsystemSettings->DamageGE,
+		1.f,
+		Context);
+	
+	if (!SpecHandle.IsValid())
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | SpecHandle is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	SpecHandle.Data->SetSetByCallerMagnitude(TAG_Attribute_Meta_Damage, InDamageAmount);
+	
+	PlayerASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+	
+	if (bShowAttackLogs)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Player hit %s for %f damage"), TEXT(__FUNCTION__), *InOtherActor->GetName(), InDamageAmount);
 	}
 }
 

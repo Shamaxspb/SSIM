@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+DEFINE_LOG_CATEGORY(LogSSIMDamagePipeline);
+
 DEFINE_LOG_CATEGORY(LogSSIMInheritance);
 DEFINE_LOG_CATEGORY(LogSSIMPlayerInitialization);
 DEFINE_LOG_CATEGORY(LogSSIMEnemyInitialization);

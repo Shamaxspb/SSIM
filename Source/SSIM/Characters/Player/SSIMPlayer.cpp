@@ -45,10 +45,6 @@ void ASSIMPlayer::BeginPlay()
 												EFacingDirection::EPD_Right : EFacingDirection::EPD_Left;
 	
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
-	
-	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->ApplyProgressionToPlayer();
-	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->ApplyCurrentAttributesToPlayer();
-	
 }
 
 void ASSIMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -88,7 +84,7 @@ void ASSIMPlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->CachePlayerCurrentAttributes();
 }
 
-// My Functions
+// Custom Functions
 void ASSIMPlayer::SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirection)
 {
 	PlayerFacingDirection = InPlayerFacingDirection;
@@ -107,6 +103,12 @@ void ASSIMPlayer::SetPlayerFacingDirection(EFacingDirection InPlayerFacingDirect
 		}
 	}
 	SetActorRotation(PlayerRotation);
+}
+
+void ASSIMPlayer::InitializeAttributes()
+{
+	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->ApplyProgressionToPlayer();
+	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->ApplyCurrentAttributesToPlayer();
 }
 
 void ASSIMPlayer::HandleMove(const FInputActionValue& Value)

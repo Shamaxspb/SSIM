@@ -10,8 +10,9 @@
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
+#include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Types/SSIMCombatDataTypes.h"
+#include "SSIM/Core/Subsystems/Combat/SSIMCombatSubsystemSettings.h"
 
 USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
 {
@@ -207,27 +208,19 @@ void USSIMPlayerCombatComponent::OnAttackCollisionBeginOverlap(UPrimitiveCompone
 }
 
 // Internal
-void USSIMPlayerCombatComponent::HitRegistration(const AActor* OtherActor)
+void USSIMPlayerCombatComponent::HitRegistration(AActor* OtherActor)
 {
+	DealDamage(RegularAttackDamage, OtherActor);
+	
+	//
 	DamageData.Instigator = SSIMPlayer;
 	DamageData.Value = RegularAttackDamage;
 	
-	if (bShowAttackLogs)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Error, TEXT("Hit Registration"));
-	}
-	
-	if (!OtherActor->Implements<USSIMDamageableInterface>())
+	/*if (!OtherActor->Implements<USSIMDamageableInterface>())
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s : Target does not implement USSIMDamageableInterface"), TEXT(__FUNCTION__));
 		return;
-	}
-		
-	if (bShowAttackLogs)
-	{
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Hit %s for %d damage"), TEXT(__FUNCTION__), *OtherActor->GetName(), RegularAttackDamage);
-		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s : Player Direction Type: "), TEXT(__FUNCTION__), *UEnum::GetValueAsString(PlayerAttackDirectionType));
-	}
+	}*/
 		
 	ISSIMDamageableInterface::Execute_ReceivePlayerAttackDirectionType(OtherActor, PlayerAttackDirectionType);
 	ISSIMDamageableInterface::Execute_ReceiveDamageInterface(OtherActor, DamageData);
@@ -238,12 +231,10 @@ void USSIMPlayerCombatComponent::HitRegistration(const AActor* OtherActor)
 	{
 		AttackKnockback();
 	}
-		
 	if (PlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Downward)
 	{
 		PogoInit();
 	}
-	
 }
 
 void USSIMPlayerCombatComponent::AttackKnockback()

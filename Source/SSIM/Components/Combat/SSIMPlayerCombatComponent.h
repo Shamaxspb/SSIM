@@ -8,7 +8,9 @@
 
 #include "SSIMPlayerCombatComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitRegistrationSignature, EPlayerAttackDirectionType, AttackDirectionType);
+class USSIMCombatSubsystemSettings;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitRegistrationSignature, EPlayerAttackDirectionType,
+                                            AttackDirectionType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoEndedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPogoAnimationStartedSignature);
@@ -83,7 +85,6 @@ private:
 	TObjectPtr<ASSIMPlayer> SSIMPlayer;
 
 #pragma region Pogo
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Combat|Pogo")
 	float PogoAngle = 50.f;
@@ -122,8 +123,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "SSIM|DEBUG|Pogo", meta = (EditCondition = "bDrawPogoDebug", EditConditionHides))
 	FLinearColor PogoReboundDirectionArrowColor = FLinearColor::Blue;
 #pragma endregion Pogo Debug
-	
-	
+
 private:
 	FTimerHandle EndPogoTimerHandle;
 	FTimerDelegate EndPogoTimerDelegate;
@@ -131,9 +131,9 @@ private:
 	FTimerHandle PogoAdjustHeightHandle;
 	FTimerDelegate PogoAdjustHeightDelegate;
 	float PogoInterpolationStepTime = 0.002f;
-	
 #pragma endregion Pogo
 
+#pragma region Knockback
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack")
 	float GroundAttackKnockbackVelocity;
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Combat|Attack")
@@ -145,6 +145,7 @@ private:
 	// Debug
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Debug|Attack")
 	bool bShowAttackKnockbackLogs;
+#pragma endregion Knockback
 	
 // Overriden Functions
 public:
@@ -173,7 +174,7 @@ protected:
 											   const FHitResult& SweepResult) override;
 	
 private:
-	void HitRegistration(const AActor* OtherActor);
+	void HitRegistration(AActor* OtherActor);
 	
 	void AttackKnockback();
 	void ResetAttackKnockbackState();
