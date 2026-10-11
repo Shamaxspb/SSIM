@@ -19,7 +19,7 @@ struct FEnemyAttributeDefaults
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes",	meta = (ClampMin = "1.0"))
 	float MaxHealth = 30.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes",	meta = (ClampMin = "0.0"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Attributes",	meta = (ClampMin = "0.0"))
 	float Health = 30.f;
 };
 

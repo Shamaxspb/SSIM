@@ -21,15 +21,16 @@ void USSIMCombatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attri
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxEnergy());
 	}
-	else if (Attribute == GetMaxHealthAttribute())
+	/*else if (Attribute == GetMaxHealthAttribute())
 	{
 		NewValue = FMath::Clamp(
 			NewValue, 
 			1.f, 
 			ProgressionSettings->AbsoluteMaximumHealth);
-	}
+	}*/
 	else if (Attribute == GetMaxEnergyAttribute())
 	{
+		// Since Energy is Player only related attribute
 		NewValue = FMath::Clamp(
 			NewValue, 
 			1.f, 

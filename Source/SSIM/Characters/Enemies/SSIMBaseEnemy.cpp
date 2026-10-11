@@ -66,11 +66,11 @@ void ASSIMBaseEnemy::InitializeAttributes()
 	
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	
-	/*UE_LOG(LogSSIMEnemyInitialization, Log, TEXT("%s | %s : MaxHealth - %f, Health - %f"), 
+	UE_LOG(LogSSIMEnemyInitialization, Log, TEXT("%s | %s | MaxHealth : %f, Health : %f"), 
 		TEXT(__FUNCTION__),
 		*GetName(),
 		EnemyData->InitialAttributes.MaxHealth,
-		EnemyData->InitialAttributes.Health);*/
+		EnemyData->InitialAttributes.Health);
 }
 
 void ASSIMBaseEnemy::SetupAttackCollision()
