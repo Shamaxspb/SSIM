@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "SSIM/Core/Animation/SSIMAnimInstance.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 #include "SSIMPlayerAnimInstance.generated.h"
 
+struct FGameplayEventData;
+class UAbilitySystemComponent;
 struct FDamageData;
 class ASSIMPlayer;
 
@@ -34,7 +37,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	TObjectPtr<UAnimMontage> CurrentAttackMontage;
 		
-
+	// vibecoding so far
+	/*TWeakObjectPtr<UAbilitySystemComponent> ASC;
+	FGameplayTagContainer EventTagFilter;
+	FDelegateHandle EventHandle;
+	
+	void OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData);*/
+	
 #pragma region Pogo Modify Bones
 	
 protected:

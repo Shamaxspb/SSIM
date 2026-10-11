@@ -32,3 +32,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Innate_Heal);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Innate_Dash);
 #pragma endregion Abilities
+
+#pragma region Abilities
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_GameplayCue_Heal);
+#pragma endregion Abilities

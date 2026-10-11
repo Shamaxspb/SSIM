@@ -21,6 +21,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")	
 	int32 HealAmount = 3;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")	
+	float HealingAirTime = 1.f;
+	
 // Overriden Functions
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 								 const FGameplayAbilityActorInfo* ActorInfo, 
@@ -34,4 +37,8 @@ protected:
 							bool bWasCancelled) override;
 	
 // Custom Functions
+private:
+	UFUNCTION()
+	void EndAirHanging();	
+	
 };

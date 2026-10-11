@@ -5,11 +5,14 @@
 #include "CoreMinimal.h"
 
 
-class UBlackboardComponent;
+class UAbilitySystemComponent;
 
-class SSIM_API USSIMGASHelper
+DECLARE_LOG_CATEGORY_EXTERN(LogSSIMGASHelper, Log, All);
+
+
+namespace SSIMGASHelper
 {
-public:
-	static void ApplyGameplayEffectToSelf(UBlackboardComponent* BB, FName KeyName, uint8 Value);
+	SSIM_API void ApplyDamageToEnemy(AActor* InInstigator, AActor* InTarget, float InDamageAmount);
 	
-};
+	SSIM_API void ApplyHealToPlayer(const UObject* WorldContextObject, int32 InHealAmount);
+}

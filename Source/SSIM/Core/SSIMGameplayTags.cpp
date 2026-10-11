@@ -32,3 +32,6 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Attack, "Ability.Combat.Attack");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Heal,   "Ability.Innate.Heal");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Dash,   "Ability.Innate.Dash");
 
+/* Gameplay Cues */
+UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Heal, "GameplayCue.Heal");
+

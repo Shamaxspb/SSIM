@@ -10,6 +10,10 @@
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
+/*void USSIMPlayerAnimInstance::OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData)
+{
+}*/
+
 void USSIMPlayerAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
