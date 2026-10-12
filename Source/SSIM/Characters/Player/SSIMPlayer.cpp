@@ -12,6 +12,7 @@
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
+#include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Subsystems/SSIMTransitionSubsystem.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
 
@@ -225,10 +226,9 @@ void ASSIMPlayer::HandleEndAttackTrace() const
 
 void ASSIMPlayer::HandleHeal()
 {
-	if (CanHeal())
-	{
-		SSIMPlayerStatsComponent->StartHealing();
-	}
+	FGameplayTagContainer HealAbilityTag;
+	HealAbilityTag.AddTag(TAG_Ability_Innate_Heal);
+	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(HealAbilityTag);
 }
 
 void ASSIMPlayer::HandleDash()
@@ -244,16 +244,23 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 	MoveInputValue = 0.f;
 }
 
-bool ASSIMPlayer::CanMove() const
+bool ASSIMPlayer::CanMove()
 {
+	
 	if (SSIMPlayerDashComponent->bDashing 
 		|| 
 		SSIMPlayerDamageReactionComponent->bStaggered 
 		|| 
 		SSIMPlayerCombatComponent->bAttackKnockbackActive
 		||
-		SSIMPlayerStatsComponent->bHealing)
+		SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Healing))
 	{
+		/*if (SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Healing))
+		{
+			// this is temporary workarounf
+			// should think how to set MoveInputValue to 0.f on Hea;
+			MoveInputValue = 0.f;
+		}*/
 		return false;
 	}
 	return true;
@@ -265,8 +272,6 @@ bool ASSIMPlayer::CanDash() const
 		|| 
 		!SSIMPlayerDashComponent->bCanDash 
 		|| 
-		SSIMPlayerStatsComponent->bHealing
-		||
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
 		if (SSIMPlayerDashComponent->bDashing)
@@ -281,13 +286,6 @@ bool ASSIMPlayer::CanDash() const
 			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is on Cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
-			}
-		}
-		if (SSIMPlayerStatsComponent->bHealing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while Healing"), TEXT(__FUNCTION__));
 			}
 		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
@@ -306,8 +304,6 @@ bool ASSIMPlayer::CanDash() const
 bool ASSIMPlayer::CanAttack() const
 {
 	if (SSIMPlayerCombatComponent->bAttacking 
-		|| 
-		SSIMPlayerStatsComponent->bHealing
 		||
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
@@ -318,32 +314,12 @@ bool ASSIMPlayer::CanAttack() const
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack, Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (SSIMPlayerStatsComponent->bHealing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while Healing"), TEXT(__FUNCTION__));
-			}
-		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while Staggered"), TEXT(__FUNCTION__));
 			}
-		}
-		return false;
-	}
-	return true;
-}
-
-bool ASSIMPlayer::CanHeal() const
-{
-	if (SSIMPlayerDamageReactionComponent->bStaggered)
-	{
-		if (SSIMPlayerDamageReactionComponent->bStaggered)
-		{
-			UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Heal while Staggered"), TEXT(__FUNCTION__));
 		}
 		return false;
 	}

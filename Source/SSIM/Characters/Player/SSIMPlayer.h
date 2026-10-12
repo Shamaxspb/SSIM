@@ -119,9 +119,10 @@ public:
 #pragma endregion  Player Defaults
 	
 #pragma region Metadata
+public:
+	float MoveInputValue;
 	
 private:
-	float MoveInputValue;
 	EFacingDirection PlayerFacingDirection;
 
 #pragma endregion Metadata
@@ -232,11 +233,6 @@ public:
 		return SSIMPlayerDamageReactionComponent->bStaggered;
 	}
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerHealing() const
-	{
-		return SSIMPlayerStatsComponent->bHealing;
-	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
 	FORCEINLINE bool GetIsPlayerInvulnerable() const
 	{
 		return SSIMPlayerStatsComponent->bInvulnerable;
@@ -298,10 +294,9 @@ private:
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
-	bool CanMove() const;
+	bool CanMove();
 	bool CanDash() const;
 	bool CanAttack() const;
-	bool CanHeal() const;
 	
 	
 // Interfaces

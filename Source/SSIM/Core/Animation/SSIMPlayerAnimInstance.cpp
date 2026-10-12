@@ -10,9 +10,29 @@
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
-/*void USSIMPlayerAnimInstance::OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData)
+
+void USSIMPlayerAnimInstance::NativeInitializeAnimation()
 {
-}*/
+	Super::NativeInitializeAnimation();
+	
+	UnbindHealAbilityActivated();
+	
+	UWorld* World = GetWorld();
+	if (IsValid(World) && World->IsGameWorld())
+	{
+		BoundASC = Player->GetAbilitySystemComponent();
+		// This is GAS equivalent of OnHealingStartedDelegate.AddDynamic() 
+		HealAbilityActivatedHandle = Player->GetAbilitySystemComponent()->
+			AbilityActivatedCallbacks.AddUObject(this, &USSIMPlayerAnimInstance::HandleHealAbilityActivated);
+	}
+}
+
+void USSIMPlayerAnimInstance::NativeUninitializeAnimation()
+{
+	UnbindHealAbilityActivated();
+	
+	Super::NativeUninitializeAnimation();
+}
 
 void USSIMPlayerAnimInstance::NativeBeginPlay()
 {
@@ -26,7 +46,7 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 	
 	Player->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDamageReceivedHandler);
 	
-	Player->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnHealingStartedHandler);
+	//Player->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnHealingStartedHandler);
 }
 
 void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -254,6 +274,43 @@ void USSIMPlayerAnimInstance::SwapHitMontage(EPlayerAttackDirectionType InPlayer
 			UE_LOG(LogSSIMAnimation, Warning, TEXT("%s | Montage SET POSITION"), TEXT(__FUNCTION__));
 		}
 	}
+}
+
+void USSIMPlayerAnimInstance::HandleHealAbilityActivated(UGameplayAbility* ActivatedAbility)
+{
+	if (!IsValid(ActivatedAbility))
+	{
+		UE_LOG(LogSSIMAnimation, Error, TEXT("%s | Activated Ability is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : BlendoutTriggerAbilities)
+	{
+		if (AbilityClass && ActivatedAbility->IsA(AbilityClass.Get()))
+		{
+			StartBlendOutPogoBones(OnPogoInterruptedBlendOutDuration);
+			return;
+		}
+	}
+}
+
+void USSIMPlayerAnimInstance::UnbindHealAbilityActivated()
+{
+	UAbilitySystemComponent* ASC = BoundASC.Get();
+	if (!ASC)
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | ASC is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	if (!HealAbilityActivatedHandle.IsValid())
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | HealAbilityActivatedHandle is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	ASC->AbilityActivatedCallbacks.Remove(HealAbilityActivatedHandle);
+	BoundASC.Reset();
+	HealAbilityActivatedHandle = FDelegateHandle();
 }
 
 void USSIMPlayerAnimInstance::OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType)

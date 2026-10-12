@@ -10,9 +10,7 @@
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
-#include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Subsystems/Combat/SSIMCombatSubsystemSettings.h"
 
 USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
 {
@@ -26,7 +24,6 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
-	SSIMPlayer->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnHealingStartedHandler);
 	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 	
 	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
@@ -451,11 +448,6 @@ void USSIMPlayerCombatComponent::EndPogo()
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
-}
-
-void USSIMPlayerCombatComponent::OnHealingStartedHandler()
-{
-	EndAttack();
 }
 
 void USSIMPlayerCombatComponent::OnDashStartedHandler()

@@ -3,15 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
 #include "SSIM/Core/Animation/SSIMAnimInstance.h"
 #include "SSIM/Core/Types/SSIMCombatDataTypes.h"
 
 #include "SSIMPlayerAnimInstance.generated.h"
 
+struct FGameplayTag;
 struct FGameplayEventData;
-class UAbilitySystemComponent;
 struct FDamageData;
+class UAbilitySystemComponent;
+class UGameplayAbility;
 class ASSIMPlayer;
 
 UENUM(BlueprintType)
@@ -38,12 +39,14 @@ protected:
 	TObjectPtr<UAnimMontage> CurrentAttackMontage;
 		
 	// vibecoding so far
-	/*TWeakObjectPtr<UAbilitySystemComponent> ASC;
-	FGameplayTagContainer EventTagFilter;
-	FDelegateHandle EventHandle;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayAbility> HealAbilityClass;
+	TWeakObjectPtr<UAbilitySystemComponent> BoundASC;
+	FDelegateHandle HealAbilityActivatedHandle;
 	
-	void OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData);*/
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|GAS")
+	TArray<TSubclassOf<UGameplayAbility>> BlendoutTriggerAbilities;
+
 #pragma region Pogo Modify Bones
 	
 protected:
@@ -99,11 +102,13 @@ protected:
 
 // Overriden Functions
 public:
+	virtual void NativeInitializeAnimation() override;
+	virtual void NativeUninitializeAnimation() override;
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 	
-// My Functions
+// Custom Functions
 protected:
 	virtual void SetOwnerReference() override;
 	
@@ -121,6 +126,9 @@ private:
 	void BlendOutPogoBone(float InBlendElapsedTime, FRotator& InPogoBoneRotation, const FRotator InModifiedRotation);
 	
 	void SwapHitMontage(EPlayerAttackDirectionType InPlayerAttackDirectionType);
+	
+	void HandleHealAbilityActivated(UGameplayAbility* ActivatedAbility);
+	void UnbindHealAbilityActivated();
 	
 #pragma region Reset Pogo Handlers
 	

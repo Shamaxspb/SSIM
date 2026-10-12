@@ -18,36 +18,25 @@ void USSIMHealAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	
 	if (!IsValid(HealingMontage))
 	{
-		if (bShowDebug)
-		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s | Hanging is not valid"), TEXT(__FUNCTION__));
-		}
-		
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Hanging is not valid"), TEXT(__FUNCTION__));
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false);
 	}
 	
 	Player->PlayAnimMontage(HealingMontage);
 	CommitAbilityCost(Handle, ActorInfo, ActivationInfo);
 	
+	Player->MoveInputValue = 0.f;
 	Player->GetCharacterMovement()->StopMovementImmediately();
+	Player->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	Player->StopJumping();
-	Player->GetCharacterMovement()->GravityScale = 0.0f;
+	Player->DisableInput(Cast<APlayerController>(Player->GetController()));
 	
-	FGameplayEventData Payload;
-	Payload.EventTag = TAG_Event_Heal_Started;
+	const FGameplayEventData Payload;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player,TAG_Event_Heal_Started,Payload);
 	
 	UAbilityTask_WaitDelay* HealingTimeDelay = UAbilityTask_WaitDelay::WaitDelay(this, HealingAirTime);
 	HealingTimeDelay->OnFinish.AddDynamic(this, &USSIMHealAbility::EndAirHanging);
 	HealingTimeDelay->ReadyForActivation();
-	
-	/*FTimerHandle AirHangingTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(
-		AirHangingTimerHandle,
-		this, &USSIMHealAbility::EndAirHanging,
-		HealingAirTime,
-		false
-		);*/
 }
 
 void USSIMHealAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -55,12 +44,16 @@ void USSIMHealAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
+	Player->EnableInput(Cast<APlayerController>(Player->GetController()));
+	
+	const FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player,TAG_Event_Heal_Ended,Payload);
 }
 
 void USSIMHealAbility::EndAirHanging()
 {
 	Player->StopAnimMontage(HealingMontage);
-	Player->GetCharacterMovement()->GravityScale = 7.0f;
+	Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	
 	SSIMGASHelper::ApplyHealToPlayer(this, HealAmount);
 	K2_EndAbility();

@@ -72,53 +72,6 @@ void USSIMPlayerStatsComponent::IncreaseHealth(const int32 InHealValue)
 	Super::IncreaseHealth(InHealValue);
 }
 
-void USSIMPlayerStatsComponent::StartHealing()
-{
-	if (!IsValid(HealingMontage))
-	{
-		if (bShowStatsLogs)
-		{
-			UE_LOG(LogSSIMValidations, Error, TEXT("%s | Hanging is not valid"), TEXT(__FUNCTION__));
-		}
-		return;
-	}
-	
-	bHealing = true;
-	OnHealingStartedDelegate.Broadcast();
-	
-	AnimInstance->Montage_Play(HealingMontage);
-	StartAirHanging();
-}
-
-void USSIMPlayerStatsComponent::CompleteHealing()
-{
-	bHealing = false;
-	OnHealingEndedDelegate.Broadcast();
-	IncreaseHealth(HealAmount);
-}
-
-void USSIMPlayerStatsComponent::StartAirHanging()
-{
-	SSIMPlayer->GetCharacterMovement()->StopMovementImmediately();
-	SSIMPlayer->StopJumping();
-	SSIMPlayer->GetCharacterMovement()->GravityScale = 0.0f;
-	
-	GetWorld()->GetTimerManager().SetTimer(
-		AirHangingTimerHandle,
-		this, &USSIMPlayerStatsComponent::EndAirHanging,
-		AirHangingDuration,
-		false
-		);
-}
-
-void USSIMPlayerStatsComponent::EndAirHanging()
-{
-	AnimInstance->Montage_Stop(HealingMontage->BlendOut.GetBlendTime());
-	SSIMPlayer->SetPlayerGravityScaleToDefault();
-	
-	CompleteHealing();
-}
-
 void USSIMPlayerStatsComponent::StartInvulnerability()
 {
 	GetWorld()->GetTimerManager().SetTimer(
@@ -168,11 +121,3 @@ void USSIMPlayerStatsComponent::DecrementHealth_DEBUG()
 		1
 	};
 }
-
-void USSIMPlayerStatsComponent::ReceiveHeal_DEBUG()
-{
-	StartHealing();
-	
-	OnHealReceivedDelegate.Broadcast(3);
-}
- 
