@@ -115,7 +115,23 @@ void ASSIMPlayer::InitializeAttributes()
 
 void ASSIMPlayer::InitializeAbilities()
 {
-	// to do
+	Super::InitializeAbilities();
+	
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : InnateAbilities)
+	{
+		if (!AbilityClass)
+		{
+			continue;
+		}
+		
+		FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
+		SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
+		
+		if (bShowDebug)
+		{
+			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Given Innate Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+		}
+	}
 }
 
 void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
@@ -232,9 +248,7 @@ void ASSIMPlayer::HandleEndAttackTrace() const
 
 void ASSIMPlayer::HandleHeal()
 {
-	FGameplayTagContainer HealAbilityTag;
-	HealAbilityTag.AddTag(TAG_Ability_Innate_Heal);
-	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(HealAbilityTag);
+	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Innate_Heal.GetTag().GetSingleTagContainer());
 }
 
 void ASSIMPlayer::HandleDash()

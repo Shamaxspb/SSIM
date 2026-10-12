@@ -86,7 +86,7 @@ void ASSIMBaseEnemy::InitializeAbilities()
 		return;
 	}
 
-	for (const TSubclassOf<UGameplayAbility>& AbilityClass : EnemyData->StartupAbilities)
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : EnemyData->UnitAbilities)
 	{
 		if (!AbilityClass)
 		{
@@ -98,7 +98,7 @@ void ASSIMBaseEnemy::InitializeAbilities()
 		
 		if (bShowDebug)
 		{
-			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Ability Given %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Given Unit Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
 		}
 	}
 }

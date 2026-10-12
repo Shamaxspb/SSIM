@@ -20,7 +20,9 @@ void USSIMPlayerAnimInstance::NativeInitializeAnimation()
 	}
 	
 	Super::NativeInitializeAnimation();
+	
 	UnbindHealAbilityActivated();
+	
 	BoundASC = Player->GetAbilitySystemComponent();
 	// This is GAS equivalent of OnHealingStartedDelegate.AddDynamic() 
 	HealAbilityActivatedHandle = Player->GetAbilitySystemComponent()->
@@ -296,6 +298,11 @@ void USSIMPlayerAnimInstance::HandleHealAbilityActivated(UGameplayAbility* Activ
 
 void USSIMPlayerAnimInstance::UnbindHealAbilityActivated()
 {
+	if (!GetWorld() ||!GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+	
 	UAbilitySystemComponent* ASC = BoundASC.Get();
 	if (!ASC)
 	{

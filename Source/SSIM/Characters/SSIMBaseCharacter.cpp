@@ -55,7 +55,23 @@ void ASSIMBaseCharacter::InitializeAttributes()
 
 void ASSIMBaseCharacter::InitializeAbilities()
 {
-	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | InitializeAbilities is not overriden"), TEXT(__FUNCTION__));
+	// Initialize basic abilities that have both Player and Enemies
+	// Other abilities are initialized in corresponding classes 
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : BasicAbilities)
+	{
+		if (!AbilityClass)
+		{
+			continue;
+		}
+		
+		FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
+		SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
+		
+		if (bShowDebug)
+		{
+			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Given Basic Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+		}
+	}
 }
 
 void ASSIMBaseCharacter::RestrictXAxisMovement() const
