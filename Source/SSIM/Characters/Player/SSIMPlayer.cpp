@@ -16,6 +16,7 @@
 #include "SSIM/Core/Subsystems/SSIMTransitionSubsystem.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
 
+
 // Overriden Functions
 ASSIMPlayer::ASSIMPlayer()
 {
@@ -110,6 +111,11 @@ void ASSIMPlayer::InitializeAttributes()
 {
 	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->ApplyProgressionToPlayer();
 	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->ApplyCurrentAttributesToPlayer();
+}
+
+void ASSIMPlayer::InitializeAbilities()
+{
+	// to do
 }
 
 void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
@@ -255,12 +261,6 @@ bool ASSIMPlayer::CanMove()
 		||
 		SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Healing))
 	{
-		/*if (SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Healing))
-		{
-			// this is temporary workarounf
-			// should think how to set MoveInputValue to 0.f on Hea;
-			MoveInputValue = 0.f;
-		}*/
 		return false;
 	}
 	return true;

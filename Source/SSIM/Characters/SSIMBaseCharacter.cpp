@@ -29,6 +29,7 @@ void ASSIMBaseCharacter::BeginPlay()
 	SSIMAbilitySystemComponent->InitAbilityActorInfo(this, this);
 	
 	InitializeAttributes();
+	InitializeAbilities();
 }
 
 void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
@@ -47,13 +48,14 @@ USSIMAbilitySystemComponent* ASSIMBaseCharacter::GetAbilitySystemComponent() con
 }
 
 // Custom Functions
-/*void ASSIMBaseCharacter::InitializeAttributes()
-{
-}*/
-
 void ASSIMBaseCharacter::InitializeAttributes()
 {
 	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | InitializeAttributes is not overriden"), TEXT(__FUNCTION__));
+}
+
+void ASSIMBaseCharacter::InitializeAbilities()
+{
+	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | InitializeAbilities is not overriden"), TEXT(__FUNCTION__));
 }
 
 void ASSIMBaseCharacter::RestrictXAxisMovement() const
@@ -93,7 +95,6 @@ void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
 	
 	HitRegistrationCollision->SetCollisionProfileName("HitRegistration", true);
 	ContactDamageCollision->SetCollisionProfileName("ContactDamage", true);
-
 }
 
 

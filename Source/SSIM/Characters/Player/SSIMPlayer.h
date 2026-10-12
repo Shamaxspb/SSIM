@@ -127,8 +127,13 @@ private:
 
 #pragma endregion Metadata
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> InnateAbilities;
+	
+	
 	// Debug
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|DEBUG")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Debug")
 	bool bShowPlayerInputLogs;
 	
 private:
@@ -268,6 +273,7 @@ public:
 	
 protected:
 	virtual void InitializeAttributes() override;
+	virtual void InitializeAbilities() override;
 
 private:
 	void SetupAttackCollision();

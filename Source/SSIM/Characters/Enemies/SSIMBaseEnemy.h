@@ -91,6 +91,8 @@ public:
 
 protected:
 	virtual void InitializeAttributes() override;
+	virtual void InitializeAbilities() override;
+	
 	void SetupAttackCollision();
 	
 private:
@@ -107,6 +109,5 @@ public:
 	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
 	virtual void ReceivePlayerAttackDirectionType_Implementation(
 		EPlayerAttackDirectionType InPlayerAttackDirectionType) const override;
-
 	
 };

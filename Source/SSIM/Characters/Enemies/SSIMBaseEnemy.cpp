@@ -66,11 +66,41 @@ void ASSIMBaseEnemy::InitializeAttributes()
 	
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	
-	UE_LOG(LogSSIMEnemyInitialization, Log, TEXT("%s | %s | MaxHealth : %f, Health : %f"), 
-		TEXT(__FUNCTION__),
-		*GetName(),
-		EnemyData->InitialAttributes.MaxHealth,
-		EnemyData->InitialAttributes.Health);
+	if (bShowDebug)
+	{
+		UE_LOG(LogSSIMEnemyInitialization, Log, TEXT("%s | %s | MaxHealth : %f, Health : %f"), 
+			TEXT(__FUNCTION__),
+			*GetName(),
+			EnemyData->InitialAttributes.MaxHealth,
+			EnemyData->InitialAttributes.Health);
+	}
+}
+
+void ASSIMBaseEnemy::InitializeAbilities()
+{
+	Super::InitializeAbilities();
+	
+	if (!IsValid(EnemyData))
+	{
+		UE_LOG(LogSSIMEnemyInitialization, Error, TEXT("%s | Enemy Data Asset is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : EnemyData->StartupAbilities)
+	{
+		if (!AbilityClass)
+		{
+			continue;
+		}
+		
+		FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
+		SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
+		
+		if (bShowDebug)
+		{
+			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Ability Given %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+		}
+	}
 }
 
 void ASSIMBaseEnemy::SetupAttackCollision()

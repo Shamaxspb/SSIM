@@ -12,19 +12,19 @@
 
 
 void USSIMPlayerAnimInstance::NativeInitializeAnimation()
-{
-	Super::NativeInitializeAnimation();
-	
-	UnbindHealAbilityActivated();
-	
-	UWorld* World = GetWorld();
-	if (IsValid(World) && World->IsGameWorld())
+{	
+	if (!GetWorld() || !GetWorld()->IsGameWorld())
 	{
-		BoundASC = Player->GetAbilitySystemComponent();
-		// This is GAS equivalent of OnHealingStartedDelegate.AddDynamic() 
-		HealAbilityActivatedHandle = Player->GetAbilitySystemComponent()->
-			AbilityActivatedCallbacks.AddUObject(this, &USSIMPlayerAnimInstance::HandleHealAbilityActivated);
+		// To avoid logic in Editor
+		return;
 	}
+	
+	Super::NativeInitializeAnimation();
+	UnbindHealAbilityActivated();
+	BoundASC = Player->GetAbilitySystemComponent();
+	// This is GAS equivalent of OnHealingStartedDelegate.AddDynamic() 
+	HealAbilityActivatedHandle = Player->GetAbilitySystemComponent()->
+		AbilityActivatedCallbacks.AddUObject(this, &USSIMPlayerAnimInstance::HandleHealAbilityActivated);
 }
 
 void USSIMPlayerAnimInstance::NativeUninitializeAnimation()
