@@ -7,7 +7,7 @@
 #include "SSIMDashAbility.generated.h"
 
 
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class SSIM_API USSIMDashAbility : public USSIMGameplayAbility
 {
 	GENERATED_BODY()

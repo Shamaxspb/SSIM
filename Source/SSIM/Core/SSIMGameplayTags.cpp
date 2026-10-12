@@ -29,9 +29,13 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_State_Invulnerable, "State.Invulnerable");
 // Basic
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Attack, "Ability.Combat.Attack");
 // Innate
-UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Heal,   "Ability.Innate.Heal");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Heal,   "Ability.Innate.Heal");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Dash,   "Ability.Innate.Dash");
 
 /* Gameplay Cues */
 UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Heal, "GameplayCue.Heal");
+
+/* PROGRESSION */
+/* Innate Abilities */
+UE_DEFINE_GAMEPLAY_TAG(TAG_Progression_InnateAbility_Dash, "Progression.InnateAbility.Dash");
 

@@ -162,6 +162,19 @@ void USSIMProgressionSubsystem::AddEnergyShard()
 	}
 }
 
+void USSIMProgressionSubsystem::UnlockInnateAbility(FGameplayTag InUnlockedAbilityTag)
+{
+	UnlockedInnateAbilities.AddTag(InUnlockedAbilityTag);
+	UE_LOG(LogSSIMProgression, Warning, TEXT("%s | Unlocked Innate Ability: %s"), 
+		TEXT(__FUNCTION__), 
+		*InUnlockedAbilityTag.ToString());
+}
+
+bool USSIMProgressionSubsystem::IsInnateAbilityUnlocked(FGameplayTag InAbilityToCheckTag) const
+{
+	return UnlockedInnateAbilities.HasTagExact(InAbilityToCheckTag);
+}
+
 void USSIMProgressionSubsystem::LoadProgressionSubsystemSettings()
 {
 	ProgressionSubsystemSettings = GetDefault<USSIMProgressionSubsystemSettings>();
@@ -214,8 +227,9 @@ void USSIMProgressionSubsystem::SerializeSaveData() const
 		return;
 	}
 	
-	ProgressionSaveData->CollectedHealthShards = CollectedHealthShards;
-	ProgressionSaveData->CollectedEnergyShards = CollectedEnergyShards;
+	ProgressionSaveData->CollectedHealthShards   = CollectedHealthShards;
+	ProgressionSaveData->CollectedEnergyShards   = CollectedEnergyShards;
+	ProgressionSaveData->UnlockedInnateAbilities = UnlockedInnateAbilities;
 	
 	UE_LOG(LogSSIMProgression, Log, TEXT("%s | Progression Data serialized"), TEXT(__FUNCTION__));
 	
@@ -230,8 +244,9 @@ void USSIMProgressionSubsystem::DeserializeSaveData()
 		return;
 	}
 	
-	CollectedHealthShards = ProgressionSaveData->CollectedHealthShards;
-	CollectedEnergyShards = ProgressionSaveData->CollectedEnergyShards;
+	CollectedHealthShards   = ProgressionSaveData->CollectedHealthShards;
+	CollectedEnergyShards   = ProgressionSaveData->CollectedEnergyShards;
+	UnlockedInnateAbilities = ProgressionSaveData->UnlockedInnateAbilities;
 }
 
 FPlayerInitAttributes USSIMProgressionSubsystem::CalculatePlayerInitMaxAttributes()
@@ -262,3 +277,10 @@ FPlayerInitAttributes USSIMProgressionSubsystem::CalculatePlayerInitMaxAttribute
 	
 	return Attributes;
 }
+
+#pragma region Debug
+void USSIMProgressionSubsystem::SaveProgressionDataManually()
+{
+	SerializeSaveData();
+}
+#pragma endregion Debug

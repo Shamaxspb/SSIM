@@ -8,7 +8,7 @@
 #include "SSIMHealAbility.generated.h"
 
 
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class SSIM_API USSIMHealAbility : public USSIMGameplayAbility
 {
 	GENERATED_BODY()

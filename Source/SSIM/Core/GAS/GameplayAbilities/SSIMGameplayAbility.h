@@ -8,7 +8,7 @@
 
 class ASSIMPlayer;
 
-UCLASS()
+UCLASS(Abstract)
 class SSIM_API USSIMGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()

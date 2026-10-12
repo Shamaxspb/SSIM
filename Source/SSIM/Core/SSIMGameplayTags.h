@@ -29,10 +29,21 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Invulnerable);
 
 #pragma region Abilities
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Innate_Heal);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Heal);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Innate_Dash);
 #pragma endregion Abilities
 
 #pragma region Abilities
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_GameplayCue_Heal);
 #pragma endregion Abilities
+
+#pragma region Progression
+#pragma region InnateAbilities
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Progression_InnateAbility_Dash);
+#pragma endregion InnateAbilities
+#pragma region Tools
+// This is for later
+#pragma endregion Tools
+#pragma endregion Progression
+
+

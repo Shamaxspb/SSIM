@@ -14,7 +14,9 @@
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Subsystems/SSIMTransitionSubsystem.h"
+#include "SSIM/Core/Subsystems/Progression/SSIMInnateAbilitiesCatalog.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
+#include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystemSettings.h"
 
 
 // Overriden Functions
@@ -45,6 +47,8 @@ void ASSIMPlayer::BeginPlay()
 	
 	PlayerFacingDirection = FVector::DotProduct(GetActorForwardVector(), FVector::RightVector) > 0.f ?
 												EFacingDirection::EPD_Right : EFacingDirection::EPD_Left;
+	
+	
 	
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
 }
@@ -116,21 +120,78 @@ void ASSIMPlayer::InitializeAttributes()
 void ASSIMPlayer::InitializeAbilities()
 {
 	Super::InitializeAbilities();
-	
-	for (const TSubclassOf<UGameplayAbility>& AbilityClass : InnateAbilities)
+
+	const USSIMProgressionSubsystemSettings* Settings = GetDefault<USSIMProgressionSubsystemSettings>();
+
+	if (Settings->InnateAbilityCatalog.IsNull())
 	{
-		if (!AbilityClass)
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Innate ability catalog is not configured"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	USSIMInnateAbilitiesCatalog* InnateAbilitiesCatalog = Settings->InnateAbilityCatalog.LoadSynchronous();
+	if (!IsValid(InnateAbilitiesCatalog))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Innate Ability Catalog failed to load"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	const FGameplayTagContainer& UnlockedInnateAbilities = 
+		GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->UnlockedInnateAbilities;
+	
+	for (const FSSIMInnateAbilityDefinition& Entry : InnateAbilitiesCatalog->InnateAbilities)
+	{
+		if (!Entry.ProgressionAbilityTag.IsValid())
 		{
+			UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Invalid ability tag in catalog"), TEXT(__FUNCTION__));
 			continue;
 		}
 		
-		FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
-		SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
+		if (!UnlockedInnateAbilities.HasTagExact(Entry.ProgressionAbilityTag))
+		{
+			if (bShowDebug)
+			{
+				UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | %s is not unlocked yet"), 
+					TEXT(__FUNCTION__),
+					*Entry.ProgressionAbilityTag.ToString());
+			}
+			continue;
+		}
 		
+		if (Entry.AbilityClass.IsNull())
+		{
+			UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Unlocked ability has no class assigned"), TEXT(__FUNCTION__));
+			continue;
+		}	
+		
+		const TSubclassOf<UGameplayAbility> AbilityClass = Entry.AbilityClass.LoadSynchronous();
+		if (!AbilityClass)
+		{
+			UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Failed to load unlocked ability class"), TEXT(__FUNCTION__));
+			continue;
+		}
+		
+		if (SSIMAbilitySystemComponent->FindAbilitySpecFromClass(AbilityClass))
+		{
+			if (bShowDebug)
+			{
+				UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | This Innate Ability is already given"), TEXT(__FUNCTION__));
+			}
+			continue;
+		}
+		
+		const FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
+		const FGameplayAbilitySpecHandle Handle = SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
 		if (bShowDebug)
 		{
-			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Given Innate Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+			if (!Handle.IsValid())
+			{
+				UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | Failed to Give Ability: %s"), 
+					TEXT(__FUNCTION__), 
+					*GetNameSafe(AbilityClass.Get()));
+			}
 		}
+		UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | Granted Innate Ability: %s"), TEXT(__FUNCTION__), *GetNameSafe(AbilityClass)); 
 	}
 }
 
@@ -248,7 +309,7 @@ void ASSIMPlayer::HandleEndAttackTrace() const
 
 void ASSIMPlayer::HandleHeal()
 {
-	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Innate_Heal.GetTag().GetSingleTagContainer());
+	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Combat_Heal.GetTag().GetSingleTagContainer());
 }
 
 void ASSIMPlayer::HandleDash()
@@ -372,4 +433,11 @@ void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDam
 {
 	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }
-#pragma endregion Interfaces                                                                                                       
+#pragma endregion Interfaces
+
+#pragma region Debug
+void ASSIMPlayer::UnlockInnateAbility_DEBUG(FGameplayTag InAbilityTag)
+{
+	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->UnlockInnateAbility(InAbilityTag);
+}
+#pragma endregion Debug

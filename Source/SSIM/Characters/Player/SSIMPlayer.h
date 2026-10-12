@@ -316,4 +316,8 @@ public:
 	
 	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
 
+	// Debug
+protected:
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Debug")
+	void UnlockInnateAbility_DEBUG(FGameplayTag InAbilityTag);
 };

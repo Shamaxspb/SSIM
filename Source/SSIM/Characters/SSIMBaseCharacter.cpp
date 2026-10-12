@@ -69,7 +69,7 @@ void ASSIMBaseCharacter::InitializeAbilities()
 		
 		if (bShowDebug)
 		{
-			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Given Basic Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Granted Basic Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
 		}
 	}
 }

@@ -6,13 +6,14 @@
 #include "Engine/DeveloperSettings.h"
 #include "SSIMProgressionSubsystemSettings.generated.h"
 
+class USSIMInnateAbilitiesCatalog;
 class UGameplayEffect;
 
 UCLASS(Config = GameplaySubsystems, DefaultConfig, meta = (DisplayName = "Progression Subsystem Settings"))
 class SSIM_API USSIMProgressionSubsystemSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	TSubclassOf<UGameplayEffect> InitPlayerMaxAttributesGE;
@@ -39,6 +40,10 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
 	int32 EnergyLevelUpShardsRequired;
 	
+	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem")
+	TSoftObjectPtr<USSIMInnateAbilitiesCatalog> InnateAbilityCatalog;
+	
+	// Debug
 	UPROPERTY(Config, EditAnywhere, Category = "Progression Subsystem|Debug")
 	bool bSaveOnEndPlay;
 	
