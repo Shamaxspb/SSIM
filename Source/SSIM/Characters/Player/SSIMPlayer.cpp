@@ -191,6 +191,7 @@ void ASSIMPlayer::InitializeAbilities()
 					*GetNameSafe(AbilityClass.Get()));
 			}
 		}
+		
 		UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | Granted Innate Ability: %s"), TEXT(__FUNCTION__), *GetNameSafe(AbilityClass)); 
 	}
 }
