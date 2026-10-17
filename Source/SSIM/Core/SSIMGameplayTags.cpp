@@ -13,12 +13,13 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_MaxEnergy, "Attribute.MaxEnergy");
 #pragma endregion Attributes
 
 /* Events */
-UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HitRegistered,	"Event.HitRegistered");
-UE_DEFINE_GAMEPLAY_TAG(TAG_Event_DamageTaken,	"Event.DamageTaken");
-UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HealReceived,	"Event.HealReceived");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HitRegistered,		"Event.HitRegistered");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_DamageTaken,		"Event.DamageTaken");
 
-UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Started,	"Event.Heal.Started");
-UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Ended,	"Event.Heal.Ended");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Started,		"Event.Heal.Started");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Ended,		"Event.Heal.Ended");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Received,		"Event.Heal.Received");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Interrupted,	"Event.Heal.Interrupted");
 
 /* State */
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Healing,	   "State.Healing");

@@ -72,6 +72,13 @@ void USSIMCombatAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& A
 
 void USSIMCombatAttributeSet::HandleDamage(const FGameplayEffectModCallbackData& Data)
 {
+	UAbilitySystemComponent* OwnerASC = GetOwningAbilitySystemComponent();
+	if (!IsValid(OwnerASC))
+	{
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s OwnerASC is not valid"), TEXT(__FUNCTION__));
+		return;
+	}
+	
 	const float LocalDamage = GetDamage();
 	SetDamage(0.f);
 	
@@ -93,7 +100,7 @@ void USSIMCombatAttributeSet::HandleDamage(const FGameplayEffectModCallbackData&
 	Payload.ContextHandle = Data.EffectSpec.GetContext();
 	Payload.EventMagnitude = ActualDamage;
 	
-	GetOwningAbilitySystemComponent()->HandleGameplayEvent(TAG_Event_DamageTaken, &Payload);
+	OwnerASC->HandleGameplayEvent(TAG_Event_DamageTaken, &Payload);
 	
 	if (GetHealth() <= 0.f)
 	{
@@ -125,13 +132,13 @@ void USSIMCombatAttributeSet::HandleHeal(const FGameplayEffectModCallbackData& D
 	SetHealth(NewHealth);
 	
 	FGameplayEventData Payload;
-	Payload.EventTag = TAG_Event_HealReceived.GetTag();
+	Payload.EventTag = TAG_Event_Heal_Received.GetTag();
 	Payload.Instigator = GetOwningActor();
 	Payload.Target = GetOwningActor();
 	Payload.ContextHandle = Data.EffectSpec.GetContext();
 	Payload.EventMagnitude = ActualHeal;
 	
-	GetOwningAbilitySystemComponent()->HandleGameplayEvent(TAG_Event_HealReceived, &Payload);
+	GetOwningAbilitySystemComponent()->HandleGameplayEvent(TAG_Event_Heal_Received, &Payload);
 	
 	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s | %f heal received. HP %f -> %f"),
 										 TEXT(__FUNCTION__),

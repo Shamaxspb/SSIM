@@ -75,6 +75,14 @@ void USSIMHealAbility::EndAirHanging()
 
 void USSIMHealAbility::HandleTakeDamage(FGameplayEventData Payload)
 {
-	UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | Heal was cancelled by taking damage"), TEXT(__FUNCTION__));
+	FGameplayEventData HealInterruptedPayload;
+	Payload.EventTag = TAG_Event_Heal_Interrupted.GetTag();
+	HealInterruptedPayload.Instigator = Payload.Instigator;
+	HealInterruptedPayload.Target = GetOwningActorFromActorInfo();
+	GetAbilitySystemComponentFromActorInfo()->HandleGameplayEvent(TAG_Event_Heal_Interrupted, &HealInterruptedPayload);
+	
+	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s : Healing interrupted by taking damage"),
+									 TEXT(__FUNCTION__),
+									 *HealInterruptedPayload.Target->GetName());
 	K2_CancelAbility();
 }
