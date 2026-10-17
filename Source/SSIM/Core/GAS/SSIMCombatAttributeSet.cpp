@@ -21,6 +21,7 @@ void USSIMCombatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attri
 	else if (Attribute == GetEnergyAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxEnergy());
+		UE_LOG(LogSSIMStatsCalculation, Log, TEXT(""));
 	}
 						// this is commented since there is only one common attribute set and 
 						// MaxHealth() should be clamped by AbsoluteMaximumHealth only for Player
@@ -36,11 +37,7 @@ void USSIMCombatAttributeSet::PreAttributeChange(const FGameplayAttribute& Attri
 	{
 		// Since Energy is Player only related attribute
 		const USSIMProgressionSubsystemSettings* ProgressionSettings = GetDefault<USSIMProgressionSubsystemSettings>();
-		
-		NewValue = FMath::Clamp(
-			NewValue, 
-			1.f, 
-			static_cast<float>(ProgressionSettings->AbsoluteMaximumEnergy));
+		NewValue = FMath::Clamp(NewValue, 1.f, static_cast<float>(ProgressionSettings->AbsoluteMaximumEnergy));
 	}
 }
 
@@ -55,6 +52,21 @@ void USSIMCombatAttributeSet::PostGameplayEffectExecute(const struct FGameplayEf
 	else if (Data.EvaluatedData.Attribute == GetHealAttribute())
 	{
 		HandleHeal(Data);
+	}
+}
+
+void USSIMCombatAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute,float& NewValue) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
+
+	if (Attribute == GetEnergyAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxEnergy());
+	}
+	else if (Attribute == GetMaxEnergyAttribute())
+	{
+		const USSIMProgressionSubsystemSettings* Settings =	GetDefault<USSIMProgressionSubsystemSettings>();
+		NewValue = FMath::Clamp(NewValue,1.f,static_cast<float>(Settings->AbsoluteMaximumEnergy));
 	}
 }
 
