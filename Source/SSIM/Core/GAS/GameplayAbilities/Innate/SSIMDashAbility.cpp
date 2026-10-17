@@ -18,7 +18,7 @@ void USSIMDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | Dash"), TEXT(__FUNCTION__));
 	
 	UAbilityTask_WaitGameplayEvent* WaitTakeDamageEvent =  
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_TakeDamage);
+		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_DamageTaken);
 	WaitTakeDamageEvent->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::HandleTakeDamage);
 	
 }

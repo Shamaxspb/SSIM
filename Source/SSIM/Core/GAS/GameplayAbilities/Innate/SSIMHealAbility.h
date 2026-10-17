@@ -8,6 +8,8 @@
 #include "SSIMHealAbility.generated.h"
 
 
+class UAbilityTask_WaitGameplayEvent;
+
 UCLASS(Abstract, Blueprintable)
 class SSIM_API USSIMHealAbility : public USSIMGameplayAbility
 {
@@ -24,6 +26,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")	
 	float HealingAirTime = 1.f;
 	
+private:
+	UPROPERTY(Transient)
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> WaitTakeDamageTask;
+	
 // Overriden Functions
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 								 const FGameplayAbilityActorInfo* ActorInfo, 
@@ -36,9 +42,14 @@ protected:
 							bool bReplicateEndAbility, 
 							bool bWasCancelled) override;
 	
+	// virtual void CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility) override;
+	
 // Custom Functions
 private:
 	UFUNCTION()
 	void EndAirHanging();	
+	
+	UFUNCTION()
+	void HandleTakeDamage(FGameplayEventData Payload);
 	
 };

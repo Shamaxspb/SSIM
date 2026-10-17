@@ -14,10 +14,12 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_MaxEnergy);
 
 #pragma region Events
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_HitRegistered);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_TakeDamage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_DamageTaken);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Started);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Ended);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Received);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Interrupted);
 #pragma endregion Events
 
 #pragma region States

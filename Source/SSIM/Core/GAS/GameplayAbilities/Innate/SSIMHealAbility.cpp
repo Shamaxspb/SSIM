@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "SSIM/Core/Helpers/SSIMGASHelper.h"
 #include "SSIM/SSIM.h"
 #include "SSIM/Core/SSIMGameplayTags.h"
@@ -37,6 +38,19 @@ void USSIMHealAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	UAbilityTask_WaitDelay* HealingTimeDelay = UAbilityTask_WaitDelay::WaitDelay(this, HealingAirTime);
 	HealingTimeDelay->OnFinish.AddDynamic(this, &USSIMHealAbility::EndAirHanging);
 	HealingTimeDelay->ReadyForActivation();
+	
+	// Binding to cancel healing by taking damage
+	WaitTakeDamageTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+		this, 
+		TAG_Event_DamageTaken,
+		nullptr,
+		false,
+		true);
+	if (WaitTakeDamageTask)
+	{
+		WaitTakeDamageTask->EventReceived.AddDynamic(this, &USSIMHealAbility::HandleTakeDamage);
+		WaitTakeDamageTask->ReadyForActivation();
+	}
 }
 
 void USSIMHealAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -57,4 +71,18 @@ void USSIMHealAbility::EndAirHanging()
 	
 	SSIMGASHelper::ApplyHealToPlayer(this, HealAmount);
 	K2_EndAbility();
+}
+
+void USSIMHealAbility::HandleTakeDamage(FGameplayEventData Payload)
+{
+	FGameplayEventData HealInterruptedPayload;
+	Payload.EventTag = TAG_Event_Heal_Interrupted.GetTag();
+	HealInterruptedPayload.Instigator = Payload.Instigator;
+	HealInterruptedPayload.Target = GetOwningActorFromActorInfo();
+	GetAbilitySystemComponentFromActorInfo()->HandleGameplayEvent(TAG_Event_Heal_Interrupted, &HealInterruptedPayload);
+	
+	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s : Healing interrupted by taking damage"),
+									 TEXT(__FUNCTION__),
+									 *HealInterruptedPayload.Target->GetName());
+	K2_CancelAbility();
 }
