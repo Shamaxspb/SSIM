@@ -29,6 +29,6 @@ void USSIMDashEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 		}
 		return;
 	}
-	
-	IPlayerDataInterface::Execute_EndDashInterface(MeshComp->GetOwner());
+	// Here was Execute interface EndDash, it was removed due to refactoring
+	// Execute some other logic here	
 }

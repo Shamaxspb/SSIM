@@ -7,7 +7,6 @@
 #include "SSIM/SSIM.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 
 
@@ -21,17 +20,17 @@ void USSIMPlayerAnimInstance::NativeInitializeAnimation()
 	
 	Super::NativeInitializeAnimation();
 	
-	UnbindHealAbilityActivated();
+	UnbindAbilityActivated();
 	
 	BoundASC = Player->GetAbilitySystemComponent();
-	// This is GAS equivalent of OnHealingStartedDelegate.AddDynamic() 
-	HealAbilityActivatedHandle = Player->GetAbilitySystemComponent()->
-		AbilityActivatedCallbacks.AddUObject(this, &USSIMPlayerAnimInstance::HandleHealAbilityActivated);
+	// This is GAS equivalent of On<...>StartedDelegate.AddDynamic() 
+	AbilityActivatedHandle = 
+		Player->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &USSIMPlayerAnimInstance::HandleAbilityActivated);
 }
 
 void USSIMPlayerAnimInstance::NativeUninitializeAnimation()
 {
-	UnbindHealAbilityActivated();
+	UnbindAbilityActivated();
 	
 	Super::NativeUninitializeAnimation();
 }
@@ -44,11 +43,7 @@ void USSIMPlayerAnimInstance::NativeBeginPlay()
 	Player->GetPlayerCombatComponent()->OnPogoAnimationStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationStartedHandler);
 	Player->GetPlayerCombatComponent()->OnPogoAnimationEndedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnPogoAnimationEndedHandler);
 	
-	Player->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDashStartedHandler);
-	
 	Player->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnDamageReceivedHandler);
-	
-	//Player->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerAnimInstance::OnHealingStartedHandler);
 }
 
 void USSIMPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -227,7 +222,7 @@ void USSIMPlayerAnimInstance::SwapHitMontage(EPlayerAttackDirectionType InPlayer
 	// [0] for now, rework later
 	bool bCorrectMontage = Player->GetPlayerCombatComponent()->UpperBodyPlayerFrontalAttackMontages.Contains(CurrentMontage);
 	bool bFalling = Player->GetCharacterMovement()->IsFalling();
-	bool bKnockbackActive = Player->GetIsPlayerAttackKnockbackActive();
+	bool bKnockbackActive = Player->IsPlayerAttackKnockbackActive();
 	
 	if (InPlayerAttackDirectionType == EPlayerAttackDirectionType::EPADT_Frontal 
 		&& 
@@ -278,9 +273,9 @@ void USSIMPlayerAnimInstance::SwapHitMontage(EPlayerAttackDirectionType InPlayer
 	}
 }
 
-void USSIMPlayerAnimInstance::HandleHealAbilityActivated(UGameplayAbility* ActivatedAbility)
+void USSIMPlayerAnimInstance::HandleAbilityActivated(UGameplayAbility* InActivatedAbility)
 {
-	if (!IsValid(ActivatedAbility))
+	if (!IsValid(InActivatedAbility))
 	{
 		UE_LOG(LogSSIMAnimation, Error, TEXT("%s | Activated Ability is not valid"), TEXT(__FUNCTION__));
 		return;
@@ -288,15 +283,15 @@ void USSIMPlayerAnimInstance::HandleHealAbilityActivated(UGameplayAbility* Activ
 
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : BlendoutTriggerAbilities)
 	{
-		if (AbilityClass && ActivatedAbility->IsA(AbilityClass.Get()))
+		if (AbilityClass && InActivatedAbility->IsA(AbilityClass.Get()))
 		{
-			StartBlendOutPogoBones(OnPogoInterruptedBlendOutDuration);
+			StartBlendOutPogoBones(DefaultPogoBlendOutDuration);
 			return;
 		}
 	}
 }
 
-void USSIMPlayerAnimInstance::UnbindHealAbilityActivated()
+void USSIMPlayerAnimInstance::UnbindAbilityActivated()
 {
 	if (!GetWorld() ||!GetWorld()->IsGameWorld())
 	{
@@ -309,15 +304,15 @@ void USSIMPlayerAnimInstance::UnbindHealAbilityActivated()
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | ASC is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
-	if (!HealAbilityActivatedHandle.IsValid())
+	if (!AbilityActivatedHandle.IsValid())
 	{
 		UE_LOG(LogSSIMValidations, Error, TEXT("%s | HealAbilityActivatedHandle is not valid"), TEXT(__FUNCTION__));
 		return;
 	}
 	
-	ASC->AbilityActivatedCallbacks.Remove(HealAbilityActivatedHandle);
+	ASC->AbilityActivatedCallbacks.Remove(AbilityActivatedHandle);
 	BoundASC.Reset();
-	HealAbilityActivatedHandle = FDelegateHandle();
+	AbilityActivatedHandle = FDelegateHandle();
 }
 
 void USSIMPlayerAnimInstance::OnHitRegistrationHandle(EPlayerAttackDirectionType InPlayerAttackDirectionType)
@@ -340,16 +335,6 @@ void USSIMPlayerAnimInstance::OnPogoAnimationStartedHandler()
 }
 
 void USSIMPlayerAnimInstance::OnDamageReceivedHandler(const FDamageData& InDamageData)
-{
-	if (bShowPogoBlendLogs)
-	{
-		UE_LOG(LogSSIMAnimation, Error, TEXT("%s"), TEXT(__FUNCTION__));
-	}
-	
-	StartBlendOutPogoBones(OnPogoInterruptedBlendOutDuration);
-}
-
-void USSIMPlayerAnimInstance::OnHealingStartedHandler()
 {
 	if (bShowPogoBlendLogs)
 	{
@@ -388,14 +373,4 @@ void USSIMPlayerAnimInstance::OnPlayerLanded(const FHitResult& Hit)
 	
 	StartBlendOutPogoBones(OnLandedPogoBlendInDuration);
 	Player->LandedDelegate.RemoveDynamic(this, &USSIMPlayerAnimInstance::OnPlayerLanded);
-}
-
-void USSIMPlayerAnimInstance::OnDashStartedHandler()
-{
-	if (bShowPogoBlendLogs)
-	{
-		UE_LOG(LogSSIMAnimation, Error, TEXT("%s"), TEXT(__FUNCTION__));
-	}
-	
-	StartBlendOutPogoBones(0.11f);
 }

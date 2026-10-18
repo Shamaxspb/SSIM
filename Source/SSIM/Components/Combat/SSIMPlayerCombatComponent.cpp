@@ -10,7 +10,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 
@@ -26,7 +25,7 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
-	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
+	// SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 	
 	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 }
@@ -35,7 +34,7 @@ void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (SSIMPlayer->GetIsPlayerAttackKnockbackActive() && AttackKnockbackType == EAttackKnockbackType::EAKT_Ground)
+	if (SSIMPlayer->IsPlayerAttackKnockbackActive() && AttackKnockbackType == EAttackKnockbackType::EAKT_Ground)
 	{
 		SSIMPlayer->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}

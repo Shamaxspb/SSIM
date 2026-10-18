@@ -7,6 +7,7 @@
 #include "SSIMDashAbility.generated.h"
 
 
+class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_WaitDelay;
 
 UCLASS(Abstract, Blueprintable)
@@ -59,6 +60,11 @@ private:
 	FName SwitchMovementModeNotifyName = TEXT("SwitchMovementMode");
 	TWeakObjectPtr<UAnimInstance> BoundAnimInstance;
 	int32 ActiveMontageInstanceID = INDEX_NONE;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> WaitTakeDamageTask;
+	UPROPERTY(Transient)
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> WaitPogoStartedTask;
 	
 // Overriden Functions
 protected:

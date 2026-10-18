@@ -11,7 +11,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Subsystems/SSIMTransitionSubsystem.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMInnateAbilitiesCatalog.h"
@@ -27,7 +26,6 @@ ASSIMPlayer::ASSIMPlayer()
 	GetCapsuleComponent()->SetCollisionProfileName("Player", true);
 	GetMesh()->SetCollisionProfileName("Player", true);
 	
-	SSIMPlayerDashComponent	  		  = CreateDefaultSubobject<USSIMPlayerDashComponent>(TEXT("PlayerDashComponent"));
 	SSIMPlayerCombatComponent 		  = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
 	SSIMPlayerStatsComponent  		  = CreateDefaultSubobject<USSIMPlayerStatsComponent>(TEXT("PlayerStatsComponent"));
 	SSIMPlayerDamageReactionComponent = CreateDefaultSubobject<USSIMPlayerDamageReactionComponent>(TEXT("PlayerDamageReactionComponent"));
@@ -229,7 +227,7 @@ void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 void ASSIMPlayer::HandleMoveCompleted()
 {
 	MoveInputValue = 0.f;
-	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerDashComponent->bDashing)
+	if (SSIMPlayerDamageReactionComponent->bStaggered || IsPlayerDashing())
 	{
 		return;
 	}
@@ -316,10 +314,6 @@ void ASSIMPlayer::HandleHeal()
 void ASSIMPlayer::HandleDash()
 {
 	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Innate_Dash.GetTag().GetSingleTagContainer());
-	/*if (CanDash())
-	{
-		SSIMPlayerDashComponent->StartDash();
-	}*/
 }
 
 void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
@@ -329,52 +323,16 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 
 bool ASSIMPlayer::CanMove()
 {
-	
 	if (SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Modifier_MovementBlock) 
 		|| 
 		SSIMPlayerDamageReactionComponent->bStaggered 
 		|| 
 		SSIMPlayerCombatComponent->bAttackKnockbackActive
 		||
-		SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Healing))
+		IsPlayerHealing())
 	{
 		return false;
 	}
-	return true;
-}
-
-bool ASSIMPlayer::CanDash() const
-{
-	if (SSIMPlayerDashComponent->bDashing 
-		|| 
-		!SSIMPlayerDashComponent->bCanDash 
-		|| 
-		SSIMPlayerDamageReactionComponent->bStaggered)
-	{
-		if (SSIMPlayerDashComponent->bDashing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
-			}
-		}
-		if (!SSIMPlayerDashComponent->bCanDash)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is on Cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
-			}
-		}
-		if (SSIMPlayerDamageReactionComponent->bStaggered)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while Staggered"), TEXT(__FUNCTION__));
-			}
-		}
-		return false;
-	}
-	
 	return true;
 }
 
@@ -423,13 +381,6 @@ void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
 {
 	SSIMPlayerCombatComponent->EndAttackTrace();
 }
-
-
-void ASSIMPlayer::EndDashInterface_Implementation() const
-{
-	SSIMPlayerDashComponent->EndDash();
-}
-
 
 void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {

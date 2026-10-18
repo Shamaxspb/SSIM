@@ -77,13 +77,19 @@ void USSIMDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	
 	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(TAG_State_Modifier_MovementBlock.GetTag());
 	
-	UAbilityTask_WaitGameplayEvent* WaitTakeDamageEvent =  
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_DamageTaken);
-	WaitTakeDamageEvent->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::EndDashByTakingDamage);
+	WaitTakeDamageTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_DamageTaken);
+	if (WaitTakeDamageTask)
+	{
+		WaitTakeDamageTask->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::EndDashByTakingDamage);
+		WaitTakeDamageTask->ReadyForActivation();
+	}
 	
-	UAbilityTask_WaitGameplayEvent* WaitPogoStartedEvent =  
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_Pogo_Started);
-	WaitPogoStartedEvent->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::EndDashByPogo);
+	WaitPogoStartedTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_Pogo_Started);
+	if (WaitPogoStartedTask)
+	{
+		WaitPogoStartedTask->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::EndDashByPogo);
+		WaitPogoStartedTask->ReadyForActivation();
+	}
 	
 	if (bShowDebug)
 	{
@@ -98,13 +104,15 @@ void USSIMDashAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 								  bool bReplicateEndAbility, 
 								  bool bWasCancelled)
 {
+	// I am binding here to MontageNotify "SwitchMovementMode"
+	// Looks like create proper AnimNotify is easier and more flexible than this approach in C++
 	if (UAnimInstance* AnimInstance = BoundAnimInstance.Get())
 	{
 		AnimInstance->OnPlayMontageNotifyBegin.RemoveDynamic(this, &ThisClass::HandleSwitchMovementModeMontageNotify);
 	}
-
 	BoundAnimInstance.Reset();
 	ActiveMontageInstanceID = INDEX_NONE;
+	//
 	
 	if (bStartedInAir)
 	{

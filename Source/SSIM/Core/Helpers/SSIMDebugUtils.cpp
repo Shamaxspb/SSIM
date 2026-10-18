@@ -15,15 +15,12 @@ void USSIMDebugUtils::PrintPlayerStates(const UObject* WorldContextObject)
 	{
 		return;
 	}
-	USSIMPlayerStatsComponent* PlayerStatsComponent = SSIMPlayer->GetPlayerStatsComponent();
 	
-	bool bAttacking    			  = SSIMPlayer->GetIsPlayerAttacking();
-	bool bPogoActive   			  = SSIMPlayer->GetIsPlayerPogoActive();
-	bool bAttackKnockbackActive   = SSIMPlayer->GetIsPlayerAttackKnockbackActive();
-	bool bDashing	   			  = SSIMPlayer->GetIsPlayerDashing();
-	bool bCanDash	   			  = SSIMPlayer->GetCanPlayerDash();
-	bool bStaggered	   			  = SSIMPlayer->GetIsPlayerStaggered();
-	bool bInvulnerable 			  = SSIMPlayer->GetIsPlayerInvulnerable();
+	bool bAttacking    			  = SSIMPlayer->IsPlayerAttacking();
+	bool bPogoActive   			  = SSIMPlayer->IsPlayerPogoActive();
+	bool bAttackKnockbackActive   = SSIMPlayer->IsPlayerAttackKnockbackActive();
+	bool bStaggered	   			  = SSIMPlayer->IsPlayerStaggered();
+	bool bInvulnerable 			  = SSIMPlayer->IsPlayerInvulnerable();
 	
 	
 	GEngine->AddOnScreenDebugMessage(
@@ -47,22 +44,6 @@ void USSIMDebugUtils::PrintPlayerStates(const UObject* WorldContextObject)
 		0.f, 
 		FColor::Orange, 
 		FString::Printf(TEXT("bPogoActive: %s"), bPogoActive ? TEXT("true") : TEXT("false")), 
-		true,
-		FVector2D(1.5f, 1.5f));
-	
-	GEngine->AddOnScreenDebugMessage(
-		-1, 
-		0.f, 
-		FColor::Blue, 
-		FString::Printf(TEXT("bDashing: %s"), bDashing ? TEXT("true") : TEXT("false")), 
-		true,
-		FVector2D(1.5f, 1.5f));
-	
-	GEngine->AddOnScreenDebugMessage(
-		-1, 
-		0.f, 
-		FColor::Cyan, 
-		FString::Printf(TEXT("bCanDash: %s"), bCanDash ? TEXT("true") : TEXT("false")), 
 		true,
 		FVector2D(1.5f, 1.5f));
 	
