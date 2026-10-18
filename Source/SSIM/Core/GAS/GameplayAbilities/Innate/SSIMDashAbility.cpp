@@ -67,7 +67,6 @@ void USSIMDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	Player->GetCharacterMovement()->StopMovementImmediately();
 	Player->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	Player->StopJumping();
-	//Player->DisableInput(Cast<APlayerController>(Player->GetController()));
 	
 	// LaunchCharacter or Root Motion?
 	//Player->LaunchCharacter(GetDashLaunchVelocity() ,true, true);
@@ -77,14 +76,25 @@ void USSIMDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	
 	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(TAG_State_Modifier_MovementBlock.GetTag());
 	
-	WaitTakeDamageTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_DamageTaken);
+	// Bind to end Dash on Damage Taken
+	WaitTakeDamageTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, 
+		TAG_Event_DamageTaken,
+		nullptr,
+		false,
+		true);
 	if (WaitTakeDamageTask)
 	{
 		WaitTakeDamageTask->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::EndDashByTakingDamage);
 		WaitTakeDamageTask->ReadyForActivation();
 	}
 	
-	WaitPogoStartedTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TAG_Event_Pogo_Started);
+	// Bind to end Dash on Pogo
+	WaitPogoStartedTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+		this, 
+		TAG_Event_Pogo_Started,
+		nullptr,
+		false,
+		true);
 	if (WaitPogoStartedTask)
 	{
 		WaitPogoStartedTask->EventReceived.AddUniqueDynamic(this, &USSIMDashAbility::EndDashByPogo);
@@ -129,8 +139,11 @@ void USSIMDashAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	SetCollisionParametersToDefault();
 	GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(TAG_State_Modifier_MovementBlock.GetTag());
 	
-	const FGameplayEventData Payload;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player,TAG_Event_Dash_Ended,Payload);
+	if (!bWasCancelled)
+	{
+		const FGameplayEventData Payload;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, TAG_Event_Dash_Ended, Payload);
+	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -193,6 +206,12 @@ void USSIMDashAbility::HandleSwitchMovementModeMontageNotify(FName NotifyName, c
 
 void USSIMDashAbility::EndDashByTakingDamage(FGameplayEventData Payload)
 {
+	FGameplayEventData DashInterruptedPayload;
+	DashInterruptedPayload.EventTag = TAG_Event_Heal_Interrupted.GetTag();
+	DashInterruptedPayload.Instigator = Payload.Instigator;
+	DashInterruptedPayload.Target = GetOwningActorFromActorInfo();
+	GetAbilitySystemComponentFromActorInfo()->HandleGameplayEvent(TAG_Event_Heal_Interrupted, &DashInterruptedPayload);
+	
 	if (bShowDebug)
 	{
 		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Dash Ability Cancelled by taking damage"), TEXT(__FUNCTION__));

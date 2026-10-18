@@ -16,6 +16,10 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_MaxEnergy, "Attribute.MaxEnergy");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HitRegistered,		"Event.HitRegistered");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_DamageTaken,		"Event.DamageTaken");
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Attack_Started,		"Event.Attack.Started");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Attack_Ended,			"Event.Attack.Ended");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Attack_Interrupted,	"Event.Attack.Interrupted");
+
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Started,		"Event.Heal.Started");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Ended,		"Event.Heal.Ended");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Received,		"Event.Heal.Received");
@@ -23,11 +27,13 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Interrupted,	"Event.Heal.Interrupted");
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Dash_Started,		"Event.Dash.Started");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Dash_Ended,		"Event.Dash.Ended");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Dash_Interrupted,	"Event.Dash.Interrupted");
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Pogo_Started,		"Event.Pogo.Started");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Pogo_Ended,		"Event.Pogo.Ended");
 
 /* State */
+UE_DEFINE_GAMEPLAY_TAG(TAG_State_Attacking,	   "State.Attacking");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Healing,	   "State.Healing");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Staggered,	   "State.Staggered");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Dashing,	   "State.Dashing");

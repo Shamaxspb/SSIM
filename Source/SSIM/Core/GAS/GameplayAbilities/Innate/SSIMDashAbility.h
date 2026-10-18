@@ -33,8 +33,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")
 	float DashBrakingDecelerationFalling = 1000.f;
 	
-	
-
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashHitRegistrationCollisionHalfHeight = 80.f;
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")

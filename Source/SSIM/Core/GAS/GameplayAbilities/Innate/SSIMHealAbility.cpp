@@ -19,7 +19,7 @@ void USSIMHealAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	
 	if (!IsValid(HealingMontage))
 	{
-		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Hanging is not valid"), TEXT(__FUNCTION__));
+		UE_LOG(LogSSIMValidations, Error, TEXT("%s | Healing montage is not valid"), TEXT(__FUNCTION__));
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false);
 	}
 	
@@ -60,8 +60,11 @@ void USSIMHealAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 	
 	Player->EnableInput(Cast<APlayerController>(Player->GetController()));
 	
-	const FGameplayEventData Payload;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player,TAG_Event_Heal_Ended,Payload);
+	if (!bWasCancelled)
+	{
+		const FGameplayEventData Payload;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, TAG_Event_Heal_Ended, Payload);
+	}
 }
 
 void USSIMHealAbility::EndAirHanging()
@@ -76,13 +79,15 @@ void USSIMHealAbility::EndAirHanging()
 void USSIMHealAbility::HandleTakeDamage(FGameplayEventData Payload)
 {
 	FGameplayEventData HealInterruptedPayload;
-	Payload.EventTag = TAG_Event_Heal_Interrupted.GetTag();
+	HealInterruptedPayload.EventTag = TAG_Event_Heal_Interrupted.GetTag();
 	HealInterruptedPayload.Instigator = Payload.Instigator;
 	HealInterruptedPayload.Target = GetOwningActorFromActorInfo();
 	GetAbilitySystemComponentFromActorInfo()->HandleGameplayEvent(TAG_Event_Heal_Interrupted, &HealInterruptedPayload);
 	
-	UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | %s : Healing interrupted by taking damage"),
-									 TEXT(__FUNCTION__),
-									 *HealInterruptedPayload.Target->GetName());
+	if (bShowDebug)
+	{
+		UE_LOG(LogSSIMStatsCalculation, Log, TEXT("%s | Healing interrupted by taking damage"), TEXT(__FUNCTION__));	
+	}
+	
 	K2_CancelAbility();
 }
