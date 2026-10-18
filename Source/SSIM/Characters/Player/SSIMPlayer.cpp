@@ -315,10 +315,11 @@ void ASSIMPlayer::HandleHeal()
 
 void ASSIMPlayer::HandleDash()
 {
-	if (CanDash())
+	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Innate_Dash.GetTag().GetSingleTagContainer());
+	/*if (CanDash())
 	{
 		SSIMPlayerDashComponent->StartDash();
-	}
+	}*/
 }
 
 void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
@@ -329,7 +330,7 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 bool ASSIMPlayer::CanMove()
 {
 	
-	if (SSIMPlayerDashComponent->bDashing 
+	if (SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Modifier_MovementBlock) 
 		|| 
 		SSIMPlayerDamageReactionComponent->bStaggered 
 		|| 

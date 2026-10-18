@@ -3,6 +3,7 @@
 
 #include "SSIMPlayerCombatComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "SSIM/SSIM.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -10,6 +11,7 @@
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
 #include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
+#include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
 
 USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
@@ -404,6 +406,9 @@ void USSIMPlayerCombatComponent::PogoStart()
 		PogoStateDuration,
 		false
 		);
+	
+	const FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(SSIMPlayer,TAG_Event_Pogo_Started,Payload);
 	
 	FVector CachedPlayerForwardVector = SSIMPlayer->GetActorForwardVector();
 	float ModifiedPogoAngle = PogoAngle;

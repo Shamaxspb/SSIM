@@ -7,6 +7,8 @@
 #include "SSIMDashAbility.generated.h"
 
 
+class UAbilityTask_WaitDelay;
+
 UCLASS(Abstract, Blueprintable)
 class SSIM_API USSIMDashAbility : public USSIMGameplayAbility
 {
@@ -16,43 +18,47 @@ class SSIM_API USSIMDashAbility : public USSIMGameplayAbility
 #pragma region Settings
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animation")
-	TObjectPtr<UAnimMontage> PlayerDashMontage;
+	TObjectPtr<UAnimMontage> DashMontage;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Config")
 	float DashDuration = 0.25f;
-	
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")
+	float DashCooldown = 2.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Config")
 	float DashVelocity = 2000.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")
-	float DashGravityScale = 0.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")
 	float DashBrakingDecelerationWalking = 1000.f;
-	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")
 	float DashBrakingDecelerationFalling = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Config")
-	float DashCooldown = 2.f;
+	
 
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashHitRegistrationCollisionHalfHeight = 80.f;
-	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashHitRegistrationCollisionRadius = 24.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashContactDamageCollisionHalfHeight = 105.f;
-	
 	UPROPERTY(EditDefaultsOnly, Category = "SSIM|DamageCollision")
 	float DashContactDamageCollisionRadius = 35.f;
 #pragma endregion Settings
 	
 #pragma region Metadata
 private:
+	UPROPERTY()
+	UAbilityTask_WaitDelay* WaitDashEnd;
+	
+	bool bStartedInAir = false;
+	
 	FTimerHandle DashInProcessTimerHandle;
 #pragma endregion Metadata
+	
+private:
+	FName SwitchMovementModeNotifyName = TEXT("SwitchMovementMode");
+	TWeakObjectPtr<UAnimInstance> BoundAnimInstance;
+	int32 ActiveMontageInstanceID = INDEX_NONE;
 	
 // Overriden Functions
 protected:
@@ -70,11 +76,20 @@ protected:
 
 // Custom Functions
 private:
-	UFUNCTION()
-	void HandleTakeDamage(FGameplayEventData Payload);
+	void SetCollisionParametersToDash() const;
+	void SetCollisionParametersToDefault() const;
 	
-	void StartDash();
-
+	UFUNCTION()
+	void HandleSwitchMovementModeMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& Payload);
+	
+	UFUNCTION()
+	void EndDashByTakingDamage(FGameplayEventData Payload);
+	UFUNCTION()
+	void EndDashByPogo(FGameplayEventData Payload);
+	UFUNCTION()
+	void EndDashByLanding(const FHitResult& Hit);
+	UFUNCTION()
+	void EndDashByDuration();
 };
 
 

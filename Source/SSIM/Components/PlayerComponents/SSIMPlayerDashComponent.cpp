@@ -19,7 +19,6 @@ void USSIMPlayerDashComponent::BeginPlay()
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerDashComponent::OnDamageReceivedHandler);
 	SSIMPlayer->GetPlayerCombatComponent()->OnPogoStartedDelegate.AddUniqueDynamic(this, &USSIMPlayerDashComponent::ResetDashOnPogo);
-	
 }
 
 void USSIMPlayerDashComponent::SetReferences()

@@ -20,6 +20,12 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Started);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Ended);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Received);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Interrupted);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Dash_Started);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Dash_Ended);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Started);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Ended);
 #pragma endregion Events
 
 #pragma region States
@@ -27,6 +33,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Healing);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Staggered);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Dashing);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Invulnerable);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Modifier_MovementBlock);
 #pragma endregion States
 
 #pragma region Abilities

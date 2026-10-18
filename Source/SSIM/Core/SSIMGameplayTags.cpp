@@ -21,17 +21,25 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Ended,		"Event.Heal.Ended");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Received,		"Event.Heal.Received");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Heal_Interrupted,	"Event.Heal.Interrupted");
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Dash_Started,		"Event.Dash.Started");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Dash_Ended,		"Event.Dash.Ended");
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Pogo_Started,		"Event.Pogo.Started");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Pogo_Ended,		"Event.Pogo.Ended");
+
 /* State */
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Healing,	   "State.Healing");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Staggered,	   "State.Staggered");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Dashing,	   "State.Dashing");
 UE_DEFINE_GAMEPLAY_TAG(TAG_State_Invulnerable, "State.Invulnerable");
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_State_Modifier_MovementBlock, "State.Modifier.MovementBlock");
+
 /* Abilities */
 // Basic
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Attack, "Ability.Combat.Attack");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Heal,   "Ability.Combat.Heal");
 // Innate
-UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Combat_Heal,   "Ability.Innate.Heal");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Innate_Dash,   "Ability.Innate.Dash");
 
 /* Gameplay Cues */
