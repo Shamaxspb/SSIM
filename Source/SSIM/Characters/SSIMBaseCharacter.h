@@ -21,7 +21,6 @@ class SSIM_API ASSIMBaseCharacter : public ACharacter, public IAbilitySystemInte
 
 // Variables
 #pragma region Components
-
 protected:
 	// GAS
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|GAS", DisplayName = "AbilitySystemComponent")
@@ -39,9 +38,15 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Components|Damage", DisplayName = "ContactDamageCollision")
 	TObjectPtr<UCapsuleComponent> ContactDamageCollision;
-
 #pragma endregion Components
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> BasicAbilities;
+	
+	// Debug
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SSIM|Debug")
+	bool bShowDebug;
 
 // Overriden Functions
 public:
@@ -68,6 +73,7 @@ public:
 	
 protected:
 	virtual void InitializeAttributes();
+	virtual void InitializeAbilities();
 	
 private:
 	void RestrictXAxisMovement() const;

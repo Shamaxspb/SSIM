@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 
 #include "SSIMProgressionSubsystem.generated.h"
@@ -27,12 +28,17 @@ class SSIM_API USSIMProgressionSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 // Variables
+#pragma region SerializedData
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
 	int32 CollectedHealthShards;
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
 	int32 CollectedEnergyShards;
+	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
+	FGameplayTagContainer UnlockedInnateAbilities;
+#pragma endregion SerializedData
 	
+public:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
 	int32 RemainingHealthShards;
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Progression")
@@ -62,6 +68,9 @@ public:
 	void AddHealthShard();
 	void AddEnergyShard();
 	
+	void UnlockInnateAbility(FGameplayTag InUnlockedAbilityTag);
+	bool IsInnateAbilityUnlocked(FGameplayTag InAbilityToCheckTag) const;
+	
 private:
 	void LoadProgressionSubsystemSettings();
 	void CreateDefaultProgressionSave();
@@ -69,4 +78,7 @@ private:
 	
 	FPlayerInitAttributes CalculatePlayerInitMaxAttributes();
 	
+	// Debug
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Debug")
+	void SaveProgressionDataManually();
 };

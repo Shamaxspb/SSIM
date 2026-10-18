@@ -11,9 +11,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction//SSIMPlayerDamageReactionComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
+#include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Subsystems/SSIMTransitionSubsystem.h"
+#include "SSIM/Core/Subsystems/Progression/SSIMInnateAbilitiesCatalog.h"
 #include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystem.h"
+#include "SSIM/Core/Subsystems/Progression/SSIMProgressionSubsystemSettings.h"
+
 
 // Overriden Functions
 ASSIMPlayer::ASSIMPlayer()
@@ -23,7 +26,6 @@ ASSIMPlayer::ASSIMPlayer()
 	GetCapsuleComponent()->SetCollisionProfileName("Player", true);
 	GetMesh()->SetCollisionProfileName("Player", true);
 	
-	SSIMPlayerDashComponent	  		  = CreateDefaultSubobject<USSIMPlayerDashComponent>(TEXT("PlayerDashComponent"));
 	SSIMPlayerCombatComponent 		  = CreateDefaultSubobject<USSIMPlayerCombatComponent>(TEXT("PlayerCombatComponent"));
 	SSIMPlayerStatsComponent  		  = CreateDefaultSubobject<USSIMPlayerStatsComponent>(TEXT("PlayerStatsComponent"));
 	SSIMPlayerDamageReactionComponent = CreateDefaultSubobject<USSIMPlayerDamageReactionComponent>(TEXT("PlayerDamageReactionComponent"));
@@ -43,6 +45,8 @@ void ASSIMPlayer::BeginPlay()
 	
 	PlayerFacingDirection = FVector::DotProduct(GetActorForwardVector(), FVector::RightVector) > 0.f ?
 												EFacingDirection::EPD_Right : EFacingDirection::EPD_Left;
+	
+	
 	
 	SSIMPlayerStatsComponent->OnDamageReceivedDelegate.AddDynamic(this, &ASSIMPlayer::OnDamageReceivedHandler);
 }
@@ -111,6 +115,85 @@ void ASSIMPlayer::InitializeAttributes()
 	GetGameInstance()->GetSubsystem<USSIMTransitionSubsystem>()->ApplyCurrentAttributesToPlayer();
 }
 
+void ASSIMPlayer::InitializeAbilities()
+{
+	Super::InitializeAbilities();
+
+	const USSIMProgressionSubsystemSettings* Settings = GetDefault<USSIMProgressionSubsystemSettings>();
+
+	if (Settings->InnateAbilityCatalog.IsNull())
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Innate ability catalog is not configured"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	USSIMInnateAbilitiesCatalog* InnateAbilitiesCatalog = Settings->InnateAbilityCatalog.LoadSynchronous();
+	if (!IsValid(InnateAbilitiesCatalog))
+	{
+		UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Innate Ability Catalog failed to load"), TEXT(__FUNCTION__));
+		return;
+	}
+	
+	const FGameplayTagContainer& UnlockedInnateAbilities = 
+		GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->UnlockedInnateAbilities;
+	
+	for (const FSSIMInnateAbilityDefinition& Entry : InnateAbilitiesCatalog->InnateAbilities)
+	{
+		if (!Entry.ProgressionAbilityTag.IsValid())
+		{
+			UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Invalid ability tag in catalog"), TEXT(__FUNCTION__));
+			continue;
+		}
+		
+		if (!UnlockedInnateAbilities.HasTagExact(Entry.ProgressionAbilityTag))
+		{
+			if (bShowDebug)
+			{
+				UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | %s is not unlocked yet"), 
+					TEXT(__FUNCTION__),
+					*Entry.ProgressionAbilityTag.ToString());
+			}
+			continue;
+		}
+		
+		if (Entry.AbilityClass.IsNull())
+		{
+			UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Unlocked ability has no class assigned"), TEXT(__FUNCTION__));
+			continue;
+		}	
+		
+		const TSubclassOf<UGameplayAbility> AbilityClass = Entry.AbilityClass.LoadSynchronous();
+		if (!AbilityClass)
+		{
+			UE_LOG(LogSSIMPlayerInitialization, Error, TEXT("%s | Failed to load unlocked ability class"), TEXT(__FUNCTION__));
+			continue;
+		}
+		
+		if (SSIMAbilitySystemComponent->FindAbilitySpecFromClass(AbilityClass))
+		{
+			if (bShowDebug)
+			{
+				UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | This Innate Ability is already given"), TEXT(__FUNCTION__));
+			}
+			continue;
+		}
+		
+		const FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
+		const FGameplayAbilitySpecHandle Handle = SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
+		if (bShowDebug)
+		{
+			if (!Handle.IsValid())
+			{
+				UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | Failed to Give Ability: %s"), 
+					TEXT(__FUNCTION__), 
+					*GetNameSafe(AbilityClass.Get()));
+			}
+		}
+		
+		UE_LOG(LogSSIMPlayerInitialization, Warning, TEXT("%s | Granted Innate Ability: %s"), TEXT(__FUNCTION__), *GetNameSafe(AbilityClass)); 
+	}
+}
+
 void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 {
 	if (CanMove())
@@ -144,7 +227,7 @@ void ASSIMPlayer::HandleMove(const FInputActionValue& Value)
 void ASSIMPlayer::HandleMoveCompleted()
 {
 	MoveInputValue = 0.f;
-	if (SSIMPlayerDamageReactionComponent->bStaggered || SSIMPlayerDashComponent->bDashing)
+	if (SSIMPlayerDamageReactionComponent->bStaggered || IsPlayerDashing())
 	{
 		return;
 	}
@@ -225,18 +308,12 @@ void ASSIMPlayer::HandleEndAttackTrace() const
 
 void ASSIMPlayer::HandleHeal()
 {
-	if (CanHeal())
-	{
-		SSIMPlayerStatsComponent->StartHealing();
-	}
+	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Combat_Heal.GetTag().GetSingleTagContainer());
 }
 
 void ASSIMPlayer::HandleDash()
 {
-	if (CanDash())
-	{
-		SSIMPlayerDashComponent->StartDash();
-	}
+	SSIMAbilitySystemComponent->TryActivateAbilitiesByTag(TAG_Ability_Innate_Dash.GetTag().GetSingleTagContainer());
 }
 
 void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
@@ -244,70 +321,24 @@ void ASSIMPlayer::OnDamageReceivedHandler(const FDamageData& InDamageData)
 	MoveInputValue = 0.f;
 }
 
-bool ASSIMPlayer::CanMove() const
+bool ASSIMPlayer::CanMove()
 {
-	if (SSIMPlayerDashComponent->bDashing 
+	if (SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Modifier_MovementBlock) 
 		|| 
 		SSIMPlayerDamageReactionComponent->bStaggered 
 		|| 
 		SSIMPlayerCombatComponent->bAttackKnockbackActive
 		||
-		SSIMPlayerStatsComponent->bHealing)
+		IsPlayerHealing())
 	{
 		return false;
 	}
-	return true;
-}
-
-bool ASSIMPlayer::CanDash() const
-{
-	if (SSIMPlayerDashComponent->bDashing 
-		|| 
-		!SSIMPlayerDashComponent->bCanDash 
-		|| 
-		SSIMPlayerStatsComponent->bHealing
-		||
-		SSIMPlayerDamageReactionComponent->bStaggered)
-	{
-		if (SSIMPlayerDashComponent->bDashing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is still in process"), TEXT(__FUNCTION__));
-			}
-		}
-		if (!SSIMPlayerDashComponent->bCanDash)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Dash is on Cooldown for %f"), TEXT(__FUNCTION__), GetWorld()->GetTimerManager().GetTimerRemaining(SSIMPlayerDashComponent->DashCooldownTimerHandle));
-			}
-		}
-		if (SSIMPlayerStatsComponent->bHealing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while Healing"), TEXT(__FUNCTION__));
-			}
-		}
-		if (SSIMPlayerDamageReactionComponent->bStaggered)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Dash while Staggered"), TEXT(__FUNCTION__));
-			}
-		}
-		return false;
-	}
-	
 	return true;
 }
 
 bool ASSIMPlayer::CanAttack() const
 {
 	if (SSIMPlayerCombatComponent->bAttacking 
-		|| 
-		SSIMPlayerStatsComponent->bHealing
 		||
 		SSIMPlayerDamageReactionComponent->bStaggered)
 	{
@@ -318,32 +349,12 @@ bool ASSIMPlayer::CanAttack() const
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack, Attack is in process"), TEXT(__FUNCTION__));
 			}
 		}
-		if (SSIMPlayerStatsComponent->bHealing)
-		{
-			if (bShowPlayerInputLogs)
-			{
-				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while Healing"), TEXT(__FUNCTION__));
-			}
-		}
 		if (SSIMPlayerDamageReactionComponent->bStaggered)
 		{
 			if (bShowPlayerInputLogs)
 			{
 				UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Attack while Staggered"), TEXT(__FUNCTION__));
 			}
-		}
-		return false;
-	}
-	return true;
-}
-
-bool ASSIMPlayer::CanHeal() const
-{
-	if (SSIMPlayerDamageReactionComponent->bStaggered)
-	{
-		if (SSIMPlayerDamageReactionComponent->bStaggered)
-		{
-			UE_LOG(LogSSIMInputValidation, Warning, TEXT("%s | Can't Heal while Staggered"), TEXT(__FUNCTION__));
 		}
 		return false;
 	}
@@ -371,15 +382,15 @@ void ASSIMPlayer::EndAttackTraceInterface_Implementation() const
 	SSIMPlayerCombatComponent->EndAttackTrace();
 }
 
-
-void ASSIMPlayer::EndDashInterface_Implementation() const
-{
-	SSIMPlayerDashComponent->EndDash();
-}
-
-
 void ASSIMPlayer::ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const
 {
 	SSIMPlayerStatsComponent->ReduceHealth(InDamageData);
 }
-#pragma endregion Interfaces                                                                                                       
+#pragma endregion Interfaces
+
+#pragma region Debug
+void ASSIMPlayer::UnlockInnateAbility_DEBUG(FGameplayTag InAbilityTag)
+{
+	GetGameInstance()->GetSubsystem<USSIMProgressionSubsystem>()->UnlockInnateAbility(InAbilityTag);
+}
+#pragma endregion Debug

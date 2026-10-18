@@ -6,8 +6,8 @@
 #include "SSIM/Characters/SSIMBaseCharacter.h"
 #include "SSIM/Components/Combat/SSIMPlayerCombatComponent.h"
 #include "SSIM/Components/DamageReaction/SSIMPlayerDamageReactionComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
+#include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Interfaces/PlayerDataInterface.h"
 #include "SSIM/Core/Interfaces/SSIMCombatInterface.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
@@ -44,8 +44,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "StatsComponent")
 	TObjectPtr<USSIMPlayerStatsComponent> SSIMPlayerStatsComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "DashComponent")
-	TObjectPtr<USSIMPlayerDashComponent> SSIMPlayerDashComponent;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "DashComponent")
+	TObjectPtr<USSIMPlayerDashComponent> SSIMPlayerDashComponent;*/
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SSIM|Player|Components", DisplayName = "DamageReactionComponent")
 	TObjectPtr<USSIMPlayerDamageReactionComponent> SSIMPlayerDamageReactionComponent;
@@ -119,15 +119,21 @@ public:
 #pragma endregion  Player Defaults
 	
 #pragma region Metadata
+public:
+	float MoveInputValue;
 	
 private:
-	float MoveInputValue;
 	EFacingDirection PlayerFacingDirection;
 
 #pragma endregion Metadata
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> InnateAbilities;
+	
+	
 	// Debug
-	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|DEBUG")
+	UPROPERTY(EditDefaultsOnly, Category = "SSIM|Player|Debug")
 	bool bShowPlayerInputLogs;
 	
 private:
@@ -145,112 +151,100 @@ public:ASSIMPlayer();
 	
 // Custom Functions
 #pragma region Inline Getters
-	
 public:
 	// Component getters
 	UFUNCTION()
-	FORCEINLINE USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
+	USSIMPlayerCombatComponent* GetPlayerCombatComponent() const
 	{
 		return SSIMPlayerCombatComponent;
 	}
 	UFUNCTION()
-	FORCEINLINE USSIMPlayerDashComponent* GetPlayerDashComponent() const
-	{
-		return SSIMPlayerDashComponent;
-	}
-	UFUNCTION()
-	FORCEINLINE USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
+	USSIMPlayerStatsComponent* GetPlayerStatsComponent() const
 	{
 		return SSIMPlayerStatsComponent;
 	}
 	UFUNCTION()
-	FORCEINLINE USSIMPlayerDamageReactionComponent* GetPlayerDamageReactionComponent() const
+	USSIMPlayerDamageReactionComponent* GetPlayerDamageReactionComponent() const
 	{
 		return SSIMPlayerDamageReactionComponent;
 	}
 	
 	UFUNCTION()
-	FORCEINLINE UBoxComponent* GetFrontalAttackCollision() const
+	UBoxComponent* GetFrontalAttackCollision() const
 	{
 		return FrontalAttackCollision;
 	}
 	UFUNCTION()
-	FORCEINLINE UBoxComponent* GetUpperAttackCollision() const
+	UBoxComponent* GetUpperAttackCollision() const
 	{
 		return UpperAttackCollision;
 	}
 	UFUNCTION()
-	FORCEINLINE UBoxComponent* GetBottomAttackCollision() const
+	UBoxComponent* GetBottomAttackCollision() const
 	{
 		return BottomAttackCollision;
 	}
 	
+	// Metadata getters
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|Input")
-	FORCEINLINE float GetPlayerMoveInputValue() const
+	float GetPlayerMoveInputValue() const
 	{
 		return MoveInputValue;
 	}
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player")
-	FORCEINLINE EFacingDirection GetPlayerFacingDirection() const
+	EFacingDirection GetPlayerFacingDirection() const
 	{
 		return PlayerFacingDirection;
 	}
-	FORCEINLINE float GetPlayerFacingDirectionValue() const
+	float GetPlayerFacingDirectionValue() const
 	{
 		return PlayerFacingDirection == EFacingDirection::EPD_Right ? 1.f : -1.f;
 	}
 	
 	// State getters
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerAttacking() const
+	bool IsPlayerAttacking() const
 	{
 		return SSIMPlayerCombatComponent->bAttacking;
 	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerAttackKnockbackActive() const
+	UFUNCTION(BlueprintPure, Category = "SSIM|Player|State")
+	bool IsPlayerAttackKnockbackActive() const
 	{
 		return SSIMPlayerCombatComponent->bAttackKnockbackActive;
 	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerPogoActive() const
+	UFUNCTION(BlueprintPure, Category = "SSIM|Player|State")
+	bool IsPlayerPogoActive() const
 	{
 		return SSIMPlayerCombatComponent->bPogoActive;
 	}
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerDashing() const
+	bool IsPlayerHealing() const
 	{
-		return SSIMPlayerDashComponent->bDashing;
+		return SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Healing.GetTag());
 	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetCanPlayerDash() const
+	UFUNCTION(BlueprintPure, Category = "SSIM|Player|State")
+	bool IsPlayerDashing() const
 	{
-		return SSIMPlayerDashComponent->bCanDash;
+		return SSIMAbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Dashing.GetTag());
 	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerStaggered() const
+	UFUNCTION(BlueprintPure, Category = "SSIM|Player|State")
+	bool IsPlayerStaggered() const
 	{
 		return SSIMPlayerDamageReactionComponent->bStaggered;
 	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerHealing() const
-	{
-		return SSIMPlayerStatsComponent->bHealing;
-	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerInvulnerable() const
+	UFUNCTION(BlueprintPure, Category = "SSIM|Player|State")
+	bool IsPlayerInvulnerable() const
 	{
 		return SSIMPlayerStatsComponent->bInvulnerable;
 	}
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Player|State")
-	FORCEINLINE bool GetIsPlayerDead() const
+	UFUNCTION(BlueprintPure, Category = "SSIM|Player|State")
+	bool IsPlayerDead() const
 	{
 		return SSIMPlayerStatsComponent->bDead;
 	}
-	
 #pragma endregion Inline Getters
 	
 #pragma region Inline Setters
-	
 	FORCEINLINE void SetPlayerGravityScaleToDefault() const
 	{
 		GetCharacterMovement()->GravityScale = DefaultPlayerGravityScale;
@@ -264,7 +258,6 @@ public:
 		ContactDamageCollision->SetCapsuleRadius(DefaultContactDamageCollisionRadius);
 		ContactDamageCollision->SetCapsuleHalfHeight(DefaultContactDamageCollisionHalfHeight);
 	}
-
 #pragma endregion Inline Setters
 	
 public:
@@ -272,6 +265,7 @@ public:
 	
 protected:
 	virtual void InitializeAttributes() override;
+	virtual void InitializeAbilities() override;
 
 private:
 	void SetupAttackCollision();
@@ -298,10 +292,8 @@ private:
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
 	
-	bool CanMove() const;
-	bool CanDash() const;
+	bool CanMove();
 	bool CanAttack() const;
-	bool CanHeal() const;
 	
 	
 // Interfaces
@@ -311,8 +303,10 @@ public:
 	virtual void StartAttackTraceInterface_Implementation() const override;
 	virtual void EndAttackTraceInterface_Implementation() const override;
 	
-	virtual void EndDashInterface_Implementation() const override;
-	
 	virtual void ReceiveDamageInterface_Implementation(const FDamageData& InDamageData) const override;
 
+	// Debug
+protected:
+	UFUNCTION(BlueprintCallable, Category = "SSIM|Debug")
+	void UnlockInnateAbility_DEBUG(FGameplayTag InAbilityTag);
 };

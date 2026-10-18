@@ -186,8 +186,6 @@ private:
 	
 	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
-	UFUNCTION()
-	void OnHealingStartedHandler();
 
 	UFUNCTION()
 	void OnDashStartedHandler();

@@ -8,7 +8,11 @@
 
 #include "SSIMPlayerAnimInstance.generated.h"
 
+struct FGameplayTag;
+struct FGameplayEventData;
 struct FDamageData;
+class UAbilitySystemComponent;
+class UGameplayAbility;
 class ASSIMPlayer;
 
 UENUM(BlueprintType)
@@ -29,14 +33,21 @@ class SSIM_API USSIMPlayerAnimInstance : public USSIMAnimInstance
 // Variables
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
-	TObjectPtr<ASSIMPlayer> SSIMPlayer;
+	TObjectPtr<ASSIMPlayer> Player;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|References")
 	TObjectPtr<UAnimMontage> CurrentAttackMontage;
 		
+	// vibecoding so far
+	TWeakObjectPtr<UAbilitySystemComponent> BoundASC;
+	
+	FDelegateHandle AbilityActivatedHandle;
+	FDelegateHandle DashAbilityActivatedHandle;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|GAS")
+	TArray<TSubclassOf<UGameplayAbility>> BlendoutTriggerAbilities;
 
 #pragma region Pogo Modify Bones
-	
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "SSIM|Pogo|CurrentRotation")
 	FRotator PogoCurrentAdditionalRotation_Pelvis   = FRotator::ZeroRotator;
@@ -59,7 +70,6 @@ protected:
 	FRotator PogoModifiedAdditionalRotation_Thigh_L = FRotator(0.f, 0.f, 30.f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Pogo|ModifiedRotation")
 	FRotator PogoModifiedAdditionalRotation_Thigh_R = FRotator(0.f, 0.f, 30.f);
-
 #pragma endregion Pogo Modify Bones
 
 protected:
@@ -90,11 +100,13 @@ protected:
 
 // Overriden Functions
 public:
+	virtual void NativeInitializeAnimation() override;
+	virtual void NativeUninitializeAnimation() override;
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 	
-// My Functions
+// Custom Functions
 protected:
 	virtual void SetOwnerReference() override;
 	
@@ -113,6 +125,9 @@ private:
 	
 	void SwapHitMontage(EPlayerAttackDirectionType InPlayerAttackDirectionType);
 	
+	void HandleAbilityActivated(UGameplayAbility* InActivatedAbility);
+	void UnbindAbilityActivated();
+	
 #pragma region Reset Pogo Handlers
 	
 	UFUNCTION()
@@ -122,11 +137,7 @@ private:
 	UFUNCTION()
 	void OnPogoAnimationEndedHandler(bool bInterrupted);
 	UFUNCTION()
-	void OnDashStartedHandler();
-	UFUNCTION()
 	void OnDamageReceivedHandler(const FDamageData& InDamageData);
-	UFUNCTION()
-	void OnHealingStartedHandler();
 	
 	UFUNCTION()
 	void OnPlayerLanded(const FHitResult& Hit);

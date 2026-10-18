@@ -8,7 +8,7 @@
 #include "SSIMAttackAbility.generated.h"
 
 
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class SSIM_API USSIMAttackAbility : public USSIMGameplayAbility
 {
 	GENERATED_BODY()

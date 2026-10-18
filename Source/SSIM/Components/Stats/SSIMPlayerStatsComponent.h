@@ -10,9 +10,6 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityStartedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInvulnerabilityEndedSignature);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealingStartedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealingEndedSignature);
-
 class ASSIMPlayer;
 struct FStaggerSequenceStep;
 struct FDamageData;
@@ -29,10 +26,6 @@ public:
 	FOnInvulnerabilityStartedSignature OnInvulnerabilityStartedDelegate;
 	FOnInvulnerabilityEndedSignature OnInvulnerabilityEndedDelegate;
 	
-	FOnHealingStartedSignature OnHealingStartedDelegate;
-	FOnHealingEndedSignature OnHealingEndedDelegate;
-	
-	bool bHealing = false;
 	bool bInvulnerable = false;
 	bool bDead = false;
 
@@ -72,10 +65,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
 	virtual void IncreaseHealth(const int32 InHealValue) override;
 	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|Stats")
-	void StartHealing();
-	void CompleteHealing();
-	
 	void StartInvulnerability();
 	void EndInvulnerability();
 	
@@ -83,15 +72,10 @@ protected:
 	virtual void SetReferences() override;
 	virtual void DeathProcessing(const FDamageData& InDamageData) override;
 	
-private:
-	void StartAirHanging();
-	void EndAirHanging();
 	
 // DEBUG
 public:
 	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
 	void DecrementHealth_DEBUG();
 	
-	UFUNCTION(BlueprintCallable, Category = "SSIM|DEBUG")
-	void ReceiveHeal_DEBUG();
 };

@@ -22,6 +22,9 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category = "Combat Subsystem")
 	TSubclassOf<UGameplayEffect> HealGE;
 	
+	UPROPERTY(Config, EditAnywhere, Category = "Combat Subsystem")
+	TSubclassOf<UGameplayEffect> IncreaseEnergyGE;
+	
 	
 	virtual FName GetCategoryName() const override;
 	virtual FText GetSectionText() const override;

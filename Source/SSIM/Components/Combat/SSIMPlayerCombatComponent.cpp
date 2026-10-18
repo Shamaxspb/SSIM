@@ -3,16 +3,15 @@
 
 #include "SSIMPlayerCombatComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "SSIM/SSIM.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SSIM/Characters/Player/SSIMPlayer.h"
 #include "SSIM/Components/Stats/SSIMPlayerStatsComponent.h"
-#include "SSIM/Components/PlayerComponents/SSIMPlayerDashComponent.h"
 #include "SSIM/Core/SSIMGameplayTags.h"
 #include "SSIM/Core/Interfaces/SSIMDamageableInterface.h"
-#include "SSIM/Core/Subsystems/Combat/SSIMCombatSubsystemSettings.h"
 
 USSIMPlayerCombatComponent::USSIMPlayerCombatComponent()
 {
@@ -26,8 +25,7 @@ void USSIMPlayerCombatComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	SSIMPlayer->GetPlayerStatsComponent()->OnDamageReceivedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDamageReceivedHandler);
-	SSIMPlayer->GetPlayerStatsComponent()->OnHealingStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnHealingStartedHandler);
-	SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
+	// SSIMPlayer->GetPlayerDashComponent()->OnDashStartedDelegate.AddDynamic(this, &USSIMPlayerCombatComponent::OnDashStartedHandler);
 	
 	EndPogoTimerDelegate.BindUObject(this, &USSIMPlayerCombatComponent::EndPogo);
 }
@@ -36,7 +34,7 @@ void USSIMPlayerCombatComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (SSIMPlayer->GetIsPlayerAttackKnockbackActive() && AttackKnockbackType == EAttackKnockbackType::EAKT_Ground)
+	if (SSIMPlayer->IsPlayerAttackKnockbackActive() && AttackKnockbackType == EAttackKnockbackType::EAKT_Ground)
 	{
 		SSIMPlayer->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
@@ -408,6 +406,9 @@ void USSIMPlayerCombatComponent::PogoStart()
 		false
 		);
 	
+	const FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(SSIMPlayer,TAG_Event_Pogo_Started,Payload);
+	
 	FVector CachedPlayerForwardVector = SSIMPlayer->GetActorForwardVector();
 	float ModifiedPogoAngle = PogoAngle;
 	
@@ -451,11 +452,6 @@ void USSIMPlayerCombatComponent::EndPogo()
 void USSIMPlayerCombatComponent::OnDamageReceivedHandler(const FDamageData& InDamageData)
 {
 	EndAttack(); // interrupt attack to avoid stuck in attack in case of mutual attack
-}
-
-void USSIMPlayerCombatComponent::OnHealingStartedHandler()
-{
-	EndAttack();
 }
 
 void USSIMPlayerCombatComponent::OnDashStartedHandler()

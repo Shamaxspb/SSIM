@@ -3,3 +3,13 @@
 
 #include "SSIMGameplayAbility.h"
 
+#include "SSIM/Characters/Player/SSIMPlayer.h"
+
+void USSIMGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+                                           const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+                                           const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	Player = CastChecked<ASSIMPlayer>(GetOwningActorFromActorInfo());
+}

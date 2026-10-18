@@ -40,5 +40,5 @@ public:
 	TSubclassOf<UGameplayEffect> InitializationEffect;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> UnitAbilities;
 };

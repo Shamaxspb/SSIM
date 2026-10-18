@@ -29,6 +29,7 @@ void ASSIMBaseCharacter::BeginPlay()
 	SSIMAbilitySystemComponent->InitAbilityActorInfo(this, this);
 	
 	InitializeAttributes();
+	InitializeAbilities();
 }
 
 void ASSIMBaseCharacter::OnConstruction(const FTransform& Transform)
@@ -47,13 +48,30 @@ USSIMAbilitySystemComponent* ASSIMBaseCharacter::GetAbilitySystemComponent() con
 }
 
 // Custom Functions
-/*void ASSIMBaseCharacter::InitializeAttributes()
-{
-}*/
-
 void ASSIMBaseCharacter::InitializeAttributes()
 {
 	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | InitializeAttributes is not overriden"), TEXT(__FUNCTION__));
+}
+
+void ASSIMBaseCharacter::InitializeAbilities()
+{
+	// Initialize basic abilities that have both Player and Enemies
+	// Other abilities are initialized in corresponding classes 
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : BasicAbilities)
+	{
+		if (!AbilityClass)
+		{
+			continue;
+		}
+		
+		FGameplayAbilitySpec AbilitySpec(AbilityClass, 1, INDEX_NONE, this);
+		SSIMAbilitySystemComponent->GiveAbility(AbilitySpec);
+		
+		if (bShowDebug)
+		{
+			UE_LOG(LogSSIMGameplayAbilities, Warning, TEXT("%s | %s | Granted Basic Ability: %s"), TEXT(__FUNCTION__), *GetName(), *AbilityClass->GetName());
+		}
+	}
 }
 
 void ASSIMBaseCharacter::RestrictXAxisMovement() const
@@ -93,7 +111,6 @@ void ASSIMBaseCharacter::SetupDamageRegistrationCollision()
 	
 	HitRegistrationCollision->SetCollisionProfileName("HitRegistration", true);
 	ContactDamageCollision->SetCollisionProfileName("ContactDamage", true);
-
 }
 
 

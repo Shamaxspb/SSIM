@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/SaveGame.h"
 #include "SSIMProgressionSaveData.generated.h"
 
+class UGameplayAbility;
 /**
  * 
  */
@@ -20,5 +22,8 @@ public:
 	
 	UPROPERTY()
 	int32 CollectedEnergyShards;
+	
+	UPROPERTY()
+	FGameplayTagContainer UnlockedInnateAbilities;
 	
 };
