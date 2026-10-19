@@ -10,21 +10,36 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class SSIM_API USSIMFrontalAttack : public USSIMPlayerAttackAbility
 {
 	GENERATED_BODY()
 	
 // Variables
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|FrontalAttack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
 	TArray<TObjectPtr<UAnimMontage>> UpperBodyAttackMontages;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|FrontalAttack")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
 	TArray<TObjectPtr<UAnimMontage>> FullBodyAttackMontages;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations")
 	TArray<TObjectPtr<UAnimMontage>> AirAttackMontages;
+	
+	
+// Overriden Functions
+protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
+								 const FGameplayAbilityActorInfo* ActorInfo, 
+								 const FGameplayAbilityActivationInfo ActivationInfo, 
+								 const FGameplayEventData* TriggerEventData) override;
+	
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, 
+							const FGameplayAbilityActorInfo* ActorInfo, 
+							const FGameplayAbilityActivationInfo ActivationInfo, 
+							bool bReplicateEndAbility, 
+							bool bWasCancelled) override;
+	
 	
 // Custom Functions
 	virtual UAnimMontage* GetAttackMontage() override;

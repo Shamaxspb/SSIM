@@ -16,12 +16,24 @@ void USSIMPlayerAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle 
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	if (!IsValid(GetAttackMontage()))
+	UAnimMontage* AttackMontage = GetAttackMontage();
+	if (!IsValid(AttackMontage))
 	{
-		// Logging inside GetAttackMontage()
-		return;
+		K2_CancelAbility();
 	}
-	AttackMontage = GetAttackMontage();
+	
+	Player->PlayAnimMontage(AttackMontage);
+	FOnMontageEnded OnAttackAnimationEnded;
+	OnAttackAnimationEnded.BindUObject(this, &USSIMPlayerAttackAbility::HandleEndMontage);
+	Player->GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(OnAttackAnimationEnded, AttackMontage);
+	
+	const FGameplayEventData AttackStartedPayload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player,TAG_Event_Attack_Started,AttackStartedPayload);
+	
+	if (bShowDebug)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Started"), TEXT(__FUNCTION__));
+	}
 	
 	WaitTakeDamageTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
 		this,
@@ -46,6 +58,11 @@ void USSIMPlayerAttackAbility::EndAbility(const FGameplayAbilitySpecHandle Handl
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, TAG_Event_Attack_Ended, Payload);
 	}
 	
+	if (bShowDebug)
+	{
+		UE_LOG(LogSSIMGameplayMessages, Log, TEXT("%s | Attack Ended"), TEXT(__FUNCTION__));
+	}
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -68,4 +85,9 @@ UAnimMontage* USSIMPlayerAttackAbility::GetAttackMontage()
 {
 	UE_LOG(LogSSIMInheritance, Warning, TEXT("%s | GetAttackMontage() is not overriden"), *GetAvatarActorFromActorInfo()->GetName());
 	return nullptr;
+}
+
+void USSIMPlayerAttackAbility::HandleEndMontage(UAnimMontage* PogoMontage, bool Interrupted)
+{
+	K2_EndAbility();
 }

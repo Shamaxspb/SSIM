@@ -20,6 +20,11 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Attack_Started);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Attack_Ended);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Attack_Interrupted);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Started);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Ended);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Animation_Started);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Animation_Ended);
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Started);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Ended);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Received);
@@ -28,9 +33,6 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Heal_Interrupted);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Dash_Started);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Dash_Ended);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Dash_Interrupted);
-
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Started);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Pogo_Ended);
 #pragma endregion Events
 
 #pragma region States
@@ -44,7 +46,10 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_State_Modifier_MovementBlock);
 #pragma endregion States
 
 #pragma region Abilities
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack_Frontal);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack_Upward);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Attack_Pogo);
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Combat_Heal);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Innate_Dash);
 #pragma endregion Abilities

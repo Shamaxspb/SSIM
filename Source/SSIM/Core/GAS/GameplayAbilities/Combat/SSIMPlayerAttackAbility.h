@@ -10,15 +10,15 @@
 
 class UAbilityTask_WaitGameplayEvent;
 
-UCLASS(Abstract, Blueprintable)
+UCLASS(Abstract)
 class SSIM_API USSIMPlayerAttackAbility : public USSIMGameplayAbility
 {
 	GENERATED_BODY()
 	
 // Variables
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
-	TObjectPtr<UAnimMontage> AttackMontage;
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SSIM|Animations|Attack")
+	TObjectPtr<UAnimMontage> AttackMontage;*/
 	
 private:
 	UPROPERTY(Transient)
@@ -43,5 +43,8 @@ protected:
 	void HandleTakeDamage(FGameplayEventData Payload);
 	
 	virtual UAnimMontage* GetAttackMontage();
+	
+private:
+	void HandleEndMontage(UAnimMontage* PogoMontage, bool Interrupted);
 	
 };
